@@ -165,6 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Display Modal
       ticketModal.classList.add('active');
 
+      // Trigger printing automatically after a short delay for DOM rendering
+      setTimeout(() => {
+        window.print();
+      }, 500);
+
       // Auto close modal after 6 seconds
       modalTimeout = setTimeout(() => {
         ticketModal.classList.remove('active');
