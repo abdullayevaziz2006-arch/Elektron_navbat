@@ -330,6 +330,119 @@
             <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
           </div>
 
+          <!-- Visual Style Editor Section -->
+          <div style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: white;">Dizayn Tahrirchisi (Visual Style Editor)</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">Dasturning ranglari, burchaklari va kiosk/monitor joylashuvlarini sozlash</p>
+            
+            <!-- Group 1: Background & Gradients -->
+            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">1. Orqa Fon Sozlamalari (Background)</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-bg-primary">Asosiy fon rangi (Color 1)</label>
+                  <input type="color" id="css-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                  <input type="color" id="css-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Group 2: Text Colors -->
+            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">2. Matn Ranglari (Typography)</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-text-primary">Asosiy matn rangi</label>
+                  <input type="color" id="css-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-text-secondary">Yordamchi matn rangi</label>
+                  <input type="color" id="css-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Group 3: Elements Styling -->
+            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">3. Bloklar va Burchaklar (Elements & Radius)</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-radius-sm">Tugmalar yumaloqligi</label>
+                  <select id="css-radius-sm" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="0px">0px (O'tkir burchak)</option>
+                    <option value="4px">4px (Kichik yumaloq)</option>
+                    <option value="8px">8px (O'rtacha yumaloq)</option>
+                    <option value="16px">16px (Katta yumaloq)</option>
+                    <option value="30px">30px (Yarim doira)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="css-radius-md">Bloklar (Kardlar) yumaloqligi</label>
+                  <select id="css-radius-md" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="0px">0px (O'tkir burchak)</option>
+                    <option value="8px">8px (Kichik yumaloq)</option>
+                    <option value="16px">16px (O'rtacha yumaloq)</option>
+                    <option value="24px">24px (Katta yumaloq)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Group 4: Kiosk Layout -->
+            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">4. Kiosk Joylashuvi (Kiosk Grid)</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-kiosk-columns">Yo'nalishlar ustunlari soni</label>
+                  <select id="css-kiosk-columns" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="repeat(auto-fit, minmax(320px, 1fr))">Avtomatik (auto-fit)</option>
+                    <option value="repeat(1, 1fr)">1 ustun (Single wide column)</option>
+                    <option value="repeat(2, 1fr)">2 ustun (2 Columns)</option>
+                    <option value="repeat(3, 1fr)">3 ustun (3 Columns)</option>
+                    <option value="repeat(4, 1fr)">4 ustun (4 Columns)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="css-kiosk-btn-padding">Tugmalar balandligi (Padding)</label>
+                  <select id="css-kiosk-btn-padding" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="1.5rem 1rem">Kichik (S)</option>
+                    <option value="2.5rem 1.5rem">O'rtacha (M)</option>
+                    <option value="3.5rem 2rem">Katta (L)</option>
+                    <option value="4.5rem 2.5rem">Juda katta (XL)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Group 5: TV Monitor Layout -->
+            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">5. Monitor Joylashuvi (Monitor Grid)</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-monitor-grid-template">Ustunlar kengligi (Chap, O'rta, O'ng)</label>
+                  <select id="css-monitor-grid-template" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="30% 45% 25%">30% : 45% : 25% (Standart)</option>
+                    <option value="25% 50% 25%">25% : 50% : 25% (Kengroq qabul)</option>
+                    <option value="20% 60% 20%">20% : 60% : 20% (Katta o'rta panel)</option>
+                    <option value="35% 35% 30%">35% : 35% : 30% (Kengroq chap panel)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="css-monitor-waiting-columns">Kutayotganlar ro'yxati ustunlari soni</label>
+                  <select id="css-monitor-waiting-columns" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
+                    <option value="repeat(2, 1fr)">2 ustun (Standart)</option>
+                    <option value="repeat(1, 1fr)">1 ustun (Bitta qator)</option>
+                    <option value="repeat(3, 1fr)">3 ustun (Kichikroq kataklar)</option>
+                    <option value="repeat(4, 1fr)">4 ustun (Ko'p navbatlar uchun)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group" style="margin-top: 1rem;">
             <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
             <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height: 120px; font-family: monospace; font-size: 0.85rem; line-height: 1.4; resize: vertical;"></textarea>

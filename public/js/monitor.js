@@ -74,7 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const brandTitleEl = document.querySelector('.brand-title');
         if (brandTitleEl) brandTitleEl.textContent = settings.monitor_title || 'Tizim Monitori';
 
-        // 6. Inject custom CSS
+        // 6. Inject style variables dynamically
+        Object.keys(settings).forEach(key => {
+          if (key.startsWith('css_')) {
+            const varName = `--` + key.replace('css_', '').replace(/_/g, '-');
+            document.documentElement.style.setProperty(varName, settings[key]);
+          }
+        });
+
+        // 7. Inject custom CSS
         let styleTag = document.getElementById('monitor-custom-css-tag');
         if (!styleTag) {
           styleTag = document.createElement('style');

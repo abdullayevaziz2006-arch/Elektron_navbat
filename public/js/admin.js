@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/settings');
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
-
+ 
       if (settings) {
         if (settingsOrgName) settingsOrgName.value = settings.org_name || '';
         if (settingsLogoMain) settingsLogoMain.value = settings.logo_main || '';
@@ -600,7 +600,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settingsKioskTitle) settingsKioskTitle.value = settings.kiosk_title || '';
         if (settingsMonitorTitle) settingsMonitorTitle.value = settings.monitor_title || '';
         if (settingsCustomCss) settingsCustomCss.value = settings.custom_css || '';
-
+ 
+        // Load CSS Style Editor values
+        const styleKeys = [
+          'bg_primary', 'bg_secondary', 'text_primary', 'text_secondary',
+          'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding',
+          'monitor_grid_template', 'monitor_waiting_columns'
+        ];
+        
+        styleKeys.forEach(sKey => {
+          const inputEl = document.getElementById(`css-${sKey.replace(/_/g, '-')}`);
+          if (inputEl) {
+            let defaultValue = '';
+            if (sKey === 'bg_primary') defaultValue = '#020617';
+            if (sKey === 'bg_secondary') defaultValue = '#0f172a';
+            if (sKey === 'text_primary') defaultValue = '#f8fafc';
+            if (sKey === 'text_secondary') defaultValue = '#94a3b8';
+            if (sKey === 'radius_sm') defaultValue = '8px';
+            if (sKey === 'radius_md') defaultValue = '16px';
+            if (sKey === 'kiosk_columns') defaultValue = 'repeat(auto-fit, minmax(320px, 1fr))';
+            if (sKey === 'kiosk_btn_padding') defaultValue = '2.5rem 1.5rem';
+            if (sKey === 'monitor_grid_template') defaultValue = '30% 45% 25%';
+            if (sKey === 'monitor_waiting_columns') defaultValue = 'repeat(2, 1fr)';
+ 
+            inputEl.value = settings[`css_${sKey}`] || defaultValue;
+          }
+        });
+ 
+        // Apply style variables to current admin panel dynamically
+        styleKeys.forEach(sKey => {
+          const val = settings[`css_${sKey}`];
+          if (val) {
+            const varName = `--` + sKey.replace(/_/g, '-');
+            document.documentElement.style.setProperty(varName, val);
+          }
+        });
+ 
         // Handle logo image preview
         if (settings.logo_img && settings.logo_img !== '') {
           settingsLogoImg.value = settings.logo_img;
@@ -611,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
           settingsLogoPreviewContainer.style.display = 'none';
           settingsLogoPreview.src = '';
         }
-
+ 
         // Handle bg image preview
         if (settings.bg_img && settings.bg_img !== '') {
           settingsBgImg.value = settings.bg_img;
@@ -620,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
           settingsBgImg.value = '';
           settingsBgPreviewContainer.style.display = 'none';
         }
-
+ 
         // Live inject custom CSS in admin panel
         let styleTag = document.getElementById('admin-custom-css-tag');
         if (!styleTag) {
@@ -629,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.head.appendChild(styleTag);
         }
         styleTag.textContent = settings.custom_css || '';
-
+ 
         // Apply theme class to admin body
         document.body.className = '';
         if (settings.theme && settings.theme !== 'modern-dark') {
@@ -645,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formSettings) {
     formSettings.addEventListener('submit', async (e) => {
       e.preventDefault();
-
+ 
       const payload = {
         org_name: settingsOrgName.value.trim(),
         logo_main: settingsLogoMain.value.trim(),
@@ -658,19 +693,33 @@ document.addEventListener('DOMContentLoaded', () => {
         monitor_title: settingsMonitorTitle.value.trim(),
         custom_css: settingsCustomCss.value
       };
-
+ 
+      // Collect style editor values
+      const styleKeys = [
+        'bg_primary', 'bg_secondary', 'text_primary', 'text_secondary',
+        'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding',
+        'monitor_grid_template', 'monitor_waiting_columns'
+      ];
+      
+      styleKeys.forEach(sKey => {
+        const inputEl = document.getElementById(`css-${sKey.replace(/_/g, '-')}`);
+        if (inputEl) {
+          payload[`css_${sKey}`] = inputEl.value;
+        }
+      });
+ 
       try {
         const response = await fetch('/api/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-
+ 
         if (!response.ok) {
           const err = await response.json();
           throw new Error(err.error || 'Sozlamalarni saqlab bo\'lmadi');
         }
-
+ 
         alert('Sozlamalar muvaffaqiyatli saqlandi!');
         loadSettings(); // Reload to apply new styles
       } catch (err) {
