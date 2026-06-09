@@ -121,6 +121,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Autoplay activation overlay handler
+  document.addEventListener('click', () => {
+    const overlay = document.getElementById('autoplay-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.style.display = 'none', 300);
+    }
+    // Warm up/resume AudioContext on user interaction
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        const tempCtx = new AudioContext();
+        if (tempCtx.state === 'suspended') {
+          tempCtx.resume();
+        }
+      }
+    } catch (e) {
+      console.error('Error warming up audio context:', e);
+    }
+  });
+
   // Uzbek Text-to-Speech using Web Speech API
   function speakAnnouncement(ticket) {
     return new Promise((resolve) => {
@@ -128,6 +149,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Speech synthesis not supported in this browser.');
         return resolve();
       }
+
+      let resolved = false;
+      const safeResolve = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve();
+        }
+      };
+
+      // Failsafe timeout: if speech gets blocked or takes too long, continue anyway
+      const failsafeTimeout = setTimeout(() => {
+        console.warn('Speech announcement timed out. Failsafe triggered.');
+        safeResolve();
+      }, 7000);
 
       // Convert letter codes into friendly phonetic pronunciation
       const letterCode = ticket.direction_code.toUpperCase();
@@ -142,17 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
         letterPronunciation = letterMapping[letterCode];
       }
 
-      // Voice text in Uzbek: "Navbat raqami: A ikki. Ikkinchi xonaga."
-      // Let's create a natural sounding sentence
+      // Voice text in Uzbek
       const text = `Navbat raqami, ${letterPronunciation} ${ticket.number}. ${ticket.room} xonaga.`;
-
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Try to find a Turkish or Russian voice if Uzbek is not available, 
-      // or default which works well for pronunciation when configured correctly
       const voices = window.speechSynthesis.getVoices();
-      
-      // Search for Turkish/Azerbaijani voices which are phonetically closer to Uzbek, or Uzbek if available
       const preferredLocales = ['uz-UZ', 'tr-TR', 'az-AZ', 'ru-RU', 'en-US'];
       let chosenVoice = null;
 
@@ -165,21 +194,23 @@ document.addEventListener('DOMContentLoaded', () => {
         utterance.voice = chosenVoice;
       }
       
-      utterance.rate = 0.85; // Slightly slower for clarity
+      utterance.rate = 0.85; 
       utterance.pitch = 1.0;
 
       utterance.onend = () => {
-        resolve();
+        clearTimeout(failsafeTimeout);
+        safeResolve();
       };
 
       utterance.onerror = (e) => {
         console.error('Speech error:', e);
-        resolve();
+        clearTimeout(failsafeTimeout);
+        safeResolve();
       };
 
       window.speechSynthesis.speak(utterance);
-    };
-  });
+    });
+  }
 
   // Process the queue of announcements one by one
   async function processQueue() {
