@@ -9,80 +9,128 @@ document.addEventListener('DOMContentLoaded', () => {
   updateClock();
 
   // DOM Elements
-  const activeCallBox = document.getElementById('active-call-box');
-  const activeCode = document.getElementById('active-code');
-  const activeRoom = document.getElementById('active-room');
-  const activeDirection = document.getElementById('active-direction');
-  const historyListContainer = document.getElementById('history-list-container');
+  const lanesContainer = document.getElementById('lanes-container');
+  const waitingGridContainer = document.getElementById('waiting-grid-container');
+  const waitingCountTag = document.getElementById('waiting-count-tag');
 
   let socket = null;
-  let activeTicket = null;
-  let callHistory = [];
+  let operatorRooms = []; // List of active rooms
+  let activeLanes = {};   // { room: ticketObj }
+  let waitingQueue = [];  // List of waiting tickets
   let announcementQueue = [];
   let isSpeaking = false;
 
-  // Initialize and load state
-  async function loadInitialState() {
+  // Initialize: Load operators to know which rooms to display, then load monitor state
+  async function initMonitor() {
+    try {
+      // 1. Fetch active operators/rooms
+      const opRes = await fetch('/api/admin/operators');
+      if (opRes.ok) {
+        const operators = await opRes.json();
+        // Collect unique rooms, sorted ascending
+        operatorRooms = [...new Set(operators.map(op => op.room))].sort((a, b) => a - b);
+      }
+      
+      // Fallback if no operators registered yet
+      if (operatorRooms.length === 0) {
+        operatorRooms = [1, 2, 3, 4]; // default test lanes
+      }
+
+      // Initialize activeLanes object
+      operatorRooms.forEach(room => {
+        activeLanes[room] = null;
+      });
+
+      // 2. Fetch current state (active servings and waiting queue)
+      await loadMonitorState();
+      
+      // 3. Render initial layout
+      renderLanes();
+      renderWaitingGrid();
+
+    } catch (err) {
+      console.error('Error initializing monitor:', err);
+    }
+  }
+
+  // Load active serving and waiting queue from API
+  async function loadMonitorState() {
     try {
       const response = await fetch('/api/monitor/state');
-      if (!response.ok) throw new Error('Dastlabki holatni yuklab bo\'lmadi');
+      if (!response.ok) throw new Error('Monitor holatini yuklab bo\'lmadi');
       const state = await response.json();
-      updateUI(state.called);
+
+      // Clear active lanes, then populate with called tickets
+      operatorRooms.forEach(room => {
+        activeLanes[room] = null;
+      });
+
+      // Populate called tickets into corresponding rooms
+      if (state.called && state.called.length > 0) {
+        state.called.forEach(ticket => {
+          if (activeLanes[ticket.room] === null) { // only assign the most recent for each room
+            activeLanes[ticket.room] = ticket;
+          }
+        });
+      }
+
+      // Save waiting queue
+      waitingQueue = state.waitingList || [];
+      waitingCountTag.textContent = `${waitingQueue.length} ta`;
+
     } catch (err) {
       console.error(err);
     }
   }
 
-  // Update UI components with data
-  function updateUI(calledTickets) {
-    if (calledTickets && calledTickets.length > 0) {
-      // The first ticket is the most recently called
-      const latest = calledTickets[0];
-      activeTicket = latest;
+  // Render Lanes (Indigo-White Rows)
+  function renderLanes() {
+    lanesContainer.innerHTML = '';
+    
+    operatorRooms.forEach(room => {
+      const ticket = activeLanes[room];
+      const ticketCode = ticket ? ticket.ticket_code : '- - -';
       
-      activeCode.textContent = latest.ticket_code;
-      activeRoom.textContent = `${latest.room}-xona`;
-      activeDirection.textContent = latest.direction_name;
-
-      // Rest are history
-      callHistory = calledTickets.slice(1);
-    } else {
-      activeCode.textContent = '- - -';
-      activeRoom.textContent = '- - -';
-      activeDirection.textContent = 'Kuting, navbat chaqiriladi...';
-      callHistory = [];
-    }
-
-    renderHistory();
+      const row = document.createElement('div');
+      row.className = 'active-lane-row';
+      row.id = `lane-room-${room}`;
+      row.innerHTML = `
+        <div class="lane-ticket-box" id="lane-ticket-val-${room}">${ticketCode}</div>
+        <div class="lane-room-box">
+          <div>${room}-operator</div>
+          <div class="lane-room-subtitle">xona ${room}</div>
+        </div>
+      `;
+      
+      lanesContainer.appendChild(row);
+    });
   }
 
-  // Render history rows
-  function renderHistory() {
-    historyListContainer.innerHTML = '';
-    if (callHistory.length === 0) {
-      historyListContainer.innerHTML = `
-        <div style="text-align: center; padding: 4rem; color: var(--text-muted); font-size: 1.2rem;">
-          Navbat tarixi bo'sh
+  // Render Right Waiting Grid badges
+  function renderWaitingGrid() {
+    waitingGridContainer.innerHTML = '';
+    
+    if (waitingQueue.length === 0) {
+      waitingGridContainer.innerHTML = `
+        <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: var(--text-muted); font-size: 0.95rem;">
+          Navbat bo'sh
         </div>
       `;
       return;
     }
 
-    callHistory.forEach(ticket => {
-      const row = document.createElement('div');
-      row.className = 'history-row';
-      row.innerHTML = `
-        <div>
-          <div class="history-code">${ticket.ticket_code}</div>
-          <div class="history-direction">${ticket.direction_name}</div>
-        </div>
-        <div class="history-room">${ticket.room}-xona</div>
+    waitingQueue.forEach(ticket => {
+      const badge = document.createElement('div');
+      badge.className = 'waiting-badge';
+      badge.innerHTML = `
+        <div class="waiting-badge-code">${ticket.ticket_code}</div>
+        <div class="waiting-badge-dir">${ticket.direction_name}</div>
       `;
-      historyListContainer.appendChild(row);
+      waitingGridContainer.appendChild(badge);
     });
   }
 
-  // Synthesize a beautiful Ding-Dong sound using Web Audio API
+  // Play Ding-Dong chime using Web Audio API
   function playDingDong() {
     return new Promise((resolve) => {
       try {
@@ -90,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!AudioContext) return resolve();
         const ctx = new AudioContext();
 
-        const playTone = (freq, startTime, duration, type = 'sine') => {
+        const playTone = (freq, startTime, duration, type = 'triangle') => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
 
@@ -109,11 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const now = ctx.currentTime;
-        // Ding (G5) -> Dong (E5)
         playTone(783.99, now, 0.8, 'triangle');       // G5
         playTone(659.25, now + 0.45, 1.2, 'triangle');  // E5
 
-        setTimeout(resolve, 1800); // Wait for chime to decay
+        setTimeout(resolve, 1800);
       } catch (e) {
         console.error(e);
         resolve();
@@ -121,32 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Autoplay activation overlay handler
-  document.addEventListener('click', () => {
-    const overlay = document.getElementById('autoplay-overlay');
-    if (overlay) {
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.style.display = 'none', 300);
-    }
-    // Warm up/resume AudioContext on user interaction
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) {
-        const tempCtx = new AudioContext();
-        if (tempCtx.state === 'suspended') {
-          tempCtx.resume();
-        }
-      }
-    } catch (e) {
-      console.error('Error warming up audio context:', e);
-    }
-  });
-
-  // Uzbek Text-to-Speech using Web Speech API
+  // Speak Uzbek TTS announcement
   function speakAnnouncement(ticket) {
     return new Promise((resolve) => {
       if (!('speechSynthesis' in window)) {
-        console.warn('Speech synthesis not supported in this browser.');
         return resolve();
       }
 
@@ -158,13 +183,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      // Failsafe timeout: if speech gets blocked or takes too long, continue anyway
       const failsafeTimeout = setTimeout(() => {
-        console.warn('Speech announcement timed out. Failsafe triggered.');
+        console.warn('Speech timeout triggered.');
         safeResolve();
       }, 7000);
 
-      // Convert letter codes into friendly phonetic pronunciation
       const letterCode = ticket.direction_code.toUpperCase();
       let letterPronunciation = letterCode;
       
@@ -177,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         letterPronunciation = letterMapping[letterCode];
       }
 
-      // Voice text in Uzbek
       const text = `Navbat raqami, ${letterPronunciation} ${ticket.number}. ${ticket.room} xonaga.`;
       const utterance = new SpeechSynthesisUtterance(text);
       
@@ -202,8 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeResolve();
       };
 
-      utterance.onerror = (e) => {
-        console.error('Speech error:', e);
+      utterance.onerror = () => {
         clearTimeout(failsafeTimeout);
         safeResolve();
       };
@@ -212,34 +233,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Process the queue of announcements one by one
+  // Process sequential voice calling queue
   async function processQueue() {
     if (isSpeaking || announcementQueue.length === 0) return;
     
     isSpeaking = true;
     const ticket = announcementQueue.shift();
 
-    // 1. Shift UI immediately to make it visually responsive
-    // Fetch current state from API first to synchronize history
-    await loadInitialState();
+    // 1. Fetch latest server state first to synchronize database
+    await loadMonitorState();
+    
+    // 2. Render state on screen (waiting list removes the called ticket, active lane updates)
+    activeLanes[ticket.room] = ticket;
+    renderLanes();
+    renderWaitingGrid();
 
-    // Add flashing animation
-    activeCallBox.classList.add('flashing');
+    // 3. Highlight the active lane row that was called
+    const activeRow = document.getElementById(`lane-room-${ticket.room}`);
+    if (activeRow) {
+      activeRow.classList.add('flashing');
+    }
 
-    // 2. Play chime sound
+    // 4. Play Ding-Dong chime
     await playDingDong();
 
-    // 3. Speak the ticket
+    // 5. Speak announcement
     await speakAnnouncement(ticket);
 
-    // Keep flashing a little longer, then remove
+    // Keep flashing a little longer, then clear
     setTimeout(() => {
-      activeCallBox.classList.remove('flashing');
+      if (activeRow) {
+        activeRow.classList.remove('flashing');
+      }
       isSpeaking = false;
-      // Process next in line
-      processQueue();
+      processQueue(); // Process next called ticket in queue
     }, 1500);
   }
+
+  // Autoplay activation overlay handler
+  document.addEventListener('click', () => {
+    const overlay = document.getElementById('autoplay-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.style.display = 'none', 300);
+    }
+    // Warm up/resume AudioContext
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        const tempCtx = new AudioContext();
+        if (tempCtx.state === 'suspended') {
+          tempCtx.resume();
+        }
+      }
+    } catch (e) {}
+  });
 
   // WebSocket connection
   function connectWebSocket() {
@@ -252,14 +300,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = JSON.parse(event.data);
         
         if (data.type === 'INITIAL_STATE') {
-          updateUI(data.state.called);
+          // Re-populate active lanes and waiting list
+          waitingQueue = data.state.waitingList || [];
+          waitingCountTag.textContent = `${waitingQueue.length} ta`;
+          
+          operatorRooms.forEach(room => activeLanes[room] = null);
+          if (data.state.called && data.state.called.length > 0) {
+            data.state.called.forEach(ticket => {
+              if (activeLanes[ticket.room] === null) {
+                activeLanes[ticket.room] = ticket;
+              }
+            });
+          }
+          renderLanes();
+          renderWaitingGrid();
+
+        } else if (data.type === 'TICKET_CREATED') {
+          // Push new ticket directly to waiting list immediately!
+          const ticket = data.ticket;
+          // Check if already in queue to prevent duplicates
+          if (!waitingQueue.some(q => q.id === ticket.id)) {
+            waitingQueue.push(ticket);
+            waitingCountTag.textContent = `${waitingQueue.length} ta`;
+            renderWaitingGrid();
+          }
+
         } else if (data.type === 'TICKET_CALLED') {
-          // Push to announcement queue
+          // Queue the called event for audio and shift animations
           announcementQueue.push(data.ticket);
           processQueue();
+
         } else if (data.type === 'QUEUE_CHANGED') {
-          // Just reload history, don't trigger announcements
-          loadInitialState();
+          // Sync waiting list and active servings
+          loadMonitorState().then(() => {
+            renderLanes();
+            renderWaitingGrid();
+          });
         }
       } catch (e) {
         console.error('Error handling WebSocket message:', e);
@@ -271,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Initialize SpeechSynthesis loading voices (Chrome issue helper)
+  // Pre-fetch voices
   if ('speechSynthesis' in window) {
     window.speechSynthesis.getVoices();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -279,6 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  loadInitialState();
-  connectWebSocket();
+  initMonitor().then(() => {
+    connectWebSocket();
+  });
 });

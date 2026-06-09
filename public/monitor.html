@@ -7,200 +7,310 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     body {
-      background-color: #020617;
+      background-color: #0c111d;
       height: 100vh;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      padding: 1rem 3rem;
-      background: rgba(15, 23, 42, 0.9);
-      border-bottom: 2px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .header-time {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--color-accent);
-      font-family: var(--font-title);
-      text-align: right;
-    }
-
-    .monitor-layout {
-      flex-grow: 1;
       display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 2rem;
-      padding: 2rem 3rem;
-      height: calc(100vh - 85px);
+      grid-template-columns: 30% 45% 25%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', 'Inter', sans-serif;
     }
 
-    /* Active Call Display */
-    .active-call-section {
+    /* Left Branding Column (Red Background) */
+    .brand-section {
+      background-color: #e60000;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      text-align: center;
-      padding: 4rem 2rem;
-      border: 2px solid rgba(255, 255, 255, 0.05);
+      padding: 3rem;
+      color: white;
       position: relative;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+      z-index: 5;
+    }
+
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      animation: float 4s infinite ease-in-out;
+    }
+
+    .ranch-logo-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .ranch-bar {
+      background: white;
+      transform: skewX(-20deg);
+      border-radius: 2px;
+      width: 10px;
+    }
+
+    .ranch-bar-1 { height: 28px; opacity: 0.7; }
+    .ranch-bar-2 { height: 42px; opacity: 0.85; }
+    .ranch-bar-3 { height: 56px; opacity: 0.95; }
+    .ranch-bar-4 { height: 75px; width: 14px; }
+
+    .brand-text {
+      text-align: left;
+    }
+
+    .brand-text h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -1px;
+      margin: 0;
+    }
+
+    .brand-text p {
+      font-size: 1.3rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      margin-top: 3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 1.5rem;
+      width: 80%;
+      text-align: center;
+    }
+
+    .brand-clock {
+      font-size: 3rem;
+      font-weight: 800;
+      color: white;
+      font-family: var(--font-title);
+      margin-top: 2rem;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 0.5rem 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Center Active Lanes Column */
+    .active-section {
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+      background-color: #070a13;
+      border-right: 1px solid var(--glass-border);
+      height: 100vh;
       overflow: hidden;
     }
 
-    .active-call-section.flashing {
-      animation: pulseGold 2s infinite;
-      border-color: var(--color-accent);
-      background: rgba(245, 158, 11, 0.05);
-    }
-
-    .now-calling-label {
-      font-size: 1.8rem;
-      color: var(--text-secondary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 1rem;
-    }
-
-    .active-ticket-code {
-      font-size: 14rem;
-      font-weight: 900;
-      line-height: 1;
-      font-family: var(--font-title);
-      color: #ffffff;
-      text-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
-      margin-bottom: 1rem;
-      transition: transform 0.3s ease;
-    }
-
-    .active-call-section.flashing .active-ticket-code {
-      color: var(--color-accent);
-      text-shadow: 0 10px 40px rgba(245, 158, 11, 0.6);
-      transform: scale(1.05);
-    }
-
-    .active-ticket-room {
-      font-size: 4.5rem;
+    .section-header {
+      font-size: 1.6rem;
       font-weight: 800;
-      color: var(--color-success);
-      margin-bottom: 0.5rem;
-      font-family: var(--font-title);
-    }
-
-    .active-ticket-direction {
-      font-size: 2rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* History Grid Display */
-    .history-section {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-
-    .history-header {
-      font-size: 1.8rem;
-      font-weight: 700;
+      color: white;
       margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--glass-border);
-      padding-bottom: 0.8rem;
-      color: var(--text-primary);
-    }
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-
-    .history-row {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-md);
-      padding: 1.5rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: var(--transition-fast);
-    }
-
-    .history-code {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--color-primary);
-      font-family: var(--font-title);
-    }
-
-    .history-room {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      font-family: var(--font-title);
-    }
-
-    .history-direction {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
-    }
-
-    .back-btn {
-      color: var(--text-secondary);
-      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.9rem;
+    }
+
+    .lanes-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    /* Redesigned Active Row: Purple/Indigo Left, White Right */
+    .active-lane-row {
+      display: flex;
+      background-color: #e60000; /* Red divider lines */
+      padding: 3px;
+      border-radius: 8px;
+      height: 75px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .active-lane-row.flashing {
+      animation: pulseGold 2s infinite;
+      transform: scale(1.02);
+    }
+
+    .lane-ticket-box {
+      width: 45%;
+      background-color: #311b92; /* Royal Indigo */
+      color: white;
+      font-size: 2.8rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-title);
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      letter-spacing: -1px;
+      transition: background-color 0.3s ease;
+    }
+
+    .active-lane-row.flashing .lane-ticket-box {
+      background-color: #4a148c;
+    }
+
+    .lane-room-box {
+      width: 55%;
+      background-color: white;
+      color: #0f172a;
+      font-size: 1.8rem;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .lane-room-subtitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: -2px;
+    }
+
+    /* Right Waiting List Column */
+    .waiting-section {
+      background-color: #0c111d;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .waiting-list-scroll {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+      align-content: start;
+    }
+
+    .waiting-badge {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .waiting-badge-code {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      font-family: var(--font-title);
+      line-height: 1.1;
+    }
+
+    .waiting-badge-dir {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 90%;
+      margin-top: 3px;
+    }
+
+    .back-btn-corner {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      transition: var(--transition-fast);
+      z-index: 10;
+    }
+    .back-btn-corner:hover {
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <div class="logo-container">
-        <div class="logo-icon">EN</div>
-        <div class="logo-text">
-          <h1 style="font-size: 1.5rem;">TOSHKENT DAVLAT UNIVERSITETI</h1>
-          <p>Elektron Navbat Monitori</p>
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 2rem;">
-        <div class="header-time" id="clock">16:05:00</div>
-        <a href="index.html" class="back-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        </a>
-      </div>
-    </div>
-  </header>
+  <!-- Back button -->
+  <a href="index.html" class="back-btn-corner">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+  </a>
 
-  <main class="monitor-layout">
-    <!-- Active Serving Screen -->
-    <div class="glass-panel active-call-section" id="active-call-box">
-      <div class="now-calling-label">Hozir chaqirilmoqda:</div>
-      <div class="active-ticket-code" id="active-code">- - -</div>
-      <div class="active-ticket-room" id="active-room">- - -</div>
-      <div class="active-ticket-direction" id="active-direction">Kuting, navbat chaqiriladi...</div>
-    </div>
-
-    <!-- History Sidebar -->
-    <div class="glass-panel history-section">
-      <h3 class="history-header">Oxirgi chaqirilganlar</h3>
-      <div class="history-list" id="history-list-container">
-        <!-- History elements loaded dynamically -->
-        <div style="text-align: center; padding: 4rem; color: var(--text-muted); font-size: 1.2rem;">
-          Navbat tarixi bo'sh
-        </div>
+  <!-- Left: Branding Panel -->
+  <section class="brand-section">
+    <div class="brand-logo-container">
+      <div class="ranch-logo-bars">
+        <div class="ranch-bar ranch-bar-1"></div>
+        <div class="ranch-bar ranch-bar-2"></div>
+        <div class="ranch-bar ranch-bar-3"></div>
+        <div class="ranch-bar ranch-bar-4"></div>
+      </div>
+      <div class="brand-text">
+        <h1>RANCH</h1>
+        <p>University</p>
       </div>
     </div>
-  </main>
+    <div class="brand-title">Tizim Monitori</div>
+    <div class="brand-clock" id="clock">18:17:00</div>
+  </section>
+
+  <!-- Center: Active Serving Lanes -->
+  <section class="active-section">
+    <h3 class="section-header">
+      <span style="color: var(--color-accent);">●</span> Qabulda (Serving)
+    </h3>
+    <div class="lanes-container" id="lanes-container">
+      <!-- Active rows rendered dynamically for each operator room -->
+      <div style="text-align: center; padding: 4rem; color: var(--text-muted);">
+        Yuklanmoqda...
+      </div>
+    </div>
+  </section>
+
+  <!-- Right: Waiting List -->
+  <section class="waiting-section">
+    <h3 class="section-header" style="justify-content: space-between;">
+      <span>Navbatda (Waiting)</span>
+      <span class="badge-room" id="waiting-count-tag" style="background: var(--color-primary); font-size: 0.8rem; padding: 0.1rem 0.6rem;">0 ta</span>
+    </h3>
+    <div class="waiting-list-scroll" id="waiting-grid-container">
+      <!-- Waiting badges injected dynamically -->
+      <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: var(--text-muted); font-size: 0.95rem;">
+        Navbat bo'sh
+      </div>
+    </div>
+  </section>
 
   <!-- Autoplay Activation Overlay -->
   <div id="autoplay-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.96); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; cursor: pointer; transition: opacity 0.3s ease;">

@@ -10,7 +10,7 @@ const run = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) return reject(err);
-      resolve(this); // 'this' contains changes and lastID
+      resolve(this);
     });
   });
 };
@@ -55,6 +55,17 @@ async function initDatabase() {
     )
   `);
 
+  // Create Operator-Directions mapping table (Many-to-Many)
+  await run(`
+    CREATE TABLE IF NOT EXISTS operator_directions (
+      operator_id INTEGER,
+      direction_id INTEGER,
+      PRIMARY KEY (operator_id, direction_id),
+      FOREIGN KEY (operator_id) REFERENCES operators(id) ON DELETE CASCADE,
+      FOREIGN KEY (direction_id) REFERENCES directions(id) ON DELETE CASCADE
+    )
+  `);
+
   // Create Queues table
   await run(`
     CREATE TABLE IF NOT EXISTS queues (
@@ -91,10 +102,9 @@ async function initDatabase() {
     console.log('Seeded default directions.');
   }
 
-  // Seed default operator admin/operators if empty
+  // Seed default operators if empty
   const operatorCount = await get(`SELECT COUNT(*) as count FROM operators`);
   if (operatorCount.count === 0) {
-    // We hash the password: default password is '12345'
     const salt = await bcrypt.genSalt(10);
     const defaultPasswordHash = await bcrypt.hash('12345', salt);
 
@@ -112,22 +122,41 @@ async function initDatabase() {
       );
     }
     console.log('Seeded default operators.');
+
+    // Seed default operator-direction mapping
+    const ops = await all(`SELECT id, username FROM operators`);
+    const dirs = await all(`SELECT id, code FROM directions`);
+
+    const opMap = {
+      'operator1': 'B', // Huquq
+      'operator2': 'A', // Iqtisodiyot
+      'operator3': 'C', // Pedagogika
+      'operator4': 'D'  // Axborot texnologiyalari
+    };
+
+    for (const op of ops) {
+      const targetCode = opMap[op.username];
+      const targetDir = dirs.find(d => d.code === targetCode);
+      if (targetDir) {
+        await run(
+          `INSERT OR IGNORE INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
+          [op.id, targetDir.id]
+        );
+      }
+    }
+    console.log('Seeded default operator-direction mapping.');
   }
 }
 
 // Generate the next queue number for a given direction, resetting daily
 async function getNextQueueNumber(directionCode) {
-  // Find the last queue entry for this direction created today (local time)
-  // SQLite datetime is stored in UTC by default, but we can compare dates using date() function
-  const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  
+  const todayStr = new Date().toISOString().split('T')[0];
   const lastTicket = await get(
     `SELECT number FROM queues 
      WHERE direction_code = ? AND date(created_at, 'localtime') = date(?)
      ORDER BY id DESC LIMIT 1`,
     [directionCode, todayStr]
   );
-
   return lastTicket ? lastTicket.number + 1 : 1;
 }
 
@@ -152,34 +181,69 @@ module.exports = {
 
   // Operators Operations
   getOperators: () => all(`SELECT id, username, room FROM operators ORDER BY username ASC`),
-  addOperator: async (username, password, room) => {
+  
+  addOperator: async (username, password, room, directionIds = []) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
-    return run(
+    const result = await run(
       `INSERT INTO operators (username, password, room) VALUES (?, ?, ?)`,
       [username, hash, room]
     );
+    const operatorId = result.lastID;
+    
+    // Insert direction mappings
+    if (directionIds && directionIds.length > 0) {
+      for (const dirId of directionIds) {
+        await run(
+          `INSERT INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
+          [operatorId, dirId]
+        );
+      }
+    }
+    return result;
   },
-  updateOperator: async (id, username, password, room) => {
+
+  updateOperator: async (id, username, password, room, directionIds = []) => {
+    // Update basic operator info
     if (password && password.trim() !== '') {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
-      return run(
+      await run(
         `UPDATE operators SET username = ?, password = ?, room = ? WHERE id = ?`,
         [username, hash, room, id]
       );
     } else {
-      return run(
+      await run(
         `UPDATE operators SET username = ?, room = ? WHERE id = ?`,
         [username, room, id]
       );
     }
+
+    // Update direction mappings: delete old ones first
+    await run(`DELETE FROM operator_directions WHERE operator_id = ?`, [id]);
+    if (directionIds && directionIds.length > 0) {
+      for (const dirId of directionIds) {
+        await run(
+          `INSERT INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
+          [id, dirId]
+        );
+      }
+    }
   },
-  deleteOperator: (id) => run(`DELETE FROM operators WHERE id = ?`, [id]),
+
+  deleteOperator: async (id) => {
+    await run(`DELETE FROM operator_directions WHERE operator_id = ?`, [id]);
+    return run(`DELETE FROM operators WHERE id = ?`, [id]);
+  },
+
+  getOperatorDirections: (operatorId) => all(
+    `SELECT direction_id FROM operator_directions WHERE operator_id = ?`,
+    [operatorId]
+  ),
 
   // Queue Operations
   createTicket: async (directionCode) => {
-    const direction = await get(`SELECT name, room FROM directions WHERE code = ?`, [directionCode]);
+    const direction = await get(`SELECT id, name, room FROM directions WHERE code = ?`, [directionCode]);
     if (!direction) throw new Error('Yo\'nalish topilmadi');
 
     const nextNum = await getNextQueueNumber(directionCode);
@@ -197,10 +261,12 @@ module.exports = {
       number: nextNum,
       ticket_code: `${directionCode}${nextNum}`,
       room: direction.room,
-      status: 'waiting'
+      status: 'waiting',
+      created_at: new Date().toISOString()
     };
   },
 
+  // Get waiting queue. Restructured: returns ALL waiting tickets.
   getWaitingQueue: () => all(
     `SELECT q.*, d.name as direction_name 
      FROM queues q
@@ -209,24 +275,36 @@ module.exports = {
      ORDER BY q.id ASC`
   ),
 
+  // RESTURCTURED CALL NEXT TICKET:
+  // Operator calls the oldest ticket from the list of directions they serve.
   callNextTicket: async (operatorId, room) => {
-    // Get the oldest waiting ticket for directions matching this room, or generally any oldest waiting ticket
-    // Let's first check if there are waiting tickets assigned to this operator's room
-    let ticket = await get(
+    // 1. Get the direction codes assigned to this operator
+    const assignedDirs = await all(
+      `SELECT d.code FROM operator_directions od
+       JOIN directions d ON od.direction_id = d.id
+       WHERE od.operator_id = ?`,
+      [operatorId]
+    );
+
+    if (assignedDirs.length === 0) return null; // No directions mapped to this operator
+
+    // Create an SQL placeholders string: (?, ?, ?)
+    const placeholders = assignedDirs.map(() => '?').join(',');
+    const codes = assignedDirs.map(d => d.code);
+
+    // 2. Query the oldest waiting ticket from the assigned direction codes
+    const ticket = await get(
       `SELECT q.*, d.name as direction_name 
        FROM queues q
        JOIN directions d ON q.direction_code = d.code
-       WHERE q.status = 'waiting' AND q.room = ?
+       WHERE q.status = 'waiting' AND q.direction_code IN (${placeholders})
        ORDER BY q.id ASC LIMIT 1`,
-      [room]
+      codes
     );
 
-    // Fallback: If no tickets for this room, check for any waiting ticket (multi-room handling if needed)
-    // Actually, usually operators only call students for directions assigned to their room, as per TZ.
-    // So let's stick to room matching.
-    
     if (!ticket) return null;
 
+    // 3. Update status to 'called', bind operator and room
     const now = new Date().toISOString();
     await run(
       `UPDATE queues SET status = 'called', called_at = ?, operator_id = ?, room = ? WHERE id = ?`,
@@ -242,7 +320,6 @@ module.exports = {
   },
 
   recallTicket: async (ticketId) => {
-    // Returns the ticket info to trigger announcement again
     const ticket = await get(
       `SELECT q.*, d.name as direction_name 
        FROM queues q
@@ -271,37 +348,40 @@ module.exports = {
     );
   },
 
-  // Monitor status (called and waiting)
+  // Monitor status (Restructured: called and waiting list)
   getMonitorState: async () => {
-    // Get active called tickets
+    // Get active called tickets (showing multiple counters, up to 10 active serving items)
     const called = await all(
       `SELECT q.*, d.name as direction_name
        FROM queues q
        JOIN directions d ON q.direction_code = d.code
        WHERE q.status = 'called'
-       ORDER BY q.called_at DESC LIMIT 6`
+       ORDER BY q.called_at DESC LIMIT 10`
     );
 
     called.forEach(c => {
       c.ticket_code = `${c.direction_code}${c.number}`;
     });
 
-    // Get length of waiting queues grouped by direction
-    const waitingCounts = await all(
-      `SELECT direction_code, COUNT(*) as count 
-       FROM queues 
-       WHERE status = 'waiting' 
-       GROUP BY direction_code`
+    // Get complete waiting list
+    const waitingList = await all(
+      `SELECT q.*, d.name as direction_name
+       FROM queues q
+       JOIN directions d ON q.direction_code = d.code
+       WHERE q.status = 'waiting'
+       ORDER BY q.id ASC`
     );
 
-    return { called, waitingCounts };
+    waitingList.forEach(w => {
+      w.ticket_code = `${w.direction_code}${w.number}`;
+    });
+
+    return { called, waitingList };
   },
 
   // Daily Statistics
   getDailyStats: async (room) => {
     const todayStr = new Date().toISOString().split('T')[0];
-
-    // Total tickets processed today
     const queryParams = [todayStr];
     let roomFilter = "";
     if (room) {
@@ -327,8 +407,6 @@ module.exports = {
       queryParams
     );
 
-    // Average waiting time for called/completed tickets today (called_at - created_at)
-    // SQLite strftime('%s', called_at) - strftime('%s', created_at) gives difference in seconds
     const avgWait = await get(
       `SELECT AVG(strftime('%s', called_at) - strftime('%s', created_at)) as avg_time 
        FROM queues 

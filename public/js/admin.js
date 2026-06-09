@@ -194,8 +194,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Load directions as checkboxes inside Operator Modal
+  async function loadDirectionCheckboxes() {
+    const container = document.getElementById('operator-directions-checkboxes');
+    if (!container) return;
+
+    try {
+      const response = await fetch('/api/directions');
+      if (!response.ok) throw new Error('Yo\'nalishlarni yuklab bo\'lmadi');
+      const directions = await response.json();
+
+      container.innerHTML = '';
+      if (directions.length === 0) {
+        container.innerHTML = `<span style="color: var(--text-muted); font-size: 0.8rem;">Yo'nalishlar mavjud emas</span>`;
+        return;
+      }
+
+      directions.forEach(dir => {
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '0.5rem';
+        label.style.cursor = 'pointer';
+        label.style.fontSize = '0.85rem';
+        label.style.color = 'var(--text-secondary)';
+        label.innerHTML = `
+          <input type="checkbox" value="${dir.id}" class="operator-direction-checkbox">
+          <span>[${dir.code}] ${dir.name}</span>
+        `;
+        container.appendChild(label);
+      });
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = `<span style="color: var(--color-danger); font-size: 0.8rem;">Yuklashda xatolik yuz berdi</span>`;
+    }
+  }
+
   // Open operator modal (Add / Edit)
-  function openOperatorModal(op = null) {
+  async function openOperatorModal(op = null) {
+    // 1. First render checkboxes
+    await loadDirectionCheckboxes();
+
     if (op) {
       modalOperatorTitle.textContent = 'Operatorni Tahrirlash';
       operatorIdInput.value = op.id;
@@ -207,6 +246,22 @@ document.addEventListener('DOMContentLoaded', () => {
       operatorPasswordInput.required = false;
       labelPassword.textContent = 'Yangi parol (ixtiyoriy)';
       operatorPwHint.style.display = 'block';
+
+      // 2. Fetch and check mapped direction checkboxes
+      try {
+        const res = await fetch(`/api/admin/operators/${op.id}/directions`);
+        if (res.ok) {
+          const assignedIds = await res.json();
+          const checkboxes = document.querySelectorAll('.operator-direction-checkbox');
+          checkboxes.forEach(cb => {
+            if (assignedIds.includes(parseInt(cb.value))) {
+              cb.checked = true;
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching operator directions:', err);
+      }
     } else {
       modalOperatorTitle.textContent = 'Yangi Operator Qo\'shish';
       operatorIdInput.value = '';
@@ -229,6 +284,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = operatorPasswordInput.value;
     const room = parseInt(operatorRoomInput.value);
 
+    // Collect checked direction checkboxes
+    const checkboxes = document.querySelectorAll('.operator-direction-checkbox');
+    const directionIds = Array.from(checkboxes)
+      .filter(cb => cb.checked)
+      .map(cb => parseInt(cb.value));
+
+    if (directionIds.length === 0) {
+      alert('Iltimos, operator uchun kamida bitta yo\'nalishni tanlang.');
+      return;
+    }
+
     const url = id ? `/api/admin/operators/${id}` : '/api/admin/operators';
     const method = id ? 'PUT' : 'POST';
 
@@ -236,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, room })
+        body: JSON.stringify({ username, password, room, directionIds })
       });
 
       if (!response.ok) {

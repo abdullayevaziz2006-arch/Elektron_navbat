@@ -149,12 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load Waiting list filtered by operator room directions
   async function loadWaitingList() {
     try {
-      const response = await fetch('/api/operator/queue');
+      const response = await fetch(`/api/operator/queue?operator_id=${currentOperator.id}`);
       if (!response.ok) throw new Error('Kutish ro\'yxatini yuklab bo\'lmadi');
       const queue = await response.json();
 
-      // Filter list to only show tickets assigned to this operator's room
-      const myQueue = queue.filter(item => item.room === currentOperator.room);
+      const myQueue = queue;
 
       waitingCountBadge.textContent = `${myQueue.length} ta talaba`;
 

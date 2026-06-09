@@ -104,17 +104,35 @@ app.post('/api/tickets', async (req, res) => {
   }
 });
 
-// Get current waiting tickets list
+// Get waiting queue. Supports filtering by operator's assigned directions
 app.get('/api/operator/queue', async (req, res) => {
+  const { operator_id } = req.query;
   try {
     const list = await db.getWaitingQueue();
+
+    if (operator_id) {
+      const opId = parseInt(operator_id);
+      // Fetch operator mapped direction codes
+      const assignedDirs = await db.all(
+        `SELECT d.code FROM operator_directions od
+         JOIN directions d ON od.direction_id = d.id
+         WHERE od.operator_id = ?`,
+        [opId]
+      );
+      
+      const codes = assignedDirs.map(d => d.code);
+      // Filter list to only show tickets matching assigned direction codes
+      const filteredList = list.filter(item => codes.includes(item.direction_code));
+      return res.json(filteredList);
+    }
+
     res.json(list);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Call next ticket for a room/operator
+// Call next ticket for an operator
 app.post('/api/operator/call', async (req, res) => {
   const { operator_id, room } = req.body;
   if (!operator_id || !room) {
@@ -122,7 +140,7 @@ app.post('/api/operator/call', async (req, res) => {
   }
 
   try {
-    const ticket = await db.callNextTicket(operator_id, room);
+    const ticket = await db.callNextTicket(parseInt(operator_id), parseInt(room));
     if (!ticket) {
       return res.json({ success: false, message: 'Navbatda talabalar yo\'q' });
     }
@@ -244,13 +262,23 @@ app.get('/api/admin/operators', async (req, res) => {
   }
 });
 
+// Fetch operator mapped direction IDs
+app.get('/api/admin/operators/:id/directions', async (req, res) => {
+  try {
+    const list = await db.getOperatorDirections(parseInt(req.params.id));
+    res.json(list.map(item => item.direction_id));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/admin/operators', async (req, res) => {
-  const { username, password, room } = req.body;
+  const { username, password, room, directionIds } = req.body;
   if (!username || !password || !room) {
     return res.status(400).json({ error: 'Barcha maydonlarni to\'ldiring' });
   }
   try {
-    await db.addOperator(username, password, room);
+    await db.addOperator(username, password, room, directionIds || []);
     res.status(201).json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -258,10 +286,10 @@ app.post('/api/admin/operators', async (req, res) => {
 });
 
 app.put('/api/admin/operators/:id', async (req, res) => {
-  const { username, password, room } = req.body;
+  const { username, password, room, directionIds } = req.body;
   const { id } = req.params;
   try {
-    await db.updateOperator(id, username, password, room);
+    await db.updateOperator(id, username, password, room, directionIds || []);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
