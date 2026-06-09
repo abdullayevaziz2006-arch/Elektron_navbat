@@ -200,6 +200,18 @@
       display: none;
     }
     @media print {
+      @page {
+        size: 80mm auto;
+        margin: 0;
+      }
+      html, body {
+        height: auto !important;
+        background: #fff !important;
+        color: #000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
       body * {
         display: none !important;
       }
@@ -207,14 +219,14 @@
         display: block !important;
       }
       .receipt-print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 80mm;
-        padding: 10px;
-        font-family: monospace;
-        color: black;
-        background: white;
+        position: relative !important;
+        width: 80mm !important;
+        max-width: 80mm !important;
+        margin: 0 auto !important;
+        padding: 6mm !important;
+        box-sizing: border-box !important;
+        height: auto !important;
+        min-height: unset !important;
       }
     }
   </style>
