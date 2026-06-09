@@ -122,8 +122,11 @@ async function initDatabase() {
       );
     }
     console.log('Seeded default operators.');
+  }
 
-    // Seed default operator-direction mapping
+  // Seed default operator-direction mapping if empty
+  const mappingCount = await get(`SELECT COUNT(*) as count FROM operator_directions`);
+  if (mappingCount.count === 0) {
     const ops = await all(`SELECT id, username FROM operators`);
     const dirs = await all(`SELECT id, code FROM directions`);
 
