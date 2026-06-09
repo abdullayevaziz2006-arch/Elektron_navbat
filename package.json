@@ -1,0 +1,18 @@
+{
+  "name": "elektron-navbat",
+  "version": "1.0.0",
+  "description": "Elektron Navbat Tizimi (Electronic Queue System)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7",
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mijoz Infokioski | Elektron Navbat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #020617 0%, #0b1329 100%);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .kiosk-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      height: calc(100vh - 85px);
+    }
+
+    .kiosk-welcome {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .kiosk-welcome h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .kiosk-welcome p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .directions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+      align-content: start;
+    }
+
+    .direction-btn {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition-normal);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .direction-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      opacity: 0;
+      transition: var(--transition-fast);
+    }
+
+    .direction-btn:hover {
+      background: rgba(30, 41, 59, 0.75);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-5px);
+    }
+
+    .direction-btn:hover::after {
+      opacity: 1;
+    }
+
+    .direction-btn:active {
+      transform: scale(0.97);
+    }
+
+    .direction-code {
+      font-size: 3.5rem;
+      font-weight: 800;
+      font-family: var(--font-title);
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+      line-height: 1;
+      text-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+    }
+
+    .direction-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .direction-room {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Receipt Styling in Dialog */
+    .receipt {
+      width: 100%;
+      background: #ffffff;
+      color: #000000;
+      padding: 2.5rem 2rem;
+      border-radius: var(--radius-sm);
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border: 1px solid #ddd;
+    }
+
+    .receipt-header {
+      border-bottom: 2px dashed #000;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .receipt-header h3 {
+      font-family: var(--font-title);
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .receipt-header p {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .receipt-number {
+      font-size: 4.5rem;
+      font-weight: 800;
+      margin: 1rem 0;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .receipt-info {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+
+    .receipt-info strong {
+      font-size: 1.1rem;
+    }
+
+    .receipt-barcode {
+      margin: 1.5rem auto 1rem auto;
+      font-size: 0.8rem;
+    }
+
+    .receipt-barcode svg {
+      width: 80%;
+      max-width: 250px;
+      height: 40px;
+    }
+
+    .receipt-footer {
+      border-top: 2px dashed #000;
+      padding-top: 1rem;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    .back-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      transition: var(--transition-fast);
+    }
+    .back-btn:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">EN</div>
+      <div class="logo-text">
+        <h1>TOSHKENT DAVLAT UNIVERSITETI</h1>
+        <p>Elektron Navbat Kioski</p>
+      </div>
+    </div>
+    <a href="index.html" class="back-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Asosiy Portal
+    </a>
+  </header>
+
+  <main class="kiosk-container">
+    <div class="kiosk-welcome">
+      <h2>Navbat Raqamini Oling</h2>
+      <p>Iltimos, kerakli yo'nalish tugmasini bosing va chekni oling</p>
+    </div>
+
+    <!-- Direction Cards Grid -->
+    <div class="directions-grid" id="directions-grid">
+      <!-- Loaded dynamically via JS -->
+      <div style="text-align: center; grid-column: 1/-1; padding: 3rem; color: var(--text-secondary);">
+        Yuklanmoqda...
+      </div>
+    </div>
+  </main>
+
+  <!-- Ticket Print Confirmation Modal -->
+  <div class="modal-overlay" id="ticket-modal">
+    <div class="modal-content" style="max-width: 400px; border: none; background: transparent;">
+      <div class="receipt" id="receipt-card">
+        <div class="receipt-header">
+          <h3>TASHKENT STATE UNIV</h3>
+          <p>Elektron Navbat Tizimi</p>
+        </div>
+        <div class="receipt-info">
+          Yo'nalish:<br>
+          <strong id="receipt-direction-name">IQTISODIYOT</strong>
+        </div>
+        <div class="receipt-info" style="font-size: 0.9rem;">
+          Sizning navbat raqamingiz:
+        </div>
+        <div class="receipt-number" id="receipt-number-display">A22</div>
+        <div class="receipt-info">
+          Iltimos, murojaat qiling:<br>
+          <strong id="receipt-room-display">2-operator (Xona 2)</strong>
+        </div>
+        <div class="receipt-barcode">
+          <!-- Dummy SVG Barcode -->
+          <svg viewBox="0 0 100 20" preserveAspectRatio="none">
+            <rect x="0" width="2" height="20" fill="black"></rect>
+            <rect x="4" width="1" height="20" fill="black"></rect>
+            <rect x="7" width="3" height="20" fill="black"></rect>
+            <rect x="12" width="1" height="20" fill="black"></rect>
+            <rect x="15" width="2" height="20" fill="black"></rect>
+            <rect x="18" width="4" height="20" fill="black"></rect>
+            <rect x="24" width="1" height="20" fill="black"></rect>
+            <rect x="27" width="2" height="20" fill="black"></rect>
+            <rect x="31" width="3" height="20" fill="black"></rect>
+            <rect x="36" width="1" height="20" fill="black"></rect>
+            <rect x="39" width="4" height="20" fill="black"></rect>
+            <rect x="45" width="2" height="20" fill="black"></rect>
+            <rect x="49" width="1" height="20" fill="black"></rect>
+            <rect x="52" width="3" height="20" fill="black"></rect>
+            <rect x="57" width="2" height="20" fill="black"></rect>
+            <rect x="61" width="1" height="20" fill="black"></rect>
+            <rect x="64" width="4" height="20" fill="black"></rect>
+            <rect x="70" width="2" height="20" fill="black"></rect>
+            <rect x="74" width="3" height="20" fill="black"></rect>
+            <rect x="79" width="1" height="20" fill="black"></rect>
+            <rect x="82" width="2" height="20" fill="black"></rect>
+            <rect x="86" width="4" height="20" fill="black"></rect>
+            <rect x="92" width="1" height="20" fill="black"></rect>
+            <rect x="95" width="3" height="20" fill="black"></rect>
+          </svg>
+          <div id="receipt-id-text" style="font-size: 0.7rem; margin-top: 5px; letter-spacing: 2px;">*0012903*</div>
+        </div>
+        <div class="receipt-footer">
+          <span id="receipt-date-time">09.06.2026 16:05</span><br>
+          Kuting! Hozir chaqiriladi...
+        </div>
+        
+        <!-- Print Button for kiosk test environments -->
+        <button class="btn btn-primary" onclick="window.print()" style="margin-top: 1.5rem; width: 100%; border-radius: 4px; padding: 0.6rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: -3px; margin-right: 5px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Chekni Chop Etish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Printable Receipt for browser window.print() -->
+  <div id="print-area" class="receipt-print-area" style="display: none;">
+    <div style="text-align: center; font-family: monospace; font-size: 12px; line-height: 1.3;">
+      <h3>TASHKENT STATE UNIV</h3>
+      <p>Elektron Navbat Tizimi</p>
+      <hr style="border: 1px dashed black;">
+      <p>Yo'nalish: <strong id="print-direction"></strong></p>
+      <p>Navbat raqami:</p>
+      <h1 style="font-size: 38px; margin: 5px 0;" id="print-number"></h1>
+      <p>Murojaat qiling:<br><strong id="print-room"></strong></p>
+      <hr style="border: 1px dashed black;">
+      <p id="print-time"></p>
+      <p>Kuting! Hozir chaqiriladi...</p>
+    </div>
+  </div>
+
+  <script src="js/kiosk.js"></script>
+</body>
+</html>

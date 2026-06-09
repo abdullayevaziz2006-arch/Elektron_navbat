@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kutish Zali Monitori | Elektron Navbat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #020617;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 3rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .header-time {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--color-accent);
+      font-family: var(--font-title);
+      text-align: right;
+    }
+
+    .monitor-layout {
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 2rem;
+      padding: 2rem 3rem;
+      height: calc(100vh - 85px);
+    }
+
+    /* Active Call Display */
+    .active-call-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .active-call-section.flashing {
+      animation: pulseGold 2s infinite;
+      border-color: var(--color-accent);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .now-calling-label {
+      font-size: 1.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .active-ticket-code {
+      font-size: 14rem;
+      font-weight: 900;
+      line-height: 1;
+      font-family: var(--font-title);
+      color: #ffffff;
+      text-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .active-call-section.flashing .active-ticket-code {
+      color: var(--color-accent);
+      text-shadow: 0 10px 40px rgba(245, 158, 11, 0.6);
+      transform: scale(1.05);
+    }
+
+    .active-ticket-room {
+      font-size: 4.5rem;
+      font-weight: 800;
+      color: var(--color-success);
+      margin-bottom: 0.5rem;
+      font-family: var(--font-title);
+    }
+
+    .active-ticket-direction {
+      font-size: 2rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* History Grid Display */
+    .history-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .history-header {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 0.8rem;
+      color: var(--text-primary);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    .history-row {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-fast);
+    }
+
+    .history-code {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      font-family: var(--font-title);
+    }
+
+    .history-room {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-family: var(--font-title);
+    }
+
+    .history-direction {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .back-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div class="logo-container">
+        <div class="logo-icon">EN</div>
+        <div class="logo-text">
+          <h1 style="font-size: 1.5rem;">TOSHKENT DAVLAT UNIVERSITETI</h1>
+          <p>Elektron Navbat Monitori</p>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <div class="header-time" id="clock">16:05:00</div>
+        <a href="index.html" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="monitor-layout">
+    <!-- Active Serving Screen -->
+    <div class="glass-panel active-call-section" id="active-call-box">
+      <div class="now-calling-label">Hozir chaqirilmoqda:</div>
+      <div class="active-ticket-code" id="active-code">- - -</div>
+      <div class="active-ticket-room" id="active-room">- - -</div>
+      <div class="active-ticket-direction" id="active-direction">Kuting, navbat chaqiriladi...</div>
+    </div>
+
+    <!-- History Sidebar -->
+    <div class="glass-panel history-section">
+      <h3 class="history-header">Oxirgi chaqirilganlar</h3>
+      <div class="history-list" id="history-list-container">
+        <!-- History elements loaded dynamically -->
+        <div style="text-align: center; padding: 4rem; color: var(--text-muted); font-size: 1.2rem;">
+          Navbat tarixi bo'sh
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/monitor.js"></script>
+</body>
+</html>

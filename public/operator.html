@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Oynasi | Elektron Navbat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #020617 0%, #0c1530 100%);
+    }
+
+    .operator-container {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+      display: none; /* Hidden until login */
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-container {
+      max-width: 450px;
+      margin: 6rem auto;
+      width: 90%;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: var(--text-secondary);
+    }
+
+    .console-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .console-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .current-call-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem;
+      position: relative;
+    }
+
+    .current-ticket-display {
+      font-size: 5.5rem;
+      font-weight: 800;
+      color: var(--color-accent);
+      margin: 1.5rem 0;
+      font-family: var(--font-title);
+      text-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+      line-height: 1;
+    }
+
+    .current-ticket-details {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .controls-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .controls-row .btn {
+      padding: 1.2rem;
+      font-size: 1.1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .queue-list-card {
+      display: flex;
+      flex-direction: column;
+      height: 480px;
+    }
+
+    .queue-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .queue-list-scroll {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding-right: 0.5rem;
+    }
+
+    .queue-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-fast);
+    }
+    .queue-item:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .queue-item-code {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      font-family: var(--font-title);
+    }
+
+    .queue-item-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .queue-item-time {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Stats bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.5rem;
+    }
+
+    .stat-icon {
+      height: 50px;
+      width: 50px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-info h4 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      font-family: var(--font-title);
+    }
+
+    .stat-info p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .operator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .operator-user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-success), var(--color-primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .badge-room {
+      background: var(--color-success);
+      color: white;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Operator Login Panel (Glassmorphic) -->
+  <div class="login-container glass-panel" id="login-panel">
+    <div class="login-header">
+      <div class="logo-icon" style="margin: 0 auto 1rem auto;">OP</div>
+      <h2>Operator Kirishi</h2>
+      <p>Elektron navbat tizimini boshqarish uchun hisobingizga kiring</p>
+    </div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="username">Foydalanuvchi nomi</label>
+        <input type="text" id="username" class="form-control" placeholder="Masalan: operator1" required>
+      </div>
+      <div class="form-group" style="margin-bottom: 2rem;">
+        <label for="password">Parol</label>
+        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem;">
+        Tizimga Kirish
+      </button>
+    </form>
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <a href="index.html" style="color: var(--text-secondary); font-size: 0.9rem;">Asosiy sahifaga qaytish</a>
+    </div>
+  </div>
+
+  <!-- 2. Operator Console Panel (Dashboard) -->
+  <div class="operator-container" id="operator-panel">
+    
+    <div class="operator-header">
+      <div class="operator-user-info">
+        <div class="avatar" id="operator-avatar">OP</div>
+        <div>
+          <h3 id="operator-name-display">Operator</h3>
+          <span class="badge-room" id="operator-room-badge">Room 2</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <a href="index.html" class="btn btn-secondary">Hub</a>
+        <button class="btn btn-danger" id="logout-btn">Chiqish</button>
+      </div>
+    </div>
+
+    <div class="console-grid">
+      <!-- Left side: Current Student Management -->
+      <div class="glass-panel current-call-card">
+        <h3 style="color: var(--text-secondary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">
+          Hozir qabulda:
+        </h3>
+        
+        <div class="current-ticket-display" id="current-ticket-code">- - -</div>
+        
+        <div class="current-ticket-details" id="current-ticket-details">
+          Qabul qilishni boshlash uchun "KEYINGI" tugmasini bosing
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-danger" id="skip-btn" disabled>Kelmidi (O'tkazish)</button>
+          <button class="btn btn-primary" id="recall-btn" disabled>Chaqirish (Ovoz/Chime)</button>
+          
+          <button class="btn btn-success" id="complete-btn" style="grid-column: 1 / -1; margin-top: 0.5rem;" disabled>
+            Qabul Tugallandi
+          </button>
+        </div>
+
+        <button class="btn btn-accent" id="next-btn" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 1.2rem;">
+          KEYINGI TALABA (Chaqirish)
+        </button>
+      </div>
+
+      <!-- Right side: Waiting List -->
+      <div class="glass-panel queue-list-card">
+        <div class="queue-list-header">
+          <h3>Kutish ro'yxati</h3>
+          <span class="badge-room" id="waiting-count-badge" style="background: var(--color-primary);">0 talaba</span>
+        </div>
+        
+        <div class="queue-list-scroll" id="waiting-list-container">
+          <!-- Waiting list items injected dynamically -->
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            Kutayotganlar yo'q
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Daily Statistics -->
+    <div class="stats-grid">
+      <div class="glass-panel stat-card">
+        <div class="stat-icon" style="color: var(--color-success);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <div class="stat-info">
+          <h4 id="stat-served">0</h4>
+          <p>Qabul qilindi</p>
+        </div>
+      </div>
+
+      <div class="glass-panel stat-card">
+        <div class="stat-icon" style="color: var(--color-danger);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+        <div class="stat-info">
+          <h4 id="stat-skipped">0</h4>
+          <p>Kelmaganlar</p>
+        </div>
+      </div>
+
+      <div class="glass-panel stat-card">
+        <div class="stat-icon" style="color: var(--color-primary);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <div class="stat-info">
+          <h4 id="stat-avg-wait">0m</h4>
+          <p>O'rtacha kutish</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/operator.js"></script>
+</body>
+</html>

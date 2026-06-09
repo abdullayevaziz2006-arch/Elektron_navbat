@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elektron Navbat Tizimi | Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hub-container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 3rem 2rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hub-title {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+    }
+
+    .hub-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+      max-width: 600px;
+    }
+
+    .grid-portal {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .portal-card {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem;
+      transition: var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      transition: var(--transition-fast);
+    }
+
+    .portal-card:hover {
+      transform: translateY(-8px);
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .portal-card.kiosk::before { background: var(--color-primary); }
+    .portal-card.operator::before { background: var(--color-success); }
+    .portal-card.monitor::before { background: var(--color-accent); }
+    .portal-card.admin::before { background: var(--color-danger); }
+
+    .portal-card:hover.kiosk { box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15); }
+    .portal-card:hover.operator { box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15); }
+    .portal-card:hover.monitor { box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15); }
+    .portal-card:hover.admin { box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15); }
+
+    .portal-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      height: 80px;
+      width: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      transition: var(--transition-fast);
+    }
+
+    .portal-card:hover .portal-icon {
+      transform: scale(1.1);
+    }
+
+    .kiosk .portal-icon { color: var(--color-primary); }
+    .operator .portal-icon { color: var(--color-success); }
+    .monitor .portal-icon { color: var(--color-accent); }
+    .admin .portal-icon { color: var(--color-danger); }
+
+    .portal-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .portal-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">EN</div>
+      <div class="logo-text">
+        <h1>ELEKTRON NAVBAT</h1>
+        <p>Toshkent Davlat Universiteti</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="hub-container">
+    <h2 class="hub-title">Navbat Boshqaruvi Portali</h2>
+    <p class="hub-subtitle">Universitet elektron navbat tizimini sozlash va undan foydalanish uchun kerakli terminalni tanlang.</p>
+
+    <div class="grid-portal">
+      <!-- Kiosk -->
+      <a href="kiosk.html" class="portal-card glass-panel kiosk">
+        <div class="portal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        </div>
+        <h3>Mijoz Infokioski</h3>
+        <p>Talabalar va mijozlar uchun yo'nalish tugmalarini bosib, navbat raqamini olish terminali.</p>
+      </a>
+
+      <!-- Operator -->
+      <a href="operator.html" class="portal-card glass-panel operator">
+        <div class="portal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <h3>Operator Oynasi</h3>
+        <p>Operatorlar uchun talabalarni chaqirish, o'tkazib yuborish yoki qabulni yakunlash oynasi.</p>
+      </a>
+
+      <!-- Monitor -->
+      <a href="monitor.html" class="portal-card glass-panel monitor">
+        <div class="portal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </div>
+        <h3>Katta Monitor</h3>
+        <p>Kutish zalidagi talabalar uchun chaqirilgan navbat raqamlari va ovozli xabarlar ekrani.</p>
+      </a>
+
+      <!-- Admin -->
+      <a href="admin.html" class="portal-card glass-panel admin">
+        <div class="portal-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+        <h3>Tizim Administratori</h3>
+        <p>Yo'nalishlar, operatorlar, xonalarni sozlash, hisobotlarni olish va zaxiralash paneli.</p>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 Elektron Navbat Tizimi. Toshkent Davlat Universiteti.
+  </footer>
+
+</body>
+</html>

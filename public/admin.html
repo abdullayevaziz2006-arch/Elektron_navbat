@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tizim Administratori | Elektron Navbat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: #020617;
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Layout */
+    .admin-sidebar {
+      width: 280px;
+      background: rgba(15, 23, 42, 0.85);
+      border-right: 1px solid var(--glass-border);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .admin-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .admin-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 1.2rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .menu-item:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .menu-item.active {
+      color: white;
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    /* Content Area */
+    .admin-content {
+      flex-grow: 1;
+      padding: 2.5rem 3rem;
+      overflow-y: auto;
+      height: 100vh;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .content-header h2 {
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .admin-card {
+      margin-bottom: 2rem;
+    }
+
+    /* Modal Form Custom Layout */
+    .grid-form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .admin-menu {
+        flex-direction: row;
+        flex-grow: 0;
+      }
+      .admin-content {
+        padding: 1.5rem;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="admin-logo">
+      <div class="logo-icon" style="width: 35px; height: 35px; font-size: 1.1rem;">AD</div>
+      <div class="logo-text">
+        <h1 style="font-size: 1rem; line-height: 1.1;">ADMIN PANEL</h1>
+        <p style="font-size: 0.65rem;">Elektron Navbat</p>
+      </div>
+    </div>
+
+    <nav class="admin-menu">
+      <div class="menu-item active" data-target="tab-directions">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+        Yo'nalishlar
+      </div>
+      <div class="menu-item" data-target="tab-operators">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        Operatorlar
+      </div>
+      <div class="menu-item" data-target="tab-history">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Navbat Tarixi
+      </div>
+    </nav>
+
+    <div>
+      <a href="index.html" class="menu-item" style="color: var(--text-muted); border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Portaldan Chiqish
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content Areas -->
+  <main class="admin-content">
+
+    <!-- 1. DIRECTIONS TAB -->
+    <div id="tab-directions" class="tab-panel">
+      <div class="content-header">
+        <div>
+          <h2>Yo'nalishlar Boshqaruvi</h2>
+          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Kiosk tugmalari va chipta kodlarini sozlash</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-direction">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Yo'nalish Qo'shish
+        </button>
+      </div>
+
+      <div class="glass-panel table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nomi</th>
+              <th>Chipta Kodi</th>
+              <th>Xona raqami</th>
+              <th style="text-align: right;">Amallar</th>
+            </tr>
+          </thead>
+          <tbody id="table-directions-body">
+            <!-- Loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. OPERATORS TAB -->
+    <div id="tab-operators" class="tab-panel" style="display: none;">
+      <div class="content-header">
+        <div>
+          <h2>Operatorlar Boshqaruvi</h2>
+          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Tizim operatorlari akkauntlari va xonalarni bog'lash</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-operator">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Operator Qo'shish
+        </button>
+      </div>
+
+      <div class="glass-panel table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Foydalanuvchi nomi</th>
+              <th>Belgilangan xona</th>
+              <th style="text-align: right;">Amallar</th>
+            </tr>
+          </thead>
+          <tbody id="table-operators-body">
+            <!-- Loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. QUEUE HISTORY TAB -->
+    <div id="tab-history" class="tab-panel" style="display: none;">
+      <div class="content-header">
+        <div>
+          <h2>Barcha Navbatlar Tarixi</h2>
+          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Barcha olingan navbat chiptalari va qabul arxivlari</p>
+        </div>
+        <button class="btn btn-accent" id="btn-export-csv">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: -3px; margin-right: 5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Excel/CSV Yuklab Olish
+        </button>
+      </div>
+
+      <div class="glass-panel table-container" style="max-height: 650px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Chipta</th>
+              <th>Yo'nalish</th>
+              <th>Sana/Vaqt</th>
+              <th>Status</th>
+              <th>Operator</th>
+              <th>Xona</th>
+              <th>Kutish (min)</th>
+            </tr>
+          </thead>
+          <tbody id="table-history-body">
+            <!-- Loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 4. MODAL: ADD/EDIT DIRECTION -->
+  <div class="modal-overlay" id="modal-direction">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-direction-title">Yangi Yo'nalish Qo'shish</h3>
+        <button class="modal-close" id="modal-direction-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-direction">
+          <input type="hidden" id="direction-id">
+          <div class="form-group">
+            <label for="direction-name">Yo'nalish nomi</label>
+            <input type="text" id="direction-name" class="form-control" placeholder="Masalan: Iqtisodiyot" required>
+          </div>
+          <div class="grid-form">
+            <div class="form-group">
+              <label for="direction-code">Chipta kodi (1 ta harf)</label>
+              <input type="text" id="direction-code" class="form-control" placeholder="A" maxlength="2" required>
+            </div>
+            <div class="form-group">
+              <label for="direction-room">Xona raqami</label>
+              <input type="number" id="direction-room" class="form-control" placeholder="2" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">
+            Saqlash
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MODAL: ADD/EDIT OPERATOR -->
+  <div class="modal-overlay" id="modal-operator">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-operator-title">Yangi Operator Qo'shish</h3>
+        <button class="modal-close" id="modal-operator-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-operator">
+          <input type="hidden" id="operator-id">
+          <div class="form-group">
+            <label for="operator-username">Foydalanuvchi nomi (Login)</label>
+            <input type="text" id="operator-username" class="form-control" placeholder="operator1" required>
+          </div>
+          <div class="grid-form">
+            <div class="form-group">
+              <label for="operator-password" id="label-password">Parol</label>
+              <input type="password" id="operator-password" class="form-control" placeholder="••••••••" required>
+              <span style="font-size: 0.75rem; color: var(--text-muted); display: none;" id="operator-pw-hint">Tahrirlashda parolni o'zgartirmasangiz, bo'sh qoldiring</span>
+            </div>
+            <div class="form-group">
+              <label for="operator-room">Xona raqami</label>
+              <input type="number" id="operator-room" class="form-control" placeholder="1" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">
+            Saqlash
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
