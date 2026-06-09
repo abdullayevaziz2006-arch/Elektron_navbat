@@ -27,17 +27,61 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
       if (settings) {
+        // 1. Set brand color
         const brandColor = settings.brand_color || '#e60000';
         document.documentElement.style.setProperty('--brand-color', brandColor);
         document.documentElement.style.setProperty('--color-primary', brandColor);
 
-        const logoMainEl = document.querySelector('.brand-text h1');
-        const logoSubEl = document.querySelector('.brand-text p');
-        if (logoMainEl) logoMainEl.textContent = settings.logo_main || 'RANCH';
-        if (logoSubEl) logoSubEl.textContent = settings.logo_sub || 'University';
+        // 2. Set theme class
+        document.body.className = '';
+        if (settings.theme && settings.theme !== 'modern-dark') {
+          document.body.classList.add(`theme-${settings.theme}`);
+        }
 
+        // 3. Set custom background image
+        if (settings.bg_img && settings.bg_img !== '') {
+          document.body.style.setProperty('--custom-bg-img', `url('${settings.bg_img}')`);
+          document.body.classList.add('has-custom-bg');
+        } else {
+          document.body.style.removeProperty('--custom-bg-img');
+          document.body.classList.remove('has-custom-bg');
+        }
+
+        // 4. Set logo (custom image or text bars logo)
+        const logoContainer = document.querySelector('.brand-logo-container');
+        if (logoContainer) {
+          if (settings.logo_img && settings.logo_img !== '') {
+            logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 120px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+          } else {
+            const logoMainVal = settings.logo_main || 'RANCH';
+            const logoSubVal = settings.logo_sub || 'University';
+            logoContainer.innerHTML = `
+              <div class="ranch-logo-bars">
+                <div class="ranch-bar ranch-bar-1"></div>
+                <div class="ranch-bar ranch-bar-2"></div>
+                <div class="ranch-bar ranch-bar-3"></div>
+                <div class="ranch-bar ranch-bar-4"></div>
+              </div>
+              <div class="brand-text">
+                <h1>${logoMainVal}</h1>
+                <p>${logoSubVal}</p>
+              </div>
+            `;
+          }
+        }
+
+        // 5. Monitor Title
         const brandTitleEl = document.querySelector('.brand-title');
         if (brandTitleEl) brandTitleEl.textContent = settings.monitor_title || 'Tizim Monitori';
+
+        // 6. Inject custom CSS
+        let styleTag = document.getElementById('monitor-custom-css-tag');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'monitor-custom-css-tag';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = settings.custom_css || '';
       }
     } catch (err) {
       console.error('Error loading branding settings:', err);

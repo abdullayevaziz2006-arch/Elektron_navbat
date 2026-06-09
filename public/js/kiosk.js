@@ -24,37 +24,66 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
       if (settings) {
-        // Set brand color
+        // 1. Set brand color
         const brandColor = settings.brand_color || '#e60000';
         document.documentElement.style.setProperty('--color-primary', brandColor);
         document.documentElement.style.setProperty('--brand-color', brandColor);
 
-        // Header logo icon
-        const logoIconEl = document.querySelector('.logo-icon');
-        if (logoIconEl && settings.logo_main) {
-          logoIconEl.textContent = settings.logo_main.substring(0, 2).toUpperCase();
+        // 2. Set theme class
+        document.body.className = '';
+        if (settings.theme && settings.theme !== 'modern-dark') {
+          document.body.classList.add(`theme-${settings.theme}`);
         }
 
-        // Header titles
-        const logoTitleEl = document.querySelector('.logo-text h1');
-        if (logoTitleEl) logoTitleEl.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
+        // 3. Set custom background image
+        if (settings.bg_img && settings.bg_img !== '') {
+          document.body.style.setProperty('--custom-bg-img', `url('${settings.bg_img}')`);
+          document.body.classList.add('has-custom-bg');
+        } else {
+          document.body.style.removeProperty('--custom-bg-img');
+          document.body.classList.remove('has-custom-bg');
+        }
 
-        const logoSubEl = document.querySelector('.logo-text p');
-        if (logoSubEl) logoSubEl.textContent = settings.kiosk_title || 'Elektron Navbat Kioski';
+        // 4. Set logo (custom image or text logo)
+        const logoContainer = document.querySelector('.logo-container');
+        if (logoContainer) {
+          if (settings.logo_img && settings.logo_img !== '') {
+            logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 55px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+          } else {
+            const logoIconVal = settings.logo_main ? settings.logo_main.substring(0, 2).toUpperCase() : 'EN';
+            const orgNameVal = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
+            const kioskTitleVal = settings.kiosk_title || 'Elektron Navbat Kioski';
+            logoContainer.innerHTML = `
+              <div class="logo-icon">${logoIconVal}</div>
+              <div class="logo-text">
+                <h1>${orgNameVal}</h1>
+                <p>${kioskTitleVal}</p>
+              </div>
+            `;
+          }
+        }
 
-        // Receipt header (screen modal)
+        // 5. Receipt headers (screen modal and printing area)
         const receiptOrgName = document.getElementById('receipt-org-name');
         if (receiptOrgName) receiptOrgName.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
 
         const receiptSystemTitle = document.getElementById('receipt-system-title');
         if (receiptSystemTitle) receiptSystemTitle.textContent = settings.kiosk_title || 'Elektron Navbat Tizimi';
 
-        // Receipt header (print area)
         const printOrgName = document.getElementById('print-org-name');
         if (printOrgName) printOrgName.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
 
         const printSystemTitle = document.getElementById('print-system-title');
         if (printSystemTitle) printSystemTitle.textContent = settings.kiosk_title || 'Elektron Navbat Tizimi';
+
+        // 6. Inject custom CSS
+        let styleTag = document.getElementById('kiosk-custom-css-tag');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'kiosk-custom-css-tag';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = settings.custom_css || '';
       }
     } catch (err) {
       console.error('Error loading branding settings:', err);

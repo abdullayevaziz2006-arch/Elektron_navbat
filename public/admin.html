@@ -289,6 +289,35 @@
                 <input type="text" id="settings-brand-color-hex" class="form-control" placeholder="#e60000" pattern="^#[0-9a-fA-F]{6}$" required>
               </div>
             </div>
+            <div class="form-group">
+              <label for="settings-theme">Dizayn Mavzusi (Theme)</label>
+              <select id="settings-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
+                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-form" style="margin-top: 1rem;">
+            <div class="form-group">
+              <label for="settings-logo-file">Logotip Rasmi (PNG/SVG - Matn o'rniga)</label>
+              <input type="file" id="settings-logo-file" class="form-control" accept="image/*" style="padding: 0.5rem;">
+              <input type="hidden" id="settings-logo-img">
+              <div id="settings-logo-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <img id="settings-logo-preview" style="max-height: 40px; max-width: 120px; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 4px;">
+                <button type="button" class="btn btn-danger" id="btn-reset-logo" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="settings-bg-file">Orqa Fon Rasmi (Background Image)</label>
+              <input type="file" id="settings-bg-file" class="form-control" accept="image/*" style="padding: 0.5rem;">
+              <input type="hidden" id="settings-bg-img">
+              <div id="settings-bg-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                <span style="font-size: 0.8rem; color: var(--color-success);">Rasm yuklandi</span>
+                <button type="button" class="btn btn-danger" id="btn-reset-bg" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+              </div>
+            </div>
           </div>
 
           <div class="form-group" style="margin-top: 1rem;">
@@ -299,6 +328,11 @@
           <div class="form-group" style="margin-top: 1rem;">
             <label for="settings-monitor-title">Monitor Sarlavhasi (Monitor Title)</label>
             <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
+            <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height: 120px; font-family: monospace; font-size: 0.85rem; line-height: 1.4; resize: vertical;"></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.8rem; padding: 0.9rem;">

@@ -462,8 +462,112 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsLogoSub = document.getElementById('settings-logo-sub');
   const settingsBrandColor = document.getElementById('settings-brand-color');
   const settingsBrandColorHex = document.getElementById('settings-brand-color-hex');
+  const settingsTheme = document.getElementById('settings-theme');
+  const settingsLogoFile = document.getElementById('settings-logo-file');
+  const settingsLogoImg = document.getElementById('settings-logo-img');
+  const settingsLogoPreviewContainer = document.getElementById('settings-logo-preview-container');
+  const settingsLogoPreview = document.getElementById('settings-logo-preview');
+  const btnResetLogo = document.getElementById('btn-reset-logo');
+  const settingsBgFile = document.getElementById('settings-bg-file');
+  const settingsBgImg = document.getElementById('settings-bg-img');
+  const settingsBgPreviewContainer = document.getElementById('settings-bg-preview-container');
+  const btnResetBg = document.getElementById('btn-reset-bg');
   const settingsKioskTitle = document.getElementById('settings-kiosk-title');
   const settingsMonitorTitle = document.getElementById('settings-monitor-title');
+  const settingsCustomCss = document.getElementById('settings-custom-css');
+
+  // Helper to compress image and convert to Base64
+  function processAndCompressImage(file, maxDimension = 800) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (file.type === 'image/svg+xml') {
+          return resolve(reader.result);
+        }
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDimension) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.8)); // 80% quality
+        };
+        img.onerror = () => reject(new Error('Rasm yuklashda xatolik'));
+        img.src = event.target.result;
+      };
+      reader.onerror = () => reject(new Error('Faylni o\'qib bo\'lmadi'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Handle Logo file upload
+  if (settingsLogoFile) {
+    settingsLogoFile.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const base64 = await processAndCompressImage(file, 400); // logo size limit
+        settingsLogoImg.value = base64;
+        settingsLogoPreview.src = base64;
+        settingsLogoPreviewContainer.style.display = 'flex';
+      } catch (err) {
+        alert(err.message);
+        settingsLogoFile.value = '';
+      }
+    });
+  }
+
+  // Handle Logo reset
+  if (btnResetLogo) {
+    btnResetLogo.addEventListener('click', () => {
+      settingsLogoImg.value = '';
+      settingsLogoFile.value = '';
+      settingsLogoPreviewContainer.style.display = 'none';
+      settingsLogoPreview.src = '';
+    });
+  }
+
+  // Handle Background file upload
+  if (settingsBgFile) {
+    settingsBgFile.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const base64 = await processAndCompressImage(file, 1024); // bg size limit
+        settingsBgImg.value = base64;
+        settingsBgPreviewContainer.style.display = 'flex';
+      } catch (err) {
+        alert(err.message);
+        settingsBgFile.value = '';
+      }
+    });
+  }
+
+  // Handle Background reset
+  if (btnResetBg) {
+    btnResetBg.addEventListener('click', () => {
+      settingsBgImg.value = '';
+      settingsBgFile.value = '';
+      settingsBgPreviewContainer.style.display = 'none';
+    });
+  }
 
   // Sync color picker with HEX input text
   if (settingsBrandColor && settingsBrandColorHex) {
@@ -492,8 +596,45 @@ document.addEventListener('DOMContentLoaded', () => {
           settingsBrandColor.value = settings.brand_color || '#e60000';
           settingsBrandColorHex.value = settings.brand_color || '#e60000';
         }
+        if (settingsTheme) settingsTheme.value = settings.theme || 'modern-dark';
         if (settingsKioskTitle) settingsKioskTitle.value = settings.kiosk_title || '';
         if (settingsMonitorTitle) settingsMonitorTitle.value = settings.monitor_title || '';
+        if (settingsCustomCss) settingsCustomCss.value = settings.custom_css || '';
+
+        // Handle logo image preview
+        if (settings.logo_img && settings.logo_img !== '') {
+          settingsLogoImg.value = settings.logo_img;
+          settingsLogoPreview.src = settings.logo_img;
+          settingsLogoPreviewContainer.style.display = 'flex';
+        } else {
+          settingsLogoImg.value = '';
+          settingsLogoPreviewContainer.style.display = 'none';
+          settingsLogoPreview.src = '';
+        }
+
+        // Handle bg image preview
+        if (settings.bg_img && settings.bg_img !== '') {
+          settingsBgImg.value = settings.bg_img;
+          settingsBgPreviewContainer.style.display = 'flex';
+        } else {
+          settingsBgImg.value = '';
+          settingsBgPreviewContainer.style.display = 'none';
+        }
+
+        // Live inject custom CSS in admin panel
+        let styleTag = document.getElementById('admin-custom-css-tag');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'admin-custom-css-tag';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = settings.custom_css || '';
+
+        // Apply theme class to admin body
+        document.body.className = '';
+        if (settings.theme && settings.theme !== 'modern-dark') {
+          document.body.classList.add(`theme-${settings.theme}`);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -510,8 +651,12 @@ document.addEventListener('DOMContentLoaded', () => {
         logo_main: settingsLogoMain.value.trim(),
         logo_sub: settingsLogoSub.value.trim(),
         brand_color: settingsBrandColorHex.value.trim(),
+        theme: settingsTheme.value,
+        logo_img: settingsLogoImg.value,
+        bg_img: settingsBgImg.value,
         kiosk_title: settingsKioskTitle.value.trim(),
-        monitor_title: settingsMonitorTitle.value.trim()
+        monitor_title: settingsMonitorTitle.value.trim(),
+        custom_css: settingsCustomCss.value
       };
 
       try {
@@ -527,6 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         alert('Sozlamalar muvaffaqiyatli saqlandi!');
+        loadSettings(); // Reload to apply new styles
       } catch (err) {
         alert(`Xatolik: ${err.message}`);
       }
