@@ -20,9 +20,36 @@ document.addEventListener('DOMContentLoaded', () => {
   let announcementQueue = [];
   let isSpeaking = false;
 
+  // Load dynamic settings branding
+  async function loadBranding() {
+    try {
+      const response = await fetch('/api/settings');
+      if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
+      const settings = await response.json();
+      if (settings) {
+        const brandColor = settings.brand_color || '#e60000';
+        document.documentElement.style.setProperty('--brand-color', brandColor);
+        document.documentElement.style.setProperty('--color-primary', brandColor);
+
+        const logoMainEl = document.querySelector('.brand-text h1');
+        const logoSubEl = document.querySelector('.brand-text p');
+        if (logoMainEl) logoMainEl.textContent = settings.logo_main || 'RANCH';
+        if (logoSubEl) logoSubEl.textContent = settings.logo_sub || 'University';
+
+        const brandTitleEl = document.querySelector('.brand-title');
+        if (brandTitleEl) brandTitleEl.textContent = settings.monitor_title || 'Tizim Monitori';
+      }
+    } catch (err) {
+      console.error('Error loading branding settings:', err);
+    }
+  }
+
   // Initialize: Load operators to know which rooms to display, then load monitor state
   async function initMonitor() {
     try {
+      // Load custom branding first
+      await loadBranding();
+
       // 1. Fetch active operators/rooms
       const opRes = await fetch('/api/admin/operators');
       if (opRes.ok) {
@@ -331,7 +358,8 @@ document.addEventListener('DOMContentLoaded', () => {
           processQueue();
 
         } else if (data.type === 'QUEUE_CHANGED') {
-          // Sync waiting list and active servings
+          // Sync waiting list, active servings, and branding settings
+          loadBranding();
           loadMonitorState().then(() => {
             renderLanes();
             renderWaitingGrid();

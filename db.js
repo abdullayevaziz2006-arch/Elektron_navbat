@@ -82,6 +82,14 @@ async function initDatabase() {
     )
   `);
 
+  // Create Settings table (Key-Value)
+  await run(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
   // Seed default directions if empty
   const directionCount = await get(`SELECT COUNT(*) as count FROM directions`);
   if (directionCount.count === 0) {
@@ -148,6 +156,23 @@ async function initDatabase() {
       }
     }
     console.log('Seeded default operator-direction mapping.');
+  }
+
+  // Seed default settings if empty
+  const settingsCount = await get(`SELECT COUNT(*) as count FROM settings`);
+  if (settingsCount.count === 0) {
+    const defaultSettings = [
+      { key: 'org_name', value: 'RANCH UNIVERSITY' },
+      { key: 'logo_main', value: 'RANCH' },
+      { key: 'logo_sub', value: 'University' },
+      { key: 'brand_color', value: '#e60000' },
+      { key: 'kiosk_title', value: 'Elektron Navbat Kioski' },
+      { key: 'monitor_title', value: 'Tizim Monitori' }
+    ];
+    for (const s of defaultSettings) {
+      await run(`INSERT INTO settings (key, value) VALUES (?, ?)`, [s.key, s.value]);
+    }
+    console.log('Seeded default branding settings.');
   }
 }
 
@@ -243,6 +268,26 @@ module.exports = {
     `SELECT direction_id FROM operator_directions WHERE operator_id = ?`,
     [operatorId]
   ),
+
+  // Settings Operations
+  getSettings: async () => {
+    const rows = await all(`SELECT * FROM settings`);
+    const settingsObj = {};
+    rows.forEach(r => {
+      settingsObj[r.key] = r.value;
+    });
+    return settingsObj;
+  },
+
+  updateSettings: async (settingsObj) => {
+    for (const key in settingsObj) {
+      await run(
+        `INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)`,
+        [key, String(settingsObj[key])]
+      );
+    }
+    return true;
+  },
 
   // Queue Operations
   createTicket: async (directionCode) => {

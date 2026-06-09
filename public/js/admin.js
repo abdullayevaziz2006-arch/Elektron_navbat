@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (target === 'tab-directions') loadDirections();
       if (target === 'tab-operators') loadOperators();
       if (target === 'tab-history') loadHistory();
+      if (target === 'tab-settings') loadSettings();
     });
   });
 
@@ -453,6 +454,84 @@ document.addEventListener('DOMContentLoaded', () => {
     link.click();
     document.body.removeChild(link);
   });
+
+  // --- Settings Tab ---
+  const formSettings = document.getElementById('form-settings');
+  const settingsOrgName = document.getElementById('settings-org-name');
+  const settingsLogoMain = document.getElementById('settings-logo-main');
+  const settingsLogoSub = document.getElementById('settings-logo-sub');
+  const settingsBrandColor = document.getElementById('settings-brand-color');
+  const settingsBrandColorHex = document.getElementById('settings-brand-color-hex');
+  const settingsKioskTitle = document.getElementById('settings-kiosk-title');
+  const settingsMonitorTitle = document.getElementById('settings-monitor-title');
+
+  // Sync color picker with HEX input text
+  if (settingsBrandColor && settingsBrandColorHex) {
+    settingsBrandColor.addEventListener('input', (e) => {
+      settingsBrandColorHex.value = e.target.value;
+    });
+    settingsBrandColorHex.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        settingsBrandColor.value = val;
+      }
+    });
+  }
+
+  async function loadSettings() {
+    try {
+      const response = await fetch('/api/settings');
+      if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
+      const settings = await response.json();
+
+      if (settings) {
+        if (settingsOrgName) settingsOrgName.value = settings.org_name || '';
+        if (settingsLogoMain) settingsLogoMain.value = settings.logo_main || '';
+        if (settingsLogoSub) settingsLogoSub.value = settings.logo_sub || '';
+        if (settingsBrandColor) {
+          settingsBrandColor.value = settings.brand_color || '#e60000';
+          settingsBrandColorHex.value = settings.brand_color || '#e60000';
+        }
+        if (settingsKioskTitle) settingsKioskTitle.value = settings.kiosk_title || '';
+        if (settingsMonitorTitle) settingsMonitorTitle.value = settings.monitor_title || '';
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Sozlamalarni yuklashda xatolik yuz berdi');
+    }
+  }
+
+  if (formSettings) {
+    formSettings.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        org_name: settingsOrgName.value.trim(),
+        logo_main: settingsLogoMain.value.trim(),
+        logo_sub: settingsLogoSub.value.trim(),
+        brand_color: settingsBrandColorHex.value.trim(),
+        kiosk_title: settingsKioskTitle.value.trim(),
+        monitor_title: settingsMonitorTitle.value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Sozlamalarni saqlab bo\'lmadi');
+        }
+
+        alert('Sozlamalar muvaffaqiyatli saqlandi!');
+      } catch (err) {
+        alert(`Xatolik: ${err.message}`);
+      }
+    });
+  }
 
   // Modal dismissals on overlay click
   [modalDirection, modalOperator].forEach(modal => {

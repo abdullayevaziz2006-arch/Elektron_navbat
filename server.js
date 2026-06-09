@@ -316,6 +316,26 @@ app.get('/api/admin/history', async (req, res) => {
   }
 });
 
+// --- Settings APIs ---
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await db.getSettings();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/settings', async (req, res) => {
+  try {
+    await db.updateSettings(req.body);
+    broadcast({ type: 'QUEUE_CHANGED' }); // Trigger style reload on client terminals
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get Monitor State directly
 app.get('/api/monitor/state', async (req, res) => {
   try {

@@ -17,6 +17,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let modalTimeout = null;
 
+  // Load dynamic branding settings
+  async function loadBranding() {
+    try {
+      const response = await fetch('/api/settings');
+      if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
+      const settings = await response.json();
+      if (settings) {
+        // Set brand color
+        const brandColor = settings.brand_color || '#e60000';
+        document.documentElement.style.setProperty('--color-primary', brandColor);
+        document.documentElement.style.setProperty('--brand-color', brandColor);
+
+        // Header logo icon
+        const logoIconEl = document.querySelector('.logo-icon');
+        if (logoIconEl && settings.logo_main) {
+          logoIconEl.textContent = settings.logo_main.substring(0, 2).toUpperCase();
+        }
+
+        // Header titles
+        const logoTitleEl = document.querySelector('.logo-text h1');
+        if (logoTitleEl) logoTitleEl.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
+
+        const logoSubEl = document.querySelector('.logo-text p');
+        if (logoSubEl) logoSubEl.textContent = settings.kiosk_title || 'Elektron Navbat Kioski';
+
+        // Receipt header (screen modal)
+        const receiptOrgName = document.getElementById('receipt-org-name');
+        if (receiptOrgName) receiptOrgName.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
+
+        const receiptSystemTitle = document.getElementById('receipt-system-title');
+        if (receiptSystemTitle) receiptSystemTitle.textContent = settings.kiosk_title || 'Elektron Navbat Tizimi';
+
+        // Receipt header (print area)
+        const printOrgName = document.getElementById('print-org-name');
+        if (printOrgName) printOrgName.textContent = settings.org_name || 'TOSHKENT DAVLAT UNIVERSITETI';
+
+        const printSystemTitle = document.getElementById('print-system-title');
+        if (printSystemTitle) printSystemTitle.textContent = settings.kiosk_title || 'Elektron Navbat Tizimi';
+      }
+    } catch (err) {
+      console.error('Error loading branding settings:', err);
+    }
+  }
+
   // Initialize WebSocket for real-time updates (e.g., if directions list is modified by admin)
   let socket;
   function connectWebSocket() {
@@ -28,8 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'QUEUE_CHANGED') {
-          // Re-load directions list if they changed
+          // Re-load directions list and branding if they changed
           loadDirections();
+          loadBranding();
         }
       } catch (e) {
         console.error('Error handling WebSocket message:', e);
@@ -189,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Load initial configurations
-  loadDirections();
-  connectWebSocket();
+  loadBranding().then(() => {
+    loadDirections();
+    connectWebSocket();
+  });
 });
