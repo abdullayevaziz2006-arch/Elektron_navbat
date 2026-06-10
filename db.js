@@ -93,87 +93,895 @@ async function initDatabase() {
     )
   `);
 
-  // Seed default directions if empty
+    // Seed default directions if empty
   const directionCount = await get(`SELECT COUNT(*) as count FROM directions`);
   if (directionCount.count === 0) {
     const defaultDirections = [
-      { name: 'Iqtisodiyot', code: 'A', room: 2 },
-      { name: 'Huquq', code: 'B', room: 1 },
-      { name: 'Pedagogika', code: 'C', room: 3 },
-      { name: 'Axborot texnologiyalari', code: 'D', room: 4 },
-      { name: 'Tibbiyot', code: 'E', room: 5 },
-      { name: 'Tarix', code: 'F', room: 6 }
-    ];
+    {
+        "id": 7,
+        "name": "IQTISODIYOT",
+        "code": "A",
+        "room": 3
+    },
+    {
+        "id": 8,
+        "name": "BUXGALTERIYA HISOBI",
+        "code": "B",
+        "room": 3
+    },
+    {
+        "id": 9,
+        "name": "MENEJMENT",
+        "code": "D",
+        "room": 3
+    },
+    {
+        "id": 10,
+        "name": "MARKETING",
+        "code": "E",
+        "room": 3
+    },
+    {
+        "id": 11,
+        "name": "BANK ISHI",
+        "code": "F",
+        "room": 11
+    },
+    {
+        "id": 12,
+        "name": "FILOLOGIYA VA TILLARNI O'QITISH(RUS TILI)",
+        "code": "G",
+        "room": 7
+    },
+    {
+        "id": 13,
+        "name": "FILOLOGIYA VA TILLARNI O'QITISH(O'ZBEK TILI)",
+        "code": "H",
+        "room": 7
+    },
+    {
+        "id": 14,
+        "name": "FILOLOGIYA VA TILLARNI O'QITISH(INGGILIZ TILI)",
+        "code": "I",
+        "room": 7
+    },
+    {
+        "id": 15,
+        "name": "MAKTABGACHA TA'LIM (O'QUV YILI  MUDDATI 3 YIL)",
+        "code": "J",
+        "room": 7
+    },
+    {
+        "id": 16,
+        "name": "MATEMATIKA",
+        "code": "K",
+        "room": 7
+    },
+    {
+        "id": 17,
+        "name": "BOSHLANG'ICH TA'LIM",
+        "code": "L",
+        "room": 7
+    },
+    {
+        "id": 18,
+        "name": "SPORT FAOLIYATI (BOKS)",
+        "code": "M",
+        "room": 13
+    },
+    {
+        "id": 19,
+        "name": "SPORT FAOLIYATI (VALEYBOL)",
+        "code": "N",
+        "room": 13
+    },
+    {
+        "id": 20,
+        "name": "SPORT FAOLIYATI (YENGIL ATLETIKA)",
+        "code": "O",
+        "room": 13
+    },
+    {
+        "id": 21,
+        "name": "SPORT FAOLIYATI (FUTBOL)",
+        "code": "P",
+        "room": 13
+    },
+    {
+        "id": 22,
+        "name": "SPORT FAOLIYATI (ERKIN KURASH)",
+        "code": "Q",
+        "room": 13
+    },
+    {
+        "id": 23,
+        "name": "JISMONIY MADANIYAT(O'QUV YILI 3 YIL)",
+        "code": "R",
+        "room": 13
+    },
+    {
+        "id": 24,
+        "name": "KOMPYUTER INJINIRING (KOMPYUTER INJINIRING)",
+        "code": "S",
+        "room": 13
+    },
+    {
+        "id": 25,
+        "name": "KOMPYUTER INJINIRING (MULTIMEDIA TEXNOLOGIYALARI)",
+        "code": "T",
+        "room": 13
+    },
+    {
+        "id": 26,
+        "name": "KOMPYUTER INJINIRING (KOMPYUTER TIZIMLARI AXBOROT XAVFSIZLIGI)",
+        "code": "U",
+        "room": 13
+    },
+    {
+        "id": 27,
+        "name": "KOMPYUTER INJINIRING (MA'LUMOTLAR ILMI)",
+        "code": "V",
+        "room": 13
+    },
+    {
+        "id": 28,
+        "name": "KIBERXAVFSIZLIK INJINIRING",
+        "code": "X",
+        "room": 13
+    },
+    {
+        "id": 29,
+        "name": "TEXNOLOGIK MASHINALAR VA JIHOZLAR",
+        "code": "Y",
+        "room": 13
+    },
+    {
+        "id": 30,
+        "name": "ENERGETIKA MUHANDISLIGI (ELEKTR TA'MINOTI)",
+        "code": "C",
+        "room": 13
+    },
+    {
+        "id": 31,
+        "name": "TRANSPORT VOSITALARI MUHANDISLIGI (AVTAMOIL TRANSPORTI BO'YICHA)",
+        "code": "W",
+        "room": 13
+    },
+    {
+        "id": 32,
+        "name": "LOGISTIKA (TRANSPORT FAOLIYATI BO'YICHA)",
+        "code": "Z",
+        "room": 13
+    },
+    {
+        "id": 33,
+        "name": "SHAHAR QURULISHI VA LOYIHALASH",
+        "code": "AA",
+        "room": 13
+    },
+    {
+        "id": 34,
+        "name": "ARXITEKTURA",
+        "code": "AB",
+        "room": 13
+    },
+    {
+        "id": 35,
+        "name": "DAVOLASH ISHI (O'QUVMUDDATI 6 YIL)",
+        "code": "AC",
+        "room": 10
+    },
+    {
+        "id": 36,
+        "name": "STOMATOLOGIYA (O'QUV MUDDATI 5 YIL)",
+        "code": "AD",
+        "room": 10
+    },
+    {
+        "id": 37,
+        "name": "PEDIATERIYA ISHI (O'QUV MUDDATI 6 YIL)",
+        "code": "AE",
+        "room": 10
+    }
+];
     for (const d of defaultDirections) {
       await run(
-        `INSERT INTO directions (name, code, room) VALUES (?, ?, ?)`,
-        [d.name, d.code, d.room]
+        `INSERT INTO directions (id, name, code, room) VALUES (?, ?, ?, ?)`,
+        [d.id, d.name, d.code, d.room]
       );
     }
-    console.log('Seeded default directions.');
+    console.log('Seeded directions.');
   }
 
   // Seed default operators if empty
   const operatorCount = await get(`SELECT COUNT(*) as count FROM operators`);
   if (operatorCount.count === 0) {
-    const salt = await bcrypt.genSalt(10);
-    const defaultPasswordHash = await bcrypt.hash('12345', salt);
-
     const defaultOperators = [
-      { username: 'operator1', password: defaultPasswordHash, room: 1 },
-      { username: 'operator2', password: defaultPasswordHash, room: 2 },
-      { username: 'operator3', password: defaultPasswordHash, room: 3 },
-      { username: 'operator4', password: defaultPasswordHash, room: 4 }
-    ];
-
+    {
+        "id": 1,
+        "username": "operator1",
+        "password": "$2a$10$ibPL.b7H5v07QVDdz5eaS.IDg4cBLIxjiOPc7eDMu8i2e0v/2h07i",
+        "room": 1
+    },
+    {
+        "id": 2,
+        "username": "operator2",
+        "password": "$2a$10$ibPL.b7H5v07QVDdz5eaS.IDg4cBLIxjiOPc7eDMu8i2e0v/2h07i",
+        "room": 2
+    },
+    {
+        "id": 3,
+        "username": "operator3",
+        "password": "$2a$10$ibPL.b7H5v07QVDdz5eaS.IDg4cBLIxjiOPc7eDMu8i2e0v/2h07i",
+        "room": 3
+    },
+    {
+        "id": 4,
+        "username": "operator4",
+        "password": "$2a$10$ibPL.b7H5v07QVDdz5eaS.IDg4cBLIxjiOPc7eDMu8i2e0v/2h07i",
+        "room": 4
+    },
+    {
+        "id": 5,
+        "username": "operator5",
+        "password": "$2a$10$o/k.0NOdjXzynTcyejGyUe0aWwaXBz.mROlaElzZJBAQcQwn0NWLK",
+        "room": 5
+    },
+    {
+        "id": 6,
+        "username": "operator6",
+        "password": "$2a$10$m9VF4t2Hxg8jxZ0q2FuFIuicwTGr17r7GOpZjJxrJXCzI193GlpZC",
+        "room": 6
+    },
+    {
+        "id": 7,
+        "username": "operator7",
+        "password": "$2a$10$NioMYHkF71N.twZp62MWSO10ugFwjNwoCTzaJXIolQpVeVn5G4Yka",
+        "room": 7
+    },
+    {
+        "id": 8,
+        "username": "operator8",
+        "password": "$2a$10$kFf.K0LFTc1CyfamfDVCz.8nJrZCixVkz5YVN5uW/D3pmF34c3K5S",
+        "room": 8
+    },
+    {
+        "id": 9,
+        "username": "operator9",
+        "password": "$2a$10$k.ZOlxQZNJffVFyp5YjcneffQVxANEfxadKsp9.WwvfQN2Tu8XWTm",
+        "room": 9
+    },
+    {
+        "id": 10,
+        "username": "operator10",
+        "password": "$2a$10$d0vMXrtv9PXEmrQaHoZpBOK4ml/q0NtYmI3UPRHpwsSNM1oUlcz/y",
+        "room": 10
+    },
+    {
+        "id": 11,
+        "username": "operator11",
+        "password": "$2a$10$w15fFGAcrypo6H00DnjaIuBkiAb8S1dPQf2BYst3zLUJto8uUlG1G",
+        "room": 11
+    },
+    {
+        "id": 12,
+        "username": "operator12",
+        "password": "$2a$10$dLsUs5mVjCzVlEG6OFry5.bMZbSgDNuV5hLOjDaptWksi9CnuDWGy",
+        "room": 12
+    },
+    {
+        "id": 13,
+        "username": "operator13",
+        "password": "$2a$10$rGi6NcFdUvaS5oHtOgHwNuuQ0wFtCzg263h6TJKRGq1aVA/rIZIs.",
+        "room": 13
+    }
+];
     for (const op of defaultOperators) {
       await run(
-        `INSERT INTO operators (username, password, room) VALUES (?, ?, ?)`,
-        [op.username, op.password, op.room]
+        `INSERT INTO operators (id, username, password, room) VALUES (?, ?, ?, ?)`,
+        [op.id, op.username, op.password, op.room]
       );
     }
-    console.log('Seeded default operators.');
+    console.log('Seeded operators.');
   }
 
   // Seed default operator-direction mapping if empty
   const mappingCount = await get(`SELECT COUNT(*) as count FROM operator_directions`);
   if (mappingCount.count === 0) {
-    const ops = await all(`SELECT id, username FROM operators`);
-    const dirs = await all(`SELECT id, code FROM directions`);
-
-    const opMap = {
-      'operator1': 'B', // Huquq
-      'operator2': 'A', // Iqtisodiyot
-      'operator3': 'C', // Pedagogika
-      'operator4': 'D'  // Axborot texnologiyalari
-    };
-
-    for (const op of ops) {
-      const targetCode = opMap[op.username];
-      const targetDir = dirs.find(d => d.code === targetCode);
-      if (targetDir) {
-        await run(
-          `INSERT OR IGNORE INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
-          [op.id, targetDir.id]
-        );
-      }
+    const defaultMappings = [
+    {
+        "operator_id": 1,
+        "direction_id": 11
+    },
+    {
+        "operator_id": 1,
+        "direction_id": 8
+    },
+    {
+        "operator_id": 1,
+        "direction_id": 7
+    },
+    {
+        "operator_id": 1,
+        "direction_id": 10
+    },
+    {
+        "operator_id": 1,
+        "direction_id": 9
+    },
+    {
+        "operator_id": 2,
+        "direction_id": 11
+    },
+    {
+        "operator_id": 2,
+        "direction_id": 8
+    },
+    {
+        "operator_id": 2,
+        "direction_id": 7
+    },
+    {
+        "operator_id": 2,
+        "direction_id": 10
+    },
+    {
+        "operator_id": 2,
+        "direction_id": 9
+    },
+    {
+        "operator_id": 3,
+        "direction_id": 11
+    },
+    {
+        "operator_id": 3,
+        "direction_id": 8
+    },
+    {
+        "operator_id": 3,
+        "direction_id": 7
+    },
+    {
+        "operator_id": 3,
+        "direction_id": 10
+    },
+    {
+        "operator_id": 3,
+        "direction_id": 9
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 17
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 14
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 13
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 12
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 15
+    },
+    {
+        "operator_id": 4,
+        "direction_id": 16
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 17
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 14
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 13
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 12
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 15
+    },
+    {
+        "operator_id": 5,
+        "direction_id": 16
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 17
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 14
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 13
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 12
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 15
+    },
+    {
+        "operator_id": 6,
+        "direction_id": 16
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 17
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 14
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 13
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 12
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 15
+    },
+    {
+        "operator_id": 7,
+        "direction_id": 16
+    },
+    {
+        "operator_id": 8,
+        "direction_id": 35
+    },
+    {
+        "operator_id": 8,
+        "direction_id": 37
+    },
+    {
+        "operator_id": 8,
+        "direction_id": 36
+    },
+    {
+        "operator_id": 9,
+        "direction_id": 35
+    },
+    {
+        "operator_id": 9,
+        "direction_id": 37
+    },
+    {
+        "operator_id": 9,
+        "direction_id": 36
+    },
+    {
+        "operator_id": 10,
+        "direction_id": 35
+    },
+    {
+        "operator_id": 10,
+        "direction_id": 37
+    },
+    {
+        "operator_id": 10,
+        "direction_id": 36
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 34
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 30
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 23
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 28
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 24
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 26
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 27
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 25
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 32
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 33
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 18
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 22
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 21
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 19
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 20
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 29
+    },
+    {
+        "operator_id": 11,
+        "direction_id": 31
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 34
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 30
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 23
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 28
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 24
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 26
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 27
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 25
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 32
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 33
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 18
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 22
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 21
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 19
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 20
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 29
+    },
+    {
+        "operator_id": 12,
+        "direction_id": 31
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 34
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 30
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 23
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 28
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 24
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 26
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 27
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 25
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 32
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 33
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 18
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 22
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 21
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 19
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 20
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 29
+    },
+    {
+        "operator_id": 13,
+        "direction_id": 31
     }
-    console.log('Seeded default operator-direction mapping.');
+];
+    for (const m of defaultMappings) {
+      await run(
+        `INSERT OR IGNORE INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
+        [m.operator_id, m.direction_id]
+      );
+    }
+    console.log('Seeded operator-direction mapping.');
   }
 
   // Seed default settings if empty
   const settingsCount = await get(`SELECT COUNT(*) as count FROM settings`);
   if (settingsCount.count === 0) {
     const defaultSettings = [
-      { key: 'org_name', value: 'RANCH UNIVERSITY' },
-      { key: 'logo_main', value: 'RANCH' },
-      { key: 'logo_sub', value: 'University' },
-      { key: 'brand_color', value: '#e60000' },
-      { key: 'kiosk_title', value: 'Elektron Navbat Kioski' },
-      { key: 'monitor_title', value: 'Tizim Monitori' }
-    ];
+    {
+        "key": "css_bg_secondary",
+        "value": "#0f172a"
+    },
+    {
+        "key": "css_text_secondary",
+        "value": "#94a3b8"
+    },
+    {
+        "key": "css_bg_color_2",
+        "value": "#6a280b"
+    },
+    {
+        "key": "css_bg_angle",
+        "value": "285deg"
+    },
+    {
+        "key": "css_glass_blur",
+        "value": "35px"
+    },
+    {
+        "key": "logo_position",
+        "value": "logo-left"
+    },
+    {
+        "key": "css_bg_primary",
+        "value": "#ff0f0f"
+    },
+    {
+        "key": "css_text_primary",
+        "value": "#f8fafc"
+    },
+    {
+        "key": "css_kiosk_btn_width",
+        "value": "440px"
+    },
+    {
+        "key": "org_name",
+        "value": "RANCH UNIVERSITY"
+    },
+    {
+        "key": "logo_main",
+        "value": "RANCH"
+    },
+    {
+        "key": "logo_sub",
+        "value": "University"
+    },
+    {
+        "key": "brand_color",
+        "value": "#ed2c2c"
+    },
+    {
+        "key": "theme",
+        "value": "theme-royal-gold"
+    },
+    {
+        "key": "admin_theme",
+        "value": "minimalist-slate"
+    },
+    {
+        "key": "kiosk_theme",
+        "value": "modern-dark"
+    },
+    {
+        "key": "monitor_theme",
+        "value": "minimalist-slate"
+    },
+    {
+        "key": "op_theme",
+        "value": "light-mode"
+    },
+    {
+        "key": "bg_img",
+        "value": ""
+    },
+    {
+        "key": "kiosk_title",
+        "value": "Elektron Navbat"
+    },
+    {
+        "key": "monitor_title",
+        "value": "Tizim Monitori"
+    },
+    {
+        "key": "custom_css",
+        "value": ""
+    },
+    {
+        "key": "css_kiosk_bg_primary",
+        "value": "#020617"
+    },
+    {
+        "key": "css_kiosk_bg_secondary",
+        "value": "#0f172a"
+    },
+    {
+        "key": "css_kiosk_text_primary",
+        "value": "#f8fafc"
+    },
+    {
+        "key": "css_kiosk_text_secondary",
+        "value": "#94a3b8"
+    },
+    {
+        "key": "css_monitor_bg_primary",
+        "value": "#000000"
+    },
+    {
+        "key": "css_monitor_text_primary",
+        "value": "#ffffff"
+    },
+    {
+        "key": "css_monitor_text_secondary",
+        "value": "#ffffff"
+    },
+    {
+        "key": "css_op_bg_primary",
+        "value": "#0024c7"
+    },
+    {
+        "key": "css_op_bg_secondary",
+        "value": "#1d4dbf"
+    },
+    {
+        "key": "css_op_text_primary",
+        "value": "#2d73b9"
+    },
+    {
+        "key": "css_op_text_secondary",
+        "value": "#4177c3"
+    },
+    {
+        "key": "css_admin_bg_primary",
+        "value": "#020617"
+    },
+    {
+        "key": "css_admin_bg_secondary",
+        "value": "#0f172a"
+    },
+    {
+        "key": "css_admin_text_primary",
+        "value": "#f8fafc"
+    },
+    {
+        "key": "css_admin_text_secondary",
+        "value": "#94a3b8"
+    },
+    {
+        "key": "css_radius_sm",
+        "value": "8px"
+    },
+    {
+        "key": "css_radius_md",
+        "value": "16px"
+    },
+    {
+        "key": "css_kiosk_columns",
+        "value": "repeat(4, 1fr)"
+    },
+    {
+        "key": "css_kiosk_btn_padding",
+        "value": "4.0rem 2.7rem"
+    },
+    {
+        "key": "logo_img",
+        "value": "/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.svg"
+    },
+    {
+        "key": "css_logo_pos",
+        "value": "absolute"
+    },
+    {
+        "key": "css_logo_top",
+        "value": "1px"
+    },
+    {
+        "key": "css_logo_left",
+        "value": "1312px"
+    }
+];
     for (const s of defaultSettings) {
-      await run(`INSERT INTO settings (key, value) VALUES (?, ?)`, [s.key, s.value]);
+      await run(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`, [s.key, s.value]);
     }
     console.log('Seeded default branding settings.');
   }
