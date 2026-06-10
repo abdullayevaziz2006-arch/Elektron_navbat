@@ -35,6 +35,80 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeTicket = null;
   let socket = null;
 
+  // Load dynamic branding settings
+  async function loadBranding() {
+    try {
+      const response = await fetch('/api/settings');
+      if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
+      const settings = await response.json();
+      if (settings) {
+        // 1. Set brand color
+        const brandColor = settings.brand_color || '#e60000';
+        document.body.style.setProperty('--brand-color', brandColor);
+        document.body.style.setProperty('--color-primary', brandColor);
+
+        // 2. Set theme class
+        document.body.className = '';
+        let themeVal = settings.op_theme || settings.theme || 'modern-dark';
+        if (themeVal) {
+          if (themeVal.startsWith('theme-')) {
+            document.body.classList.add(themeVal);
+          } else {
+            if (themeVal === 'light-mode') {
+              document.body.classList.add('theme-elegant-light');
+            } else if (themeVal === 'minimalist-slate') {
+              document.body.classList.add('theme-royal-gold');
+            } else {
+              document.body.classList.add('theme-glass-neon');
+            }
+          }
+        } else {
+          document.body.classList.add('theme-glass-neon');
+        }
+
+        // 3. Set custom background image
+        if (settings.bg_img && settings.bg_img !== '') {
+          document.body.style.setProperty('--custom-bg-img', `url('${settings.bg_img}')`);
+          document.body.classList.add('has-custom-bg');
+        } else {
+          document.body.style.removeProperty('--custom-bg-img');
+          document.body.classList.remove('has-custom-bg');
+        }
+
+        // 4. Inject style variables dynamically
+        Object.keys(settings).forEach(key => {
+          if (key.startsWith('css_')) {
+            const varName = `--` + key.replace('css_', '').replace(/_/g, '-');
+            document.body.style.setProperty(varName, settings[key]);
+          }
+        });
+
+        // 5. Scope operator-specific overrides
+        if (settings.css_op_bg_primary) document.body.style.setProperty('--bg-primary', settings.css_op_bg_primary);
+        if (settings.css_op_bg_secondary) {
+          document.body.style.setProperty('--bg-secondary', settings.css_op_bg_secondary);
+          document.body.style.setProperty('--bg-color-2', settings.css_op_bg_secondary);
+        }
+        if (settings.css_op_text_primary) document.body.style.setProperty('--text-primary', settings.css_op_text_primary);
+        if (settings.css_op_text_secondary) document.body.style.setProperty('--text-secondary', settings.css_op_text_secondary);
+
+        // 6. Inject custom CSS
+        let styleTag = document.getElementById('operator-custom-css-tag');
+        if (!styleTag) {
+          styleTag = document.createElement('style');
+          styleTag.id = 'operator-custom-css-tag';
+          document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = settings.custom_css || '';
+      }
+    } catch (err) {
+      console.error('Error loading branding settings:', err);
+    }
+  }
+
+  // Load branding
+  loadBranding();
+
   // Check login state on startup
   const savedOperator = localStorage.getItem('operator');
   if (savedOperator) {
@@ -132,6 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.type === 'TICKET_CREATED' || data.type === 'QUEUE_CHANGED' || data.type === 'TICKET_CALLED') {
           loadWaitingList();
           loadStats();
+          if (data.type === 'QUEUE_CHANGED') {
+            loadBranding();
+          }
         }
       } catch (e) {
         console.error('Error handling WebSocket message:', e);

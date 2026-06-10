@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tizim Administratori | Elektron Navbat</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=1.0.1">
   <style>
     body {
       background-color: #020617;
@@ -179,8 +179,6 @@
             <tr>
               <th>ID</th>
               <th>Nomi</th>
-              <th>Chipta Kodi</th>
-              <th>Xona raqami</th>
               <th style="text-align: right;">Amallar</th>
             </tr>
           </thead>
@@ -259,193 +257,276 @@
       <div class="content-header">
         <div>
           <h2>Tizim Sozlamalari (White-Label)</h2>
-          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Tashkilot nomi, logotip va kiosk/monitor dizayn sozlamalari</p>
+          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Tashkilot nomi, logotip va panel dizayn sozlamalari</p>
         </div>
       </div>
 
-      <div class="glass-panel" style="max-width: 600px; padding: 2rem;">
-        <form id="form-settings">
-          <div class="form-group">
-            <label for="settings-org-name">Tashkilot nomi (Organization Name)</label>
-            <input type="text" id="settings-org-name" class="form-control" placeholder="Masalan: RANCH UNIVERSITY" required>
-          </div>
-          
-          <div class="grid-form">
-            <div class="form-group">
-              <label for="settings-logo-main">Logo asosiy matni (e.g. RANCH)</label>
-              <input type="text" id="settings-logo-main" class="form-control" placeholder="Masalan: RANCH" required>
-            </div>
-            <div class="form-group">
-              <label for="settings-logo-sub">Logo yordamchi matni (e.g. University)</label>
-              <input type="text" id="settings-logo-sub" class="form-control" placeholder="Masalan: University" required>
-            </div>
-          </div>
+      <div class="glass-panel" style="max-width: 650px; padding: 2rem;">
+        <div class="settings-sub-tabs">
+          <button type="button" class="sub-tab-btn active" data-sub="settings-kiosk">Kiosk</button>
+          <button type="button" class="sub-tab-btn" data-sub="settings-monitor">Monitor Oynasi</button>
+          <button type="button" class="sub-tab-btn" data-sub="settings-operator">Operator Oynasi</button>
+          <button type="button" class="sub-tab-btn" data-sub="settings-admin">Admin Panel</button>
+        </div>
 
-          <div class="grid-form" style="margin-top: 1rem;">
+        <form id="form-settings">
+          
+          <!-- 1. KIOSK PANEL -->
+          <div id="settings-kiosk" class="settings-sub-panel">
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Kiosk Sozlamalari</h3>
+            
             <div class="form-group">
-              <label for="settings-brand-color">Brend rangi (Brand Color)</label>
-              <div style="display: flex; gap: 0.8rem; align-items: center;">
-                <input type="color" id="settings-brand-color" style="width: 55px; height: 42px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" required>
-                <input type="text" id="settings-brand-color-hex" class="form-control" placeholder="#e60000" pattern="^#[0-9a-fA-F]{6}$" required>
+              <label for="settings-org-name">Tashkilot nomi (Organization Name)</label>
+              <input type="text" id="settings-org-name" class="form-control" placeholder="Masalan: RANCH UNIVERSITY" required>
+            </div>
+            
+            <div class="grid-form">
+              <div class="form-group">
+                <label for="settings-logo-main">Logo asosiy matni (e.g. RANCH)</label>
+                <input type="text" id="settings-logo-main" class="form-control" placeholder="Masalan: RANCH" required>
+              </div>
+              <div class="form-group">
+                <label for="settings-logo-sub">Logo yordamchi matni (e.g. University)</label>
+                <input type="text" id="settings-logo-sub" class="form-control" placeholder="Masalan: University" required>
               </div>
             </div>
-            <div class="form-group">
-              <label for="settings-theme">Dizayn Mavzusi (Theme)</label>
-              <select id="settings-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
+
+            <div class="grid-form" style="margin-top: 1rem;">
+              <div class="form-group">
+                <label for="settings-brand-color">Brend rangi (Brand Color)</label>
+                <div style="display: flex; gap: 0.8rem; align-items: center;">
+                  <input type="color" id="settings-brand-color" style="width: 55px; height: 42px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" required>
+                  <input type="text" id="settings-brand-color-hex" class="form-control" placeholder="#e60000" pattern="^#[0-9a-fA-F]{6}$" required>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+              <div class="form-group">
+                <label for="settings-logo-file">Logotip Rasmi (PNG/SVG - Matn o'rniga)</label>
+                <input type="file" id="settings-logo-file" class="form-control" accept="image/*">
+                <input type="hidden" id="settings-logo-img">
+                <div id="settings-logo-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                  <img id="settings-logo-preview" style="max-height: 40px; max-width: 120px; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 4px;">
+                  <button type="button" class="btn btn-danger" id="btn-reset-logo" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="settings-bg-file">Orqa Fon Rasmi (Background Image)</label>
+                <input type="file" id="settings-bg-file" class="form-control" accept="image/*">
+                <input type="hidden" id="settings-bg-img">
+                <div id="settings-bg-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                  <span style="font-size: 0.8rem; color: var(--color-success);">Rasm yuklandi</span>
+                  <button type="button" class="btn btn-danger" id="btn-reset-bg" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="settings-kiosk-title">Kiosk Sarlavhasi (Kiosk Title)</label>
+              <input type="text" id="settings-kiosk-title" class="form-control" placeholder="Masalan: Elektron Navbat Kioski" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="settings-kiosk-theme">Kiosk Dizayn Mavzusi (Theme)</label>
+              <select id="settings-kiosk-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
                 <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
                 <option value="light-mode">Klassik Yorug' (Light Mode)</option>
                 <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
               </select>
             </div>
-          </div>
 
-          <div class="grid-form" style="margin-top: 1rem;">
-            <div class="form-group">
-              <label for="settings-logo-file">Logotip Rasmi (PNG/SVG - Matn o'rniga)</label>
-              <input type="file" id="settings-logo-file" class="form-control" accept="image/*" style="padding: 0.5rem;">
-              <input type="hidden" id="settings-logo-img">
-              <div id="settings-logo-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                <img id="settings-logo-preview" style="max-height: 40px; max-width: 120px; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 4px;">
-                <button type="button" class="btn btn-danger" id="btn-reset-logo" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+            <!-- Kiosk design colors -->
+            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Kiosk Fon & Matn Ranglari</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-kiosk-bg-primary">Asosiy fon rangi (Color 1)</label>
+                  <input type="color" id="css-kiosk-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-kiosk-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                  <input type="color" id="css-kiosk-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+              <div class="grid-form" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label for="css-kiosk-text-primary">Asosiy matn rangi</label>
+                  <input type="color" id="css-kiosk-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-kiosk-text-secondary">Yordamchi matn rangi</label>
+                  <input type="color" id="css-kiosk-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
               </div>
             </div>
-            <div class="form-group">
-              <label for="settings-bg-file">Orqa Fon Rasmi (Background Image)</label>
-              <input type="file" id="settings-bg-file" class="form-control" accept="image/*" style="padding: 0.5rem;">
-              <input type="hidden" id="settings-bg-img">
-              <div id="settings-bg-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                <span style="font-size: 0.8rem; color: var(--color-success);">Rasm yuklandi</span>
-                <button type="button" class="btn btn-danger" id="btn-reset-bg" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
+
+            <!-- Kiosk layout -->
+            <div class="grid-form" style="margin-top: 1rem;">
+              <div class="form-group">
+                <label for="css-kiosk-columns">Kiosk ustunlari soni</label>
+                <select id="css-kiosk-columns" class="form-control">
+                  <option value="repeat(auto-fit, minmax(320px, 1fr))">Avtomatik (auto-fit)</option>
+                  <option value="repeat(1, 1fr)">1 ustun</option>
+                  <option value="repeat(2, 1fr)">2 ustun</option>
+                  <option value="repeat(3, 1fr)">3 ustun</option>
+                  <option value="repeat(4, 1fr)">4 ustun</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="css-kiosk-btn-padding">Kiosk tugmalari balandligi (Padding)</label>
+                <select id="css-kiosk-btn-padding" class="form-control">
+                  <option value="1.5rem 1rem">Kichik (S)</option>
+                  <option value="2.5rem 1.5rem">O'rtacha (M)</option>
+                  <option value="3.5rem 2rem">Katta (L)</option>
+                  <option value="4.5rem 2.5rem">Juda katta (XL)</option>
+                </select>
               </div>
             </div>
           </div>
 
-          <div class="form-group" style="margin-top: 1rem;">
-            <label for="settings-kiosk-title">Kiosk Sarlavhasi (Kiosk Title)</label>
-            <input type="text" id="settings-kiosk-title" class="form-control" placeholder="Masalan: Elektron Navbat Kioski" required>
-          </div>
-
-          <div class="form-group" style="margin-top: 1rem;">
-            <label for="settings-monitor-title">Monitor Sarlavhasi (Monitor Title)</label>
-            <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
-          </div>
-
-          <!-- Visual Style Editor Section -->
-          <div style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
-            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; color: white;">Dizayn Tahrirchisi (Visual Style Editor)</h3>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">Dasturning ranglari, burchaklari va kiosk/monitor joylashuvlarini sozlash</p>
+          <!-- 1b. MONITOR PANEL -->
+          <div id="settings-monitor" class="settings-sub-panel" style="display: none;">
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Monitor Oynasi Sozlamalari</h3>
             
-            <!-- Group 1: Background & Gradients -->
-            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">1. Orqa Fon Sozlamalari (Background)</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-bg-primary">Asosiy fon rangi (Color 1)</label>
-                  <input type="color" id="css-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-bg-secondary">Yordamchi fon rangi (Color 2)</label>
-                  <input type="color" id="css-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
+            <div class="form-group">
+              <label for="settings-monitor-title">Monitor Sarlavhasi (Monitor Title)</label>
+              <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
             </div>
 
-            <!-- Group 2: Text Colors -->
-            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">2. Matn Ranglari (Typography)</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-text-primary">Asosiy matn rangi</label>
-                  <input type="color" id="css-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-text-secondary">Yordamchi matn rangi</label>
-                  <input type="color" id="css-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="settings-monitor-theme">Monitor Dizayn Mavzusi (Theme)</label>
+              <select id="settings-monitor-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
+                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+              </select>
             </div>
 
-            <!-- Group 3: Elements Styling -->
-            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">3. Bloklar va Burchaklar (Elements & Radius)</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-radius-sm">Tugmalar yumaloqligi</label>
-                  <select id="css-radius-sm" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="0px">0px (O'tkir burchak)</option>
-                    <option value="4px">4px (Kichik yumaloq)</option>
-                    <option value="8px">8px (O'rtacha yumaloq)</option>
-                    <option value="16px">16px (Katta yumaloq)</option>
-                    <option value="30px">30px (Yarim doira)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="css-radius-md">Bloklar (Kardlar) yumaloqligi</label>
-                  <select id="css-radius-md" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="0px">0px (O'tkir burchak)</option>
-                    <option value="8px">8px (Kichik yumaloq)</option>
-                    <option value="16px">16px (O'rtacha yumaloq)</option>
-                    <option value="24px">24px (Katta yumaloq)</option>
-                  </select>
-                </div>
+            <!-- Monitor design colors -->
+            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Monitor Fon & Matn Ranglari</h4>
+              <div class="form-group">
+                <label for="css-monitor-bg-primary">Asosiy fon rangi</label>
+                <input type="color" id="css-monitor-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
               </div>
-            </div>
-
-            <!-- Group 4: Kiosk Layout -->
-            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">4. Kiosk Joylashuvi (Kiosk Grid)</h4>
-              <div class="grid-form">
+              <div class="grid-form" style="margin-top: 0.5rem;">
                 <div class="form-group">
-                  <label for="css-kiosk-columns">Yo'nalishlar ustunlari soni</label>
-                  <select id="css-kiosk-columns" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="repeat(auto-fit, minmax(320px, 1fr))">Avtomatik (auto-fit)</option>
-                    <option value="repeat(1, 1fr)">1 ustun (Single wide column)</option>
-                    <option value="repeat(2, 1fr)">2 ustun (2 Columns)</option>
-                    <option value="repeat(3, 1fr)">3 ustun (3 Columns)</option>
-                    <option value="repeat(4, 1fr)">4 ustun (4 Columns)</option>
-                  </select>
+                  <label for="css-monitor-text-primary">Asosiy matn rangi</label>
+                  <input type="color" id="css-monitor-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
                 </div>
                 <div class="form-group">
-                  <label for="css-kiosk-btn-padding">Tugmalar balandligi (Padding)</label>
-                  <select id="css-kiosk-btn-padding" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="1.5rem 1rem">Kichik (S)</option>
-                    <option value="2.5rem 1.5rem">O'rtacha (M)</option>
-                    <option value="3.5rem 2rem">Katta (L)</option>
-                    <option value="4.5rem 2.5rem">Juda katta (XL)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Group 5: TV Monitor Layout -->
-            <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--color-accent);">5. Monitor Joylashuvi (Monitor Grid)</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-monitor-grid-template">Ustunlar kengligi (Chap, O'rta, O'ng)</label>
-                  <select id="css-monitor-grid-template" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="30% 45% 25%">30% : 45% : 25% (Standart)</option>
-                    <option value="25% 50% 25%">25% : 50% : 25% (Kengroq qabul)</option>
-                    <option value="20% 60% 20%">20% : 60% : 20% (Katta o'rta panel)</option>
-                    <option value="35% 35% 30%">35% : 35% : 30% (Kengroq chap panel)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="css-monitor-waiting-columns">Kutayotganlar ro'yxati ustunlari soni</label>
-                  <select id="css-monitor-waiting-columns" class="form-control" style="background: var(--bg-primary); color: var(--text-primary);">
-                    <option value="repeat(2, 1fr)">2 ustun (Standart)</option>
-                    <option value="repeat(1, 1fr)">1 ustun (Bitta qator)</option>
-                    <option value="repeat(3, 1fr)">3 ustun (Kichikroq kataklar)</option>
-                    <option value="repeat(4, 1fr)">4 ustun (Ko'p navbatlar uchun)</option>
-                  </select>
+                  <label for="css-monitor-text-secondary">Yordamchi matn rangi</label>
+                  <input type="color" id="css-monitor-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="form-group" style="margin-top: 1rem;">
-            <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
-            <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height: 120px; font-family: monospace; font-size: 0.85rem; line-height: 1.4; resize: vertical;"></textarea>
+          <!-- 2. OPERATOR OYNASI PANEL -->
+          <div id="settings-operator" class="settings-sub-panel" style="display: none;">
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Operator Oynasi Sozlamalari</h3>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+              <label for="settings-op-theme">Operator Dizayn Mavzusi (Theme)</label>
+              <select id="settings-op-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
+                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+              </select>
+            </div>
+            
+            <!-- Operator design colors -->
+            <div class="glass-panel" style="padding: 1.2rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Operator Fon & Matn Ranglari</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-op-bg-primary">Asosiy fon rangi (Color 1)</label>
+                  <input type="color" id="css-op-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-op-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                  <input type="color" id="css-op-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+              <div class="grid-form" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label for="css-op-text-primary">Asosiy matn rangi</label>
+                  <input type="color" id="css-op-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-op-text-secondary">Yordamchi matn rangi</label>
+                  <input type="color" id="css-op-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. ADMIN PANEL PANEL -->
+          <div id="settings-admin" class="settings-sub-panel" style="display: none;">
+            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Admin Panel Sozlamalari</h3>
+            
+            <div class="form-group">
+              <label for="settings-admin-theme">Admin Dizayn Mavzusi (Theme)</label>
+              <select id="settings-admin-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
+                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+              </select>
+            </div>
+
+            <!-- Admin design colors -->
+            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Admin Fon & Matn Ranglari</h4>
+              <div class="grid-form">
+                <div class="form-group">
+                  <label for="css-admin-bg-primary">Asosiy fon rangi (Color 1)</label>
+                  <input type="color" id="css-admin-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-admin-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                  <input type="color" id="css-admin-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+              <div class="grid-form" style="margin-top: 0.5rem;">
+                <div class="form-group">
+                  <label for="css-admin-text-primary">Asosiy matn rangi</label>
+                  <input type="color" id="css-admin-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                  <label for="css-admin-text-secondary">Yordamchi matn rangi</label>
+                  <input type="color" id="css-admin-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin border radius -->
+            <div class="grid-form" style="margin-top: 1rem;">
+              <div class="form-group">
+                <label for="css-radius-sm">Tugmalar yumaloqligi</label>
+                <select id="css-radius-sm" class="form-control">
+                  <option value="0px">0px (O'tkir burchak)</option>
+                  <option value="4px">4px (Kichik yumaloq)</option>
+                  <option value="8px">8px (O'rtacha yumaloq)</option>
+                  <option value="16px">16px (Katta yumaloq)</option>
+                  <option value="30px">30px (Yarim doira)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="css-radius-md">Bloklar (Kardlar) yumaloqligi</label>
+                <select id="css-radius-md" class="form-control">
+                  <option value="0px">0px (O'tkir burchak)</option>
+                  <option value="8px">8px (Kichik yumaloq)</option>
+                  <option value="16px">16px (O'rtacha yumaloq)</option>
+                  <option value="24px">24px (Katta yumaloq)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
+              <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height: 120px; font-family: monospace; font-size: 0.85rem; line-height: 1.4; resize: vertical;"></textarea>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.8rem; padding: 0.9rem;">
@@ -471,14 +552,14 @@
             <label for="direction-name">Yo'nalish nomi</label>
             <input type="text" id="direction-name" class="form-control" placeholder="Masalan: Iqtisodiyot" required>
           </div>
-          <div class="grid-form">
+          <div class="grid-form" style="display: none;">
             <div class="form-group">
-              <label for="direction-code">Chipta kodi (1 ta harf)</label>
-              <input type="text" id="direction-code" class="form-control" placeholder="A" maxlength="2" required>
+              <label for="direction-code">Chipta kodi (1-2 ta harf - ixtiyoriy)</label>
+              <input type="text" id="direction-code" class="form-control" placeholder="Avtomatik (A, B, D...)">
             </div>
             <div class="form-group">
-              <label for="direction-room">Xona raqami</label>
-              <input type="number" id="direction-room" class="form-control" placeholder="2" required>
+              <label for="direction-room">Xona raqami (ixtiyoriy)</label>
+              <input type="number" id="direction-room" class="form-control" placeholder="Operator xonasi bo'yicha">
             </div>
           </div>
           <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">
@@ -528,6 +609,6 @@
     </div>
   </div>
 
-  <script src="js/admin.js"></script>
+  <script src="js/admin.js?v=1.0.1"></script>
 </body>
 </html>

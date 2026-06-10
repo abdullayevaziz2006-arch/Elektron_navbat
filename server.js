@@ -87,13 +87,13 @@ app.get('/api/directions', async (req, res) => {
 // --- Queue / Tickets Operations ---
 // Create ticket (Kiosk)
 app.post('/api/tickets', async (req, res) => {
-  const { direction_code } = req.body;
-  if (!direction_code) {
-    return res.status(400).json({ error: 'Yo\'nalish kodini yuboring' });
+  const { direction_id } = req.body;
+  if (!direction_id) {
+    return res.status(400).json({ error: 'Yo\'nalish ID sini yuboring' });
   }
 
   try {
-    const ticket = await db.createTicket(direction_code);
+    const ticket = await db.createTicket(parseInt(direction_id));
     
     // Broadcast ticket creation event
     broadcast({ type: 'TICKET_CREATED', ticket });
@@ -112,17 +112,15 @@ app.get('/api/operator/queue', async (req, res) => {
 
     if (operator_id) {
       const opId = parseInt(operator_id);
-      // Fetch operator mapped direction codes
+      // Fetch operator mapped direction IDs
       const assignedDirs = await db.all(
-        `SELECT d.code FROM operator_directions od
-         JOIN directions d ON od.direction_id = d.id
-         WHERE od.operator_id = ?`,
+        `SELECT direction_id FROM operator_directions WHERE operator_id = ?`,
         [opId]
       );
       
-      const codes = assignedDirs.map(d => d.code);
-      // Filter list to only show tickets matching assigned direction codes
-      const filteredList = list.filter(item => codes.includes(item.direction_code));
+      const ids = assignedDirs.map(d => d.direction_id);
+      // Filter list to only show tickets matching assigned direction IDs
+      const filteredList = list.filter(item => ids.includes(item.direction_id));
       return res.json(filteredList);
     }
 
@@ -217,11 +215,13 @@ app.get('/api/operator/stats', async (req, res) => {
 // Manage Directions
 app.post('/api/admin/directions', async (req, res) => {
   const { name, code, room } = req.body;
-  if (!name || !code || !room) {
-    return res.status(400).json({ error: 'Barcha maydonlarni to\'ldiring' });
+  if (!name) {
+    return res.status(400).json({ error: 'Yo\'nalish nomini yuboring' });
   }
   try {
-    await db.addDirection(name, code, room);
+    const finalCode = code && code.trim() !== '' ? code : await db.getNextAvailableDirectionCode();
+    const finalRoom = room ? parseInt(room) : 1;
+    await db.addDirection(name, finalCode, finalRoom);
     broadcast({ type: 'QUEUE_CHANGED' });
     res.status(201).json({ success: true });
   } catch (err) {
@@ -232,8 +232,13 @@ app.post('/api/admin/directions', async (req, res) => {
 app.put('/api/admin/directions/:id', async (req, res) => {
   const { name, code, room } = req.body;
   const { id } = req.params;
+  if (!name) {
+    return res.status(400).json({ error: 'Yo\'nalish nomini yuboring' });
+  }
   try {
-    await db.updateDirection(id, name, code, room);
+    const finalCode = code && code.trim() !== '' ? code : await db.getNextAvailableDirectionCode();
+    const finalRoom = room ? parseInt(room) : 1;
+    await db.updateDirection(id, name, finalCode, finalRoom);
     broadcast({ type: 'QUEUE_CHANGED' });
     res.json({ success: true });
   } catch (err) {
@@ -329,7 +334,7 @@ app.post('/api/upload', (req, res) => {
     return res.status(400).json({ error: 'Fayl nomi va ma\'lumotlari yuborilmadi' });
   }
   try {
-    const base64Data = fileData.replace(/^data:image\/\w+;base64,/, "");
+    const base64Data = fileData.replace(/^data:image\/[^;]+;base64,/, "");
     const buffer = Buffer.from(base64Data, 'base64');
     
     const ext = path.extname(fileName) || '.png';

@@ -3,7 +3,10 @@
 :root {
   --bg-primary: #020617;
   --bg-secondary: #0f172a;
+  --bg-color-2: var(--bg-secondary);
   --bg-tertiary: #1e293b;
+  --bg-angle: 135deg;
+  --glass-blur: 12px;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -29,7 +32,7 @@
 
 /* Template 1: Glass Neon Dark (Default Theme) */
 body.theme-glass-neon {
-  background-image: linear-gradient(135deg, #020617 0%, #0f172a 100%) !important;
+  background-image: linear-gradient(var(--bg-angle, 135deg), var(--bg-primary, #020617) 0%, var(--bg-color-2, #0f172a) 100%) !important;
 }
 
 /* Template 2: Clean Elegant Light Theme */
@@ -70,6 +73,12 @@ body.theme-elegant-light .direction-btn:hover {
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06) !important;
 }
 
+body.theme-elegant-light .direction-room {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.05) !important;
+  color: var(--text-secondary) !important;
+}
+
 /* Template 3: Royal Navy & Gold Theme */
 body.theme-royal-gold {
   --bg-primary: #050b14;
@@ -101,6 +110,12 @@ body.theme-royal-gold .direction-btn::after {
   background: linear-gradient(90deg, #d4af37, #aa7c11) !important;
 }
 
+body.theme-royal-gold .direction-room {
+  background: rgba(212, 175, 55, 0.1) !important;
+  border-color: rgba(212, 175, 55, 0.2) !important;
+  color: #d4af37 !important;
+}
+
 /* Custom Background Helper */
 body.has-custom-bg {
   background: var(--custom-bg-img) no-repeat center center fixed !important;
@@ -115,6 +130,7 @@ body.has-custom-bg {
 
 body {
   background-color: var(--bg-primary);
+  background-image: linear-gradient(var(--bg-angle, 135deg), var(--bg-primary, #020617) 0%, var(--bg-color-2, #0f172a) 100%) !important;
   color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;
@@ -172,8 +188,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Glassmorphism Card Utility */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-radius: var(--radius-md);
@@ -444,4 +460,344 @@ tr:hover td {
     color: black;
     background: white;
   }
+}
+
+/* Drag-and-Drop Edit Mode and Layout Coordinates overrides */
+.logo-container {
+  position: var(--logo-pos, relative);
+  top: var(--logo-top, auto);
+  left: var(--logo-left, auto);
+}
+
+.kiosk-welcome {
+  position: var(--welcome-pos, relative);
+  top: var(--welcome-top, auto);
+  left: var(--welcome-left, auto);
+  transform: var(--welcome-transform, none);
+}
+
+.directions-grid {
+  position: relative;
+  width: 100%;
+}
+
+body.edit-mode .logo-container,
+body.edit-mode .kiosk-welcome {
+  position: absolute !important;
+  cursor: move !important;
+  border: 2px dashed var(--color-accent) !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5) !important;
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+}
+
+body.edit-mode .direction-btn {
+  pointer-events: none !important; /* Disable buttons inside grid during drag-and-drop edit mode */
+}
+
+/* Floating Designer Toggle Button */
+.designer-toggle-btn {
+  display: none !important; /* Hidden from customers */
+}
+
+/* Inline SVG logo responsiveness */
+.logo-container svg {
+  height: 55px;
+  max-width: 250px;
+  display: block;
+}
+
+.brand-logo-container svg {
+  height: 85px;
+  max-width: 250px;
+  display: block;
+}
+
+/* Floating Designer Dock */
+.designer-dock {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%); /* Hidden by default */
+  width: 90%;
+  max-width: 1100px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+  padding: 1.5rem 2rem;
+  z-index: 9990;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary);
+}
+
+.designer-dock.active {
+  transform: translate(-50%, 0);
+}
+
+.designer-dock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.8rem;
+}
+
+.designer-dock-header h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.designer-dock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.designer-dock-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.designer-dock-col label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.designer-color-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.designer-color-row input[type="color"] {
+  width: 45px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 0;
+}
+
+.designer-color-row input[type="text"] {
+  flex-grow: 1;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.8rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+/* Range Inputs */
+.designer-range-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.designer-range-wrapper input[type="range"] {
+  flex-grow: 1;
+  height: 5px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.designer-range-wrapper span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* File Upload drag-and-drop overlays */
+.global-drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 5px dashed var(--color-primary);
+  margin: 15px;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.global-drag-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.global-drag-overlay svg {
+  width: 80px;
+  height: 80px;
+  stroke: var(--color-primary);
+  margin-bottom: 1.5rem;
+  animation: float 2s infinite ease-in-out;
+}
+
+.global-drag-overlay h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.global-drag-overlay p {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.logo-drag-overlay {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: rgba(245, 158, 11, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-sm);
+  z-index: 1010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  border: 2px dashed #000;
+}
+
+.logo-container {
+  position: relative;
+}
+
+.logo-container.dragover .logo-drag-overlay {
+  opacity: 1;
+}
+
+/* Quick popover edit tooltips */
+.quick-edit-popover {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  padding: 1rem;
+  z-index: 1100;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.quick-edit-popover-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
+}
+
+/* Individual Button Resize & Drag Uslublari */
+.direction-btn {
+  position: relative;
+}
+
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 50%, var(--color-accent, #f59e0b) 50%);
+  border-radius: 0 0 var(--radius-md, 16px) 0;
+  display: none;
+  z-index: 10;
+}
+
+body.edit-mode .resize-handle {
+  display: block !important;
+}
+
+body.edit-mode .direction-btn {
+  cursor: move !important;
+  border: 1px dashed var(--color-accent, #f59e0b) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Sizing fix for file input fields */
+input[type="file"].form-control {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  height: auto;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Settings Sub-Tab Navigation Bar Styles */
+.settings-sub-tabs {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 0.8rem;
+}
+
+.sub-tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.sub-tab-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sub-tab-btn.active {
+  color: white;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.25);
 }

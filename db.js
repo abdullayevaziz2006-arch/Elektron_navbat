@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 
 const dbPath = path.join(__dirname, 'queue.db');
 const db = new sqlite3.Database(dbPath);
+db.run("PRAGMA foreign_keys = OFF");
+
 
 // Helper functions for Promise-based DB queries
 const run = (sql, params = []) => {
@@ -40,7 +42,7 @@ async function initDatabase() {
     CREATE TABLE IF NOT EXISTS directions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      code TEXT UNIQUE NOT NULL,
+      code TEXT NOT NULL,
       room INTEGER NOT NULL
     )
   `);
@@ -70,6 +72,7 @@ async function initDatabase() {
   await run(`
     CREATE TABLE IF NOT EXISTS queues (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      direction_id INTEGER,
       direction_code TEXT NOT NULL,
       number INTEGER NOT NULL,
       status TEXT NOT NULL, -- 'waiting', 'called', 'completed', 'skipped'
@@ -174,6 +177,79 @@ async function initDatabase() {
     }
     console.log('Seeded default branding settings.');
   }
+
+  // Clean up orphaned operator-direction mappings
+  await run(`DELETE FROM operator_directions WHERE direction_id NOT IN (SELECT id FROM directions)`);
+  await run(`DELETE FROM operator_directions WHERE operator_id NOT IN (SELECT id FROM operators)`);
+
+  // Fix operator_directions table foreign key reference if it points to directions_old
+  const opDirsSchema = await get(`SELECT sql FROM sqlite_master WHERE type='table' AND name='operator_directions'`);
+  if (opDirsSchema && opDirsSchema.sql.includes('directions_old')) {
+    console.log('Migrating operator_directions table to fix foreign key reference...');
+    let rows = [];
+    try {
+      rows = await all(`SELECT * FROM operator_directions`);
+    } catch (e) {
+      console.log('Could not backup operator_directions:', e.message);
+    }
+    await run(`DROP TABLE operator_directions`);
+    await run(`
+      CREATE TABLE operator_directions (
+        operator_id INTEGER,
+        direction_id INTEGER,
+        PRIMARY KEY (operator_id, direction_id),
+        FOREIGN KEY (operator_id) REFERENCES operators(id) ON DELETE CASCADE,
+        FOREIGN KEY (direction_id) REFERENCES directions(id) ON DELETE CASCADE
+      )
+    `);
+    for (const r of rows) {
+      try {
+        await run(`INSERT INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`, [r.operator_id, r.direction_id]);
+      } catch (e) {
+        // ignore invalid rows
+      }
+    }
+    console.log('operator_directions table migrated successfully.');
+  }
+
+  // Migration: Drop UNIQUE constraint on directions.code if it exists
+  const schemaRow = await get(`SELECT sql FROM sqlite_master WHERE type='table' AND name='directions'`);
+  if (schemaRow && schemaRow.sql.includes('UNIQUE')) {
+    console.log('Migrating directions table to remove UNIQUE constraint...');
+    await run(`ALTER TABLE directions RENAME TO directions_old`);
+    await run(`
+      CREATE TABLE directions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        code TEXT NOT NULL,
+        room INTEGER NOT NULL
+      )
+    `);
+    await run(`INSERT INTO directions (id, name, code, room) SELECT id, name, code, room FROM directions_old`);
+    await run(`DROP TABLE directions_old`);
+    console.log('directions table migrated successfully.');
+  }
+
+  // Migration: Add direction_id column to queues if it doesn't exist
+  const queuesCols = await all(`PRAGMA table_info(queues)`);
+  const hasDirectionId = queuesCols.some(col => col.name === 'direction_id');
+  if (!hasDirectionId) {
+    console.log('Adding direction_id column to queues table...');
+    await run(`ALTER TABLE queues ADD COLUMN direction_id INTEGER`);
+    await run(`
+      UPDATE queues 
+      SET direction_id = (
+        SELECT id FROM directions 
+        WHERE directions.code = queues.direction_code 
+        LIMIT 1
+      )
+      WHERE direction_id IS NULL
+    `);
+    console.log('queues table migrated successfully.');
+  }
+
+  // Enable foreign keys now that the schema is clean
+  await run(`PRAGMA foreign_keys = ON`);
 }
 
 // Generate the next queue number for a given direction, resetting daily
@@ -188,6 +264,27 @@ async function getNextQueueNumber(directionCode) {
   return lastTicket ? lastTicket.number + 1 : 1;
 }
 
+// Generate the next available direction letter code sequentially
+async function getNextAvailableDirectionCode() {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const existingRows = await all(`SELECT code FROM directions`);
+  const existingCodes = existingRows.map(r => r.code.toUpperCase());
+
+  for (let i = 0; i < alphabet.length; i++) {
+    const code = alphabet[i];
+    if (!existingCodes.includes(code)) return code;
+  }
+
+  for (let i = 0; i < alphabet.length; i++) {
+    for (let j = 0; j < alphabet.length; j++) {
+      const code = alphabet[i] + alphabet[j];
+      if (!existingCodes.includes(code)) return code;
+    }
+  }
+
+  return "A";
+}
+
 module.exports = {
   initDatabase,
   run,
@@ -195,16 +292,34 @@ module.exports = {
   all,
   getNextQueueNumber,
   
+  getNextAvailableDirectionCode,
+
   // Directions Operations
   getDirections: () => all(`SELECT * FROM directions ORDER BY name ASC`),
   addDirection: (name, code, room) => run(
     `INSERT INTO directions (name, code, room) VALUES (?, ?, ?)`,
     [name, code.toUpperCase(), room]
   ),
-  updateDirection: (id, name, code, room) => run(
-    `UPDATE directions SET name = ?, code = ?, room = ? WHERE id = ?`,
-    [name, code.toUpperCase(), room, id]
-  ),
+  updateDirection: async (id, name, code, room) => {
+    const newCode = code.toUpperCase();
+
+    await run(
+      `UPDATE directions SET name = ?, code = ?, room = ? WHERE id = ?`,
+      [name, newCode, room, id]
+    );
+
+    // Update all queues mapped to this direction_id
+    await run(
+      `UPDATE queues SET direction_code = ? WHERE direction_id = ?`,
+      [newCode, id]
+    );
+
+    // Update room for waiting queues
+    await run(
+      `UPDATE queues SET room = ? WHERE direction_id = ? AND status = 'waiting'`,
+      [room, id]
+    );
+  },
   deleteDirection: (id) => run(`DELETE FROM directions WHERE id = ?`, [id]),
 
   // Operators Operations
@@ -225,6 +340,16 @@ module.exports = {
         await run(
           `INSERT INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
           [operatorId, dirId]
+        );
+        // Automatically sync direction's room with operator's room
+        await run(
+          `UPDATE directions SET room = ? WHERE id = ?`,
+          [room, dirId]
+        );
+        // Sync active waiting tickets room
+        await run(
+          `UPDATE queues SET room = ? WHERE direction_id = ? AND status = 'waiting'`,
+          [room, dirId]
         );
       }
     }
@@ -254,6 +379,16 @@ module.exports = {
         await run(
           `INSERT INTO operator_directions (operator_id, direction_id) VALUES (?, ?)`,
           [id, dirId]
+        );
+        // Automatically sync direction's room with operator's room
+        await run(
+          `UPDATE directions SET room = ? WHERE id = ?`,
+          [room, dirId]
+        );
+        // Sync active waiting tickets room
+        await run(
+          `UPDATE queues SET room = ? WHERE direction_id = ? AND status = 'waiting'`,
+          [room, dirId]
         );
       }
     }
@@ -290,24 +425,25 @@ module.exports = {
   },
 
   // Queue Operations
-  createTicket: async (directionCode) => {
-    const direction = await get(`SELECT id, name, room FROM directions WHERE code = ?`, [directionCode]);
+  createTicket: async (directionId) => {
+    const direction = await get(`SELECT id, name, code, room FROM directions WHERE id = ?`, [directionId]);
     if (!direction) throw new Error('Yo\'nalish topilmadi');
 
-    const nextNum = await getNextQueueNumber(directionCode);
+    const nextNum = await getNextQueueNumber(direction.code);
     
     // Insert into queues table
     const result = await run(
-      `INSERT INTO queues (direction_code, number, status, room) VALUES (?, ?, 'waiting', ?)`,
-      [directionCode, nextNum, direction.room]
+      `INSERT INTO queues (direction_id, direction_code, number, status, room) VALUES (?, ?, ?, 'waiting', ?)`,
+      [directionId, direction.code, nextNum, direction.room]
     );
 
     return {
       id: result.lastID,
-      direction_code: directionCode,
+      direction_id: directionId,
+      direction_code: direction.code,
       direction_name: direction.name,
       number: nextNum,
-      ticket_code: `${directionCode}${nextNum}`,
+      ticket_code: `${direction.code}${nextNum}`,
       room: direction.room,
       status: 'waiting',
       created_at: new Date().toISOString()
@@ -318,7 +454,7 @@ module.exports = {
   getWaitingQueue: () => all(
     `SELECT q.*, d.name as direction_name 
      FROM queues q
-     JOIN directions d ON q.direction_code = d.code
+     JOIN directions d ON q.direction_id = d.id
      WHERE q.status = 'waiting' 
      ORDER BY q.id ASC`
   ),
@@ -326,11 +462,9 @@ module.exports = {
   // RESTURCTURED CALL NEXT TICKET:
   // Operator calls the oldest ticket from the list of directions they serve.
   callNextTicket: async (operatorId, room) => {
-    // 1. Get the direction codes assigned to this operator
+    // 1. Get the direction IDs assigned to this operator
     const assignedDirs = await all(
-      `SELECT d.code FROM operator_directions od
-       JOIN directions d ON od.direction_id = d.id
-       WHERE od.operator_id = ?`,
+      `SELECT direction_id FROM operator_directions WHERE operator_id = ?`,
       [operatorId]
     );
 
@@ -338,16 +472,16 @@ module.exports = {
 
     // Create an SQL placeholders string: (?, ?, ?)
     const placeholders = assignedDirs.map(() => '?').join(',');
-    const codes = assignedDirs.map(d => d.code);
+    const ids = assignedDirs.map(d => d.direction_id);
 
-    // 2. Query the oldest waiting ticket from the assigned direction codes
+    // 2. Query the oldest waiting ticket from the assigned direction IDs
     const ticket = await get(
       `SELECT q.*, d.name as direction_name 
        FROM queues q
-       JOIN directions d ON q.direction_code = d.code
-       WHERE q.status = 'waiting' AND q.direction_code IN (${placeholders})
+       JOIN directions d ON q.direction_id = d.id
+       WHERE q.status = 'waiting' AND q.direction_id IN (${placeholders})
        ORDER BY q.id ASC LIMIT 1`,
-      codes
+      ids
     );
 
     if (!ticket) return null;
@@ -371,7 +505,7 @@ module.exports = {
     const ticket = await get(
       `SELECT q.*, d.name as direction_name 
        FROM queues q
-       JOIN directions d ON q.direction_code = d.code
+       JOIN directions d ON q.direction_id = d.id
        WHERE q.id = ?`,
       [ticketId]
     );
@@ -402,7 +536,7 @@ module.exports = {
     const called = await all(
       `SELECT q.*, d.name as direction_name
        FROM queues q
-       JOIN directions d ON q.direction_code = d.code
+       JOIN directions d ON q.direction_id = d.id
        WHERE q.status = 'called'
        ORDER BY q.called_at DESC LIMIT 10`
     );
@@ -415,7 +549,7 @@ module.exports = {
     const waitingList = await all(
       `SELECT q.*, d.name as direction_name
        FROM queues q
-       JOIN directions d ON q.direction_code = d.code
+       JOIN directions d ON q.direction_id = d.id
        WHERE q.status = 'waiting'
        ORDER BY q.id ASC`
     );
@@ -480,7 +614,7 @@ module.exports = {
   getQueueHistory: () => all(
     `SELECT q.*, d.name as direction_name, o.username as operator_username
      FROM queues q
-     JOIN directions d ON q.direction_code = d.code
+     LEFT JOIN directions d ON q.direction_id = d.id
      LEFT JOIN operators o ON q.operator_id = o.id
      ORDER BY q.id DESC`
   )

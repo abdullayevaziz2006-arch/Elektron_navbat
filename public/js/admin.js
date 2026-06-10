@@ -22,6 +22,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Settings sub-tab switching
+  const subTabBtns = document.querySelectorAll('.sub-tab-btn');
+  const settingsSubPanels = document.querySelectorAll('.settings-sub-panel');
+
+  subTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetSub = btn.getAttribute('data-sub');
+      
+      subTabBtns.forEach(b => b.classList.remove('active'));
+      settingsSubPanels.forEach(p => p.style.display = 'none');
+      
+      btn.classList.add('active');
+      document.getElementById(targetSub).style.display = 'block';
+    });
+  });
+
   // --- Directions Elements & CRUD ---
   const tableDirectionsBody = document.getElementById('table-directions-body');
   const btnAddDirection = document.getElementById('btn-add-direction');
@@ -59,8 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.innerHTML = `
           <td>${dir.id}</td>
           <td><strong>${dir.name}</strong></td>
-          <td><span class="badge-room" style="background: var(--bg-tertiary); border: 1px solid var(--glass-border);">${dir.code}</span></td>
-          <td>${dir.room}-xona</td>
           <td style="text-align: right;">
             <button class="btn btn-secondary btn-edit-dir" data-id="${dir.id}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; margin-right: 0.5rem;">Tahrirlash</button>
             <button class="btn btn-danger btn-delete-dir" data-id="${dir.id}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">O'chirish</button>
@@ -101,7 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const id = directionIdInput.value;
     const name = directionNameInput.value.trim();
     const code = directionCodeInput.value.trim().toUpperCase();
-    const room = parseInt(directionRoomInput.value);
+    const roomVal = directionRoomInput.value.trim();
+    const room = roomVal !== '' ? parseInt(roomVal) : null;
 
     const url = id ? `/api/admin/directions/${id}` : '/api/admin/directions';
     const method = id ? 'PUT' : 'POST';
@@ -462,7 +477,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsLogoSub = document.getElementById('settings-logo-sub');
   const settingsBrandColor = document.getElementById('settings-brand-color');
   const settingsBrandColorHex = document.getElementById('settings-brand-color-hex');
-  const settingsTheme = document.getElementById('settings-theme');
+  const settingsKioskTheme = document.getElementById('settings-kiosk-theme');
+  const settingsMonitorTheme = document.getElementById('settings-monitor-theme');
+  const settingsOpTheme = document.getElementById('settings-op-theme');
+  const settingsAdminTheme = document.getElementById('settings-admin-theme');
   const settingsLogoFile = document.getElementById('settings-logo-file');
   const settingsLogoImg = document.getElementById('settings-logo-img');
   const settingsLogoPreviewContainer = document.getElementById('settings-logo-preview-container');
@@ -596,45 +614,54 @@ document.addEventListener('DOMContentLoaded', () => {
           settingsBrandColor.value = settings.brand_color || '#e60000';
           settingsBrandColorHex.value = settings.brand_color || '#e60000';
         }
-        if (settingsTheme) settingsTheme.value = settings.theme || 'modern-dark';
+        const parseTheme = (val) => {
+          let themeVal = val || 'modern-dark';
+          if (themeVal === 'theme-glass-neon') themeVal = 'modern-dark';
+          if (themeVal === 'theme-elegant-light') themeVal = 'light-mode';
+          if (themeVal === 'theme-royal-gold') themeVal = 'minimalist-slate';
+          return themeVal;
+        };
+        if (settingsKioskTheme) settingsKioskTheme.value = parseTheme(settings.kiosk_theme);
+        if (settingsMonitorTheme) settingsMonitorTheme.value = parseTheme(settings.monitor_theme);
+        if (settingsOpTheme) settingsOpTheme.value = parseTheme(settings.op_theme);
+        if (settingsAdminTheme) settingsAdminTheme.value = parseTheme(settings.admin_theme || settings.theme);
         if (settingsKioskTitle) settingsKioskTitle.value = settings.kiosk_title || '';
         if (settingsMonitorTitle) settingsMonitorTitle.value = settings.monitor_title || '';
         if (settingsCustomCss) settingsCustomCss.value = settings.custom_css || '';
  
         // Load CSS Style Editor values
         const styleKeys = [
-          'bg_primary', 'bg_secondary', 'text_primary', 'text_secondary',
-          'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding',
-          'monitor_grid_template', 'monitor_waiting_columns'
+          'kiosk_bg_primary', 'kiosk_bg_secondary', 'kiosk_text_primary', 'kiosk_text_secondary',
+          'monitor_bg_primary', 'monitor_text_primary', 'monitor_text_secondary',
+          'op_bg_primary', 'op_bg_secondary', 'op_text_primary', 'op_text_secondary',
+          'admin_bg_primary', 'admin_bg_secondary', 'admin_text_primary', 'admin_text_secondary',
+          'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding'
         ];
         
         styleKeys.forEach(sKey => {
           const inputEl = document.getElementById(`css-${sKey.replace(/_/g, '-')}`);
           if (inputEl) {
             let defaultValue = '';
-            if (sKey === 'bg_primary') defaultValue = '#020617';
-            if (sKey === 'bg_secondary') defaultValue = '#0f172a';
-            if (sKey === 'text_primary') defaultValue = '#f8fafc';
-            if (sKey === 'text_secondary') defaultValue = '#94a3b8';
+            if (sKey.includes('bg_primary')) defaultValue = '#020617';
+            if (sKey.includes('bg_secondary')) defaultValue = '#0f172a';
+            if (sKey.includes('text_primary')) defaultValue = '#f8fafc';
+            if (sKey.includes('text_secondary')) defaultValue = '#94a3b8';
             if (sKey === 'radius_sm') defaultValue = '8px';
             if (sKey === 'radius_md') defaultValue = '16px';
             if (sKey === 'kiosk_columns') defaultValue = 'repeat(auto-fit, minmax(320px, 1fr))';
             if (sKey === 'kiosk_btn_padding') defaultValue = '2.5rem 1.5rem';
-            if (sKey === 'monitor_grid_template') defaultValue = '30% 45% 25%';
-            if (sKey === 'monitor_waiting_columns') defaultValue = 'repeat(2, 1fr)';
- 
+
             inputEl.value = settings[`css_${sKey}`] || defaultValue;
           }
         });
  
         // Apply style variables to current admin panel dynamically
-        styleKeys.forEach(sKey => {
-          const val = settings[`css_${sKey}`];
-          if (val) {
-            const varName = `--` + sKey.replace(/_/g, '-');
-            document.documentElement.style.setProperty(varName, val);
-          }
-        });
+        if (settings.css_admin_bg_primary) document.body.style.setProperty('--bg-primary', settings.css_admin_bg_primary);
+        if (settings.css_admin_bg_secondary) document.body.style.setProperty('--bg-secondary', settings.css_admin_bg_secondary);
+        if (settings.css_admin_text_primary) document.body.style.setProperty('--text-primary', settings.css_admin_text_primary);
+        if (settings.css_admin_text_secondary) document.body.style.setProperty('--text-secondary', settings.css_admin_text_secondary);
+        if (settings.css_radius_sm) document.body.style.setProperty('--radius-sm', settings.css_radius_sm);
+        if (settings.css_radius_md) document.body.style.setProperty('--radius-md', settings.css_radius_md);
  
         // Handle logo image preview
         if (settings.logo_img && settings.logo_img !== '') {
@@ -667,9 +694,12 @@ document.addEventListener('DOMContentLoaded', () => {
  
         // Apply theme class to admin body
         document.body.className = '';
-        if (settings.theme && settings.theme !== 'modern-dark') {
-          document.body.classList.add(`theme-${settings.theme}`);
-        }
+        let themeClass = settings.admin_theme || settings.theme || 'theme-glass-neon';
+        if (themeClass === 'modern-dark') themeClass = 'theme-glass-neon';
+        if (themeClass === 'light-mode') themeClass = 'theme-elegant-light';
+        if (themeClass === 'minimalist-slate') themeClass = 'theme-royal-gold';
+        
+        document.body.classList.add(themeClass);
       }
     } catch (err) {
       console.error(err);
@@ -686,7 +716,11 @@ document.addEventListener('DOMContentLoaded', () => {
         logo_main: settingsLogoMain.value.trim(),
         logo_sub: settingsLogoSub.value.trim(),
         brand_color: settingsBrandColorHex.value.trim(),
-        theme: settingsTheme.value,
+        theme: settingsAdminTheme.value,
+        admin_theme: settingsAdminTheme.value,
+        kiosk_theme: settingsKioskTheme.value,
+        monitor_theme: settingsMonitorTheme.value,
+        op_theme: settingsOpTheme.value,
         logo_img: settingsLogoImg.value,
         bg_img: settingsBgImg.value,
         kiosk_title: settingsKioskTitle.value.trim(),
@@ -696,9 +730,11 @@ document.addEventListener('DOMContentLoaded', () => {
  
       // Collect style editor values
       const styleKeys = [
-        'bg_primary', 'bg_secondary', 'text_primary', 'text_secondary',
-        'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding',
-        'monitor_grid_template', 'monitor_waiting_columns'
+        'kiosk_bg_primary', 'kiosk_bg_secondary', 'kiosk_text_primary', 'kiosk_text_secondary',
+        'monitor_bg_primary', 'monitor_text_primary', 'monitor_text_secondary',
+        'op_bg_primary', 'op_bg_secondary', 'op_text_primary', 'op_text_secondary',
+        'admin_bg_primary', 'admin_bg_secondary', 'admin_text_primary', 'admin_text_secondary',
+        'radius_sm', 'radius_md', 'kiosk_columns', 'kiosk_btn_padding'
       ];
       
       styleKeys.forEach(sKey => {

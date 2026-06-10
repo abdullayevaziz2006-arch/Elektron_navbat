@@ -29,13 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
       if (settings) {
         // 1. Set brand color
         const brandColor = settings.brand_color || '#e60000';
-        document.documentElement.style.setProperty('--brand-color', brandColor);
-        document.documentElement.style.setProperty('--color-primary', brandColor);
+        document.body.style.setProperty('--brand-color', brandColor);
+        document.body.style.setProperty('--color-primary', brandColor);
 
         // 2. Set theme class
         document.body.className = '';
-        if (settings.theme && settings.theme !== 'modern-dark') {
-          document.body.classList.add(`theme-${settings.theme}`);
+        let themeVal = settings.monitor_theme || settings.theme || 'modern-dark';
+        if (themeVal && themeVal !== 'modern-dark') {
+          if (themeVal.startsWith('theme-')) {
+            document.body.classList.add(themeVal);
+          } else {
+            if (themeVal === 'light-mode') {
+              document.body.classList.add('theme-elegant-light');
+            } else if (themeVal === 'minimalist-slate') {
+              document.body.classList.add('theme-royal-gold');
+            } else {
+              document.body.classList.add('theme-glass-neon');
+            }
+          }
+        } else {
+          document.body.classList.add('theme-glass-neon');
         }
 
         // 3. Set custom background image
@@ -51,7 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const logoContainer = document.querySelector('.brand-logo-container');
         if (logoContainer) {
           if (settings.logo_img && settings.logo_img !== '') {
-            logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 120px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+            const isSvg = settings.logo_img.split('?')[0].toLowerCase().endsWith('.svg');
+            if (isSvg) {
+              try {
+                const cacheBusterUrl = settings.logo_img + (settings.logo_img.includes('?') ? '&' : '?') + 't=' + Date.now();
+                const svgResponse = await fetch(cacheBusterUrl);
+                if (svgResponse.ok) {
+                  const svgText = await svgResponse.text();
+                  logoContainer.innerHTML = svgText;
+                } else {
+                  logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 120px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+                }
+              } catch (e) {
+                console.error('Failed to inline SVG logo on monitor:', e);
+                logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 120px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+              }
+            } else {
+              logoContainer.innerHTML = `<img src="${settings.logo_img}" style="max-height: 120px; max-width: 250px; object-fit: contain;" alt="Logo">`;
+            }
           } else {
             const logoMainVal = settings.logo_main || 'RANCH';
             const logoSubVal = settings.logo_sub || 'University';
@@ -78,9 +108,18 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(settings).forEach(key => {
           if (key.startsWith('css_')) {
             const varName = `--` + key.replace('css_', '').replace(/_/g, '-');
-            document.documentElement.style.setProperty(varName, settings[key]);
+            document.body.style.setProperty(varName, settings[key]);
           }
         });
+
+        // Scope monitor-specific overrides
+        if (settings.css_monitor_bg_primary) {
+          document.body.style.setProperty('--bg-primary', settings.css_monitor_bg_primary);
+          document.body.style.setProperty('--bg-color-2', settings.css_monitor_bg_primary);
+          document.body.style.setProperty('--bg-secondary', settings.css_monitor_bg_primary);
+        }
+        if (settings.css_monitor_text_primary) document.body.style.setProperty('--text-primary', settings.css_monitor_text_primary);
+        if (settings.css_monitor_text_secondary) document.body.style.setProperty('--text-secondary', settings.css_monitor_text_secondary);
 
         // 7. Inject custom CSS
         let styleTag = document.getElementById('monitor-custom-css-tag');
