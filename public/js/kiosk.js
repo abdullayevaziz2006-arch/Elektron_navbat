@@ -31,8 +31,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Set theme class
         document.body.className = '';
-        if (settings.theme && settings.theme !== 'modern-dark') {
-          document.body.classList.add(`theme-${settings.theme}`);
+        if (settings.theme) {
+          if (settings.theme.startsWith('theme-')) {
+            document.body.classList.add(settings.theme);
+          } else {
+            if (settings.theme === 'light-mode') {
+              document.body.classList.add('theme-elegant-light');
+            } else if (settings.theme === 'minimalist-slate') {
+              document.body.classList.add('theme-royal-gold');
+            } else {
+              document.body.classList.add('theme-glass-neon');
+            }
+          }
+        } else {
+          document.body.classList.add('theme-glass-neon');
         }
 
         // 3. Set custom background image
@@ -267,6 +279,118 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === ticketModal) {
       ticketModal.classList.remove('active');
       if (modalTimeout) clearTimeout(modalTimeout);
+    }
+  });
+
+  // === Hidden Settings Menu Features ===
+  const settingsModal = document.getElementById('settings-modal');
+  const closeSettingsBtn = document.getElementById('close-settings-btn');
+  const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
+  const settingsForm = document.getElementById('settings-form');
+  
+  // Settings Form fields
+  const settingsTheme = document.getElementById('settings-theme');
+  const settingsBrandColor = document.getElementById('settings-brand-color');
+  const settingsBrandColorHex = document.getElementById('settings-brand-color-hex');
+  const settingsLogoMain = document.getElementById('settings-logo-main');
+  const settingsLogoImg = document.getElementById('settings-logo-img');
+
+  // Keyboard shortcut Ctrl + Shift + S
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      openSettingsModal();
+    }
+  });
+
+  // Open modal and load settings
+  async function openSettingsModal() {
+    try {
+      // Fetch latest settings from API
+      const response = await fetch('/api/settings');
+      if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
+      const settings = await response.json();
+      
+      // Populate fields
+      settingsTheme.value = settings.theme || 'theme-glass-neon';
+      
+      const primaryColor = settings.brand_color || '#3b82f6';
+      settingsBrandColor.value = primaryColor;
+      settingsBrandColorHex.value = primaryColor;
+      
+      settingsLogoMain.value = settings.logo_main || '';
+      settingsLogoImg.value = settings.logo_img || '';
+      
+      settingsModal.classList.add('active');
+    } catch (err) {
+      alert(`Xatolik: ${err.message}`);
+    }
+  }
+
+  function closeSettingsModal() {
+    settingsModal.classList.remove('active');
+  }
+
+  // Close event handlers
+  closeSettingsBtn.addEventListener('click', closeSettingsModal);
+  cancelSettingsBtn.addEventListener('click', closeSettingsModal);
+  settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+      closeSettingsModal();
+    }
+  });
+
+  // Color picker sync
+  settingsBrandColor.addEventListener('input', (e) => {
+    settingsBrandColorHex.value = e.target.value;
+  });
+  
+  settingsBrandColorHex.addEventListener('input', (e) => {
+    const val = e.target.value;
+    // Check if valid hex code
+    if (/^#[0-9A-F]{6}$/i.test(val)) {
+      settingsBrandColor.value = val;
+    }
+  });
+
+  // Handle form submission
+  settingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Validate hex code
+    let brandColor = settingsBrandColorHex.value.trim();
+    if (!/^#[0-9A-F]{6}$/i.test(brandColor)) {
+      alert('Iltimos, haqiqiy HEX rang kodini kiriting (masalan: #3b82f6)');
+      return;
+    }
+    
+    const settingsData = {
+      theme: settingsTheme.value,
+      brand_color: brandColor,
+      logo_main: settingsLogoMain.value.trim(),
+      logo_img: settingsLogoImg.value.trim()
+    };
+    
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settingsData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Sozlamalarni saqlashda xatolik yuz berdi');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        closeSettingsModal();
+        loadBranding();
+      } else {
+        throw new Error('Server sozlamalarni saqlamadi');
+      }
+    } catch (err) {
+      alert(`Xatolik: ${err.message}`);
     }
   });
 

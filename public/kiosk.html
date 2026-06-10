@@ -231,6 +231,27 @@
         min-height: unset !important;
       }
     }
+
+    /* Settings Modal Styling */
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition-fast);
+    }
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    .settings-tab-content {
+      animation: fadeIn 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -243,10 +264,6 @@
         <p>Elektron Navbat Kioski</p>
       </div>
     </div>
-    <a href="index.html" class="back-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      Asosiy Portal
-    </a>
   </header>
 
   <main class="kiosk-container">
@@ -341,6 +358,54 @@
       <hr style="border: 1px dashed black;">
       <p id="print-time"></p>
       <p>Kuting! Hozir chaqiriladi...</p>
+    </div>
+  </div>
+
+  <!-- Hidden Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content" style="max-width: 500px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke: var(--color-accent);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Yashirin Sozlamalar
+        </h3>
+        <button class="modal-close" id="close-settings-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y: auto; flex-grow: 1; padding: 1.5rem;">
+        <form id="settings-form">
+          <div class="form-group">
+            <label for="settings-theme">Dizayn shabloni (Design Template)</label>
+            <select id="settings-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: 0.8rem 1rem; width: 100%;">
+              <option value="theme-glass-neon">Glass Neon To'q (Default)</option>
+              <option value="theme-elegant-light">Clean Elegant Yorug'</option>
+              <option value="theme-royal-gold">Qirol Navy & Oltin</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="settings-brand-color">Asosiy rang (Brand Color)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="color" id="settings-brand-color" style="width: 50px; height: 42px; padding: 0.1rem; cursor: pointer; border: 1px solid var(--glass-border); background: none; border-radius: var(--radius-sm);">
+              <input type="text" id="settings-brand-color-hex" class="form-control" placeholder="#3b82f6" style="flex-grow: 1;">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="settings-logo-main">Logotip matni (Logo Main Text)</label>
+            <input type="text" id="settings-logo-main" class="form-control" placeholder="EN" maxlength="6">
+          </div>
+
+          <div class="form-group">
+            <label for="settings-logo-img">Logotip rasmi havolasi (Logo Image URL)</label>
+            <input type="text" id="settings-logo-img" class="form-control" placeholder="Rasm havolasi yoki bo'sh qoldiring">
+          </div>
+
+          <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" id="cancel-settings-btn">Bekor qilish</button>
+            <button type="submit" class="btn btn-primary" id="save-settings-btn">Saqlash</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
