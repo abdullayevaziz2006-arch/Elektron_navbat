@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elektron Navbat - Asosiy Menyu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617;
+      --bg2: #0f172a;
+      --accent: #ed2c2c;
+      --accent2: #f59e0b;
+      --text: #f8fafc;
+      --text2: #94a3b8;
+      --glass: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      background-image: radial-gradient(ellipse at 20% 50%, rgba(237,44,44,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                        linear-gradient(135deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-app-region: drag; /* Oynani sudrab yurib bo'ladi */
+    }
+
+    /* Drag bo'lmaydigan interaktiv elementlar */
+    button, a { -webkit-app-region: no-drag; }
+
+    /* ─── Yuqori panel ─────────────────────────────────────────────────── */
+    .titlebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px 8px;
+      -webkit-app-region: drag;
+    }
+
+    .titlebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .logo-bar {
+      background: var(--accent);
+      transform: skewX(-15deg);
+      border-radius: 2px;
+      width: 5px;
+    }
+    .logo-bar:nth-child(1) { height: 10px; opacity: 0.6; }
+    .logo-bar:nth-child(2) { height: 14px; opacity: 0.75; }
+    .logo-bar:nth-child(3) { height: 18px; opacity: 0.9; }
+    .logo-bar:nth-child(4) { height: 22px; width: 6px; }
+
+    .brand-text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .close-btn {
+      -webkit-app-region: no-drag;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.2);
+      color: #ef4444;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .close-btn:hover {
+      background: rgba(239,68,68,0.3);
+      transform: scale(1.1);
+    }
+
+    /* ─── Sarlavha ─────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 20px 24px 16px;
+      -webkit-app-region: drag;
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .hero p {
+      font-size: 0.85rem;
+      color: var(--text2);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Tugmalar panjara ─────────────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 0 24px 24px;
+      flex-grow: 1;
+      align-content: center;
+    }
+
+    .role-btn {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 20px 20px 18px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      -webkit-app-region: no-drag;
+    }
+
+    .role-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .role-btn:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .role-btn:hover::before { opacity: 1; }
+    .role-btn:active { transform: translateY(-1px) scale(0.99); }
+
+    /* Rol ranglari */
+    .role-btn.kiosk    { --c1: #ed2c2c; --c2: #f59e0b; }
+    .role-btn.monitor  { --c1: #3b82f6; --c2: #8b5cf6; }
+    .role-btn.operator { --c1: #10b981; --c2: #06b6d4; }
+    .role-btn.admin    { --c1: #f59e0b; --c2: #ef4444; }
+
+    .role-btn::before { background: linear-gradient(90deg, var(--c1), var(--c2)); }
+
+    .role-btn:hover {
+      background: rgba(255,255,255,0.055);
+    }
+
+    .role-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .role-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .role-desc {
+      font-size: 0.78rem;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    /* ─── Pastki ma'lumot qatori ───────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 10px 24px 16px;
+      font-size: 0.72rem;
+      color: #334155;
+      -webkit-app-region: drag;
+    }
+    .footer span { color: #475569; }
+
+    /* ─── Yuklash animatsiyasi ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .role-btn { animation: fadeUp 0.4s ease both; }
+    .role-btn:nth-child(1) { animation-delay: 0.05s; }
+    .role-btn:nth-child(2) { animation-delay: 0.10s; }
+    .role-btn:nth-child(3) { animation-delay: 0.15s; }
+    .role-btn:nth-child(4) { animation-delay: 0.20s; }
+  </style>
+</head>
+<body>
+
+  <!-- Yuqori panel -->
+  <div class="titlebar">
+    <div class="titlebar-brand">
+      <div class="logo-bars">
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+        <div class="logo-bar"></div>
+      </div>
+      <span class="brand-text">RANCH UNIVERSITY</span>
+    </div>
+    <button class="close-btn" id="close-btn" title="Yopish">✕</button>
+  </div>
+
+  <!-- Sarlavha -->
+  <div class="hero">
+    <h1>Elektron Navbat Tizimi</h1>
+    <p>Quyidagi rejimlardan birini tanlang</p>
+  </div>
+
+  <!-- Rollar panjara -->
+  <div class="grid">
+
+    <button class="role-btn kiosk" id="btn-kiosk">
+      <div class="role-icon">🖥️</div>
+      <div>
+        <div class="role-label">Mijoz Infokioski</div>
+        <div class="role-desc">Talabalar navbat raqami oladigan kiosk oynasi. To'liq ekranda ishga tushadi.</div>
+      </div>
+    </button>
+
+    <button class="role-btn monitor" id="btn-monitor">
+      <div class="role-icon">📺</div>
+      <div>
+        <div class="role-label">Kutish Zali Monitori</div>
+        <div class="role-desc">Navbat holati va ovozli chaqiruv uchun ko'rsatish ekrani.</div>
+      </div>
+    </button>
+
+    <button class="role-btn operator" id="btn-operator">
+      <div class="role-icon">👨‍💼</div>
+      <div>
+        <div class="role-label">Operator Paneli</div>
+        <div class="role-desc">Xodimlar navbatni boshqarish va chaqirish uchun ish oynasi.</div>
+      </div>
+    </button>
+
+    <button class="role-btn admin" id="btn-admin">
+      <div class="role-icon">⚙️</div>
+      <div>
+        <div class="role-label">Admin Panel</div>
+        <div class="role-desc">Yo'nalishlar, operatorlar va tizim sozlamalarini boshqarish.</div>
+      </div>
+    </button>
+
+  </div>
+
+  <!-- Pastki qator -->
+  <div class="footer">
+    Elektron Navbat Tizimi &nbsp;|&nbsp; <span>RANCH University © 2026</span>
+  </div>
+
+  <script>
+    document.getElementById('close-btn').addEventListener('click', () => {
+      if (window.electronAPI) window.electronAPI.quitApp();
+    });
+
+    document.getElementById('btn-kiosk').addEventListener('click', () => {
+      if (window.electronAPI) window.electronAPI.openRole('kiosk');
+    });
+    document.getElementById('btn-monitor').addEventListener('click', () => {
+      if (window.electronAPI) window.electronAPI.openRole('monitor');
+    });
+    document.getElementById('btn-operator').addEventListener('click', () => {
+      if (window.electronAPI) window.electronAPI.openRole('operator');
+    });
+    document.getElementById('btn-admin').addEventListener('click', () => {
+      if (window.electronAPI) window.electronAPI.openRole('admin');
+    });
+  </script>
+</body>
+</html>

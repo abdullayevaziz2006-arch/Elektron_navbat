@@ -1,10 +1,17 @@
 {
   "name": "elektron-navbat",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Elektron Navbat Tizimi (Electronic Queue System)",
-  "main": "server.js",
+  "main": "main.js",
+  "author": "Ranch University",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "electron": "electron .",
+    "electron-kiosk": "electron . --kiosk",
+    "electron-monitor": "electron . --monitor",
+    "electron-operator": "electron . --operator",
+    "electron-admin": "electron . --admin",
+    "build": "electron-packager . \"Elektron Navbat\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=public/favicon.ico --ignore=dist --ignore=.git --ignore=EdgeProfile --ignore=node_modules/electron-packager --asar"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -14,5 +21,9 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "electron": "^42.4.0",
+    "electron-packager": "^17.1.2"
   }
 }

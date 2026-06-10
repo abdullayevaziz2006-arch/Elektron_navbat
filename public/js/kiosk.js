@@ -317,15 +317,32 @@ document.addEventListener('DOMContentLoaded', () => {
       // Display Modal
       ticketModal.classList.add('active');
 
-      // Automatically trigger ticket printing (works silently if --kiosk-printing flag is active in Edge)
-      setTimeout(() => {
-        window.print();
-      }, 200);
+      // ─── Chek Chop Etish ─────────────────────────────────────────────────
+      // Electron desktop dasturida: yashirin (silent) chop etish — hech qanday oyna ko'rinmaydi
+      // Brauzer rejimida (Edge kiosk): window.print() fallback
+      setTimeout(async () => {
+        if (window.electronAPI && window.electronAPI.isElectron) {
+          // Electron: yashirin chop etish
+          try {
+            const result = await window.electronAPI.silentPrint();
+            if (!result.success) {
+              console.warn('Chop etish xatosi:', result.error);
+              // Agar printer topilmasa, brauzer print dialogini ochish
+              window.print();
+            }
+          } catch (e) {
+            window.print();
+          }
+        } else {
+          // Oddiy brauzer rejimi: standart chop etish
+          window.print();
+        }
+      }, 300);
 
-      // Auto close modal after 6 seconds
+      // Auto close modal after 7 seconds
       modalTimeout = setTimeout(() => {
         ticketModal.classList.remove('active');
-      }, 6000);
+      }, 7000);
 
     } catch (err) {
       alert(`Xatolik: ${err.message}`);
