@@ -295,13 +295,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsLogoMain = document.getElementById('settings-logo-main');
   const settingsLogoImg = document.getElementById('settings-logo-img');
 
-  // Keyboard shortcut Ctrl + Shift + S
+  // Keyboard shortcuts (Ctrl+Alt+S or Alt+Shift+S or Ctrl+Shift+S)
   document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && (e.code === 'KeyS' || e.key.toLowerCase() === 's')) {
+    const isCtrlAltS = e.ctrlKey && e.altKey && (e.code === 'KeyS' || e.key.toLowerCase() === 's');
+    const isAltShiftS = e.altKey && e.shiftKey && (e.code === 'KeyS' || e.key.toLowerCase() === 's');
+    const isCtrlShiftS = e.ctrlKey && e.shiftKey && (e.code === 'KeyS' || e.key.toLowerCase() === 's');
+    
+    if (isCtrlAltS || isAltShiftS || isCtrlShiftS) {
       e.preventDefault();
       openSettingsModal();
     }
   });
+
+  // Logo 5-click detection trigger (essential for touch screens without keyboards)
+  let logoClickCount = 0;
+  let logoClickTimeout = null;
+  const logoContainer = document.querySelector('.logo-container');
+  
+  if (logoContainer) {
+    logoContainer.style.cursor = 'pointer';
+    logoContainer.addEventListener('click', () => {
+      logoClickCount++;
+      if (logoClickTimeout) clearTimeout(logoClickTimeout);
+      
+      logoClickTimeout = setTimeout(() => {
+        logoClickCount = 0;
+      }, 3000);
+      
+      if (logoClickCount >= 5) {
+        logoClickCount = 0;
+        openSettingsModal();
+      }
+    });
+  }
 
   // Open modal and load settings
   async function openSettingsModal() {
