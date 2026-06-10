@@ -192,6 +192,16 @@ header {
   z-index: 10;
 }
 
+header.logo-left {
+  justify-content: flex-start;
+}
+header.logo-center {
+  justify-content: center;
+}
+header.logo-right {
+  justify-content: flex-end;
+}
+
 .logo-container {
   display: flex;
   align-items: center;

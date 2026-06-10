@@ -104,6 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
           document.head.appendChild(styleTag);
         }
         styleTag.textContent = settings.custom_css || '';
+
+        // 8. Set header logo position class
+        const header = document.querySelector('header');
+        if (header) {
+          header.className = settings.logo_position || 'logo-left';
+        }
       }
     } catch (err) {
       console.error('Error loading branding settings:', err);
@@ -290,10 +296,17 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Settings Form fields
   const settingsTheme = document.getElementById('settings-theme');
+  const settingsLogoPosition = document.getElementById('settings-logo-position');
   const settingsBrandColor = document.getElementById('settings-brand-color');
   const settingsBrandColorHex = document.getElementById('settings-brand-color-hex');
+  const settingsBtnPadding = document.getElementById('settings-btn-padding');
+  const settingsBtnWidth = document.getElementById('settings-btn-width');
   const settingsLogoMain = document.getElementById('settings-logo-main');
   const settingsLogoImg = document.getElementById('settings-logo-img');
+  const settingsLogoFile = document.getElementById('settings-logo-file');
+  
+  const valBtnPadding = document.getElementById('val-btn-padding');
+  const valBtnWidth = document.getElementById('val-btn-width');
 
   // Keyboard shortcuts (Ctrl+Alt+S or Alt+Shift+S or Ctrl+Shift+S)
   document.addEventListener('keydown', (e) => {
@@ -339,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Populate fields
       settingsTheme.value = settings.theme || 'theme-glass-neon';
+      settingsLogoPosition.value = settings.logo_position || 'logo-left';
       
       const primaryColor = settings.brand_color || '#3b82f6';
       settingsBrandColor.value = primaryColor;
@@ -346,6 +360,24 @@ document.addEventListener('DOMContentLoaded', () => {
       
       settingsLogoMain.value = settings.logo_main || '';
       settingsLogoImg.value = settings.logo_img || '';
+      settingsLogoFile.value = ''; // clear file input
+      
+      // Parse height/width from settings to set slider values
+      let padNum = 25;
+      if (settings.css_kiosk_btn_padding) {
+        const match = settings.css_kiosk_btn_padding.match(/([\d.]+)rem/);
+        if (match) padNum = Math.round(parseFloat(match[1]) * 10);
+      }
+      settingsBtnPadding.value = padNum;
+      valBtnPadding.textContent = `${(padNum / 10).toFixed(1)}rem`;
+      
+      let widthNum = 320;
+      if (settings.css_kiosk_btn_width) {
+        const match = settings.css_kiosk_btn_width.match(/(\d+)px/);
+        if (match) widthNum = parseInt(match[1]);
+      }
+      settingsBtnWidth.value = widthNum;
+      valBtnWidth.textContent = `${widthNum}px`;
       
       settingsModal.classList.add('active');
     } catch (err) {
@@ -355,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeSettingsModal() {
     settingsModal.classList.remove('active');
+    loadBranding(); // Revert any unsaved live preview changes
   }
 
   // Close event handlers
@@ -379,6 +412,67 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Live preview slider events
+  settingsBtnPadding.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const paddingCss = `${(val / 10).toFixed(1)}rem ${(val / 15).toFixed(1)}rem`;
+    document.documentElement.style.setProperty('--kiosk-btn-padding', paddingCss);
+    valBtnPadding.textContent = `${(val / 10).toFixed(1)}rem`;
+  });
+
+  settingsBtnWidth.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const widthCss = `${val}px`;
+    document.documentElement.style.setProperty('--kiosk-btn-width', widthCss);
+    valBtnWidth.textContent = `${val}px`;
+  });
+
+  settingsLogoPosition.addEventListener('change', (e) => {
+    const header = document.querySelector('header');
+    if (header) {
+      header.className = e.target.value;
+    }
+  });
+
+  // Logo file upload handler
+  settingsLogoFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const label = document.querySelector('label[for="settings-logo-file"]');
+    const oldText = label.textContent;
+    label.textContent = "Yuklanmoqda...";
+    
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileData: reader.result
+          })
+        });
+        
+        if (!response.ok) throw new Error('Yuklash amalga oshmadi');
+        const result = await response.json();
+        
+        if (result.success) {
+          settingsLogoImg.value = result.url;
+          alert('Rasm muvaffaqiyatli yuklandi!');
+        } else {
+          throw new Error(result.error || 'Yuklash xatosi');
+        }
+      } catch (err) {
+        alert(`Fayl yuklashda xatolik: ${err.message}`);
+      } finally {
+        label.textContent = oldText;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
   // Handle form submission
   settingsForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -390,11 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
+    const padVal = settingsBtnPadding.value;
+    const paddingCss = `${(padVal / 10).toFixed(1)}rem ${(padVal / 15).toFixed(1)}rem`;
+    const widthCss = `${settingsBtnWidth.value}px`;
+
     const settingsData = {
       theme: settingsTheme.value,
+      logo_position: settingsLogoPosition.value,
       brand_color: brandColor,
       logo_main: settingsLogoMain.value.trim(),
-      logo_img: settingsLogoImg.value.trim()
+      logo_img: settingsLogoImg.value.trim(),
+      css_kiosk_btn_padding: paddingCss,
+      css_kiosk_btn_width: widthCss
     };
     
     try {

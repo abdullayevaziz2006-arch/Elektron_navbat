@@ -316,6 +316,34 @@ app.get('/api/admin/history', async (req, res) => {
   }
 });
 
+// --- File Upload API ---
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.post('/api/upload', (req, res) => {
+  const { fileName, fileData } = req.body;
+  if (!fileName || !fileData) {
+    return res.status(400).json({ error: 'Fayl nomi va ma\'lumotlari yuborilmadi' });
+  }
+  try {
+    const base64Data = fileData.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    const ext = path.extname(fileName) || '.png';
+    const uniqueName = `logo_${Date.now()}${ext}`;
+    const savePath = path.join(uploadsDir, uniqueName);
+    
+    fs.writeFileSync(savePath, buffer);
+    res.json({ success: true, url: `/uploads/${uniqueName}` });
+  } catch (err) {
+    console.error('File upload error:', err);
+    res.status(500).json({ error: 'Faylni saqlashda xatolik yuz berdi' });
+  }
+});
+
 // --- Settings APIs ---
 app.get('/api/settings', async (req, res) => {
   try {
