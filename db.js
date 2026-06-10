@@ -833,7 +833,7 @@ async function initDatabase() {
     },
     {
         "key": "css_kiosk_btn_width",
-        "value": "440px"
+        "value": "420px"
     },
     {
         "key": "org_name",
@@ -961,7 +961,7 @@ async function initDatabase() {
     },
     {
         "key": "css_kiosk_btn_padding",
-        "value": "4.0rem 2.7rem"
+        "value": "1.2rem 2.0rem"
     },
     {
         "key": "logo_img",
