@@ -502,8 +502,8 @@ body.edit-mode .direction-btn {
 
 /* Inline SVG logo responsiveness */
 .logo-container svg {
-  height: 55px;
-  max-width: 250px;
+  height: 80px;
+  max-width: 350px;
   display: block;
 }
 
