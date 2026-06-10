@@ -1056,6 +1056,10 @@ async function initDatabase() {
     console.log('queues table migrated successfully.');
   }
 
+  // Force update button sizes to new compact defaults if they are currently set to the old giant values
+  await run(`UPDATE settings SET value = '420px' WHERE key = 'css_kiosk_btn_width' AND (value = '440px' OR value = '350px')`);
+  await run(`UPDATE settings SET value = '1.2rem 2.0rem' WHERE key = 'css_kiosk_btn_padding' AND (value = '4.0rem 2.7rem' OR value = '2.5rem 1.5rem')`);
+
   // Enable foreign keys now that the schema is clean
   await run(`PRAGMA foreign_keys = ON`);
 }
