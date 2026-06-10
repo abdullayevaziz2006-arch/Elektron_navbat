@@ -317,7 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // Display Modal
       ticketModal.classList.add('active');
 
-      // Printing has been disabled as requested
+      // Automatically trigger ticket printing (works silently if --kiosk-printing flag is active in Edge)
+      setTimeout(() => {
+        window.print();
+      }, 200);
 
       // Auto close modal after 6 seconds
       modalTimeout = setTimeout(() => {
