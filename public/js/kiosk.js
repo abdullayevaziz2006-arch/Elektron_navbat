@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcut Ctrl + Shift + S
   document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+    if (e.ctrlKey && e.shiftKey && (e.code === 'KeyS' || e.key.toLowerCase() === 's')) {
       e.preventDefault();
       openSettingsModal();
     }
