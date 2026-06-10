@@ -502,14 +502,14 @@ body.edit-mode .direction-btn {
 
 /* Inline SVG logo responsiveness */
 .logo-container svg {
+  width: 320px;
   height: 80px;
-  max-width: 350px;
   display: block;
 }
 
 .brand-logo-container svg {
-  height: 85px;
-  max-width: 250px;
+  width: 240px;
+  height: 60px;
   display: block;
 }
 
