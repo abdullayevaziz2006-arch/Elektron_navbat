@@ -1,3 +1,4 @@
 {
-  "serverUrl": "https://elektron-navbat.onrender.com"
+  "primaryServerUrl": "https://elektron-navbat.onrender.com",
+  "fallbackServerUrl": "http://10.70.7.17:3000"
 }

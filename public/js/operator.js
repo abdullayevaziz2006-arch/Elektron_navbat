@@ -35,10 +35,127 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeTicket = null;
   let socket = null;
 
+  // ─── CONNECTION RESOLUTION & FAILOVER ─────────────────────────────────────
+  let primaryServerUrl = 'https://elektron-navbat.onrender.com';
+  let fallbackServerUrl = 'http://10.70.7.17:3000';
+  let serverUrl = fallbackServerUrl;
+  let isPrimaryActive = false;
+
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function updateConnectionBadge(isPrimary) {
+    let badge = document.getElementById('connection-status-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = 'connection-status-badge';
+      badge.style.position = 'fixed';
+      badge.style.bottom = '16px';
+      badge.style.left = '16px';
+      badge.style.zIndex = '9999';
+      badge.style.padding = '8px 12px';
+      badge.style.borderRadius = '20px';
+      badge.style.fontSize = '12px';
+      badge.style.fontWeight = 'bold';
+      badge.style.display = 'flex';
+      badge.style.alignItems = 'center';
+      badge.style.gap = '6px';
+      badge.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      badge.style.pointerEvents = 'none';
+      badge.style.transition = 'all 0.3s ease';
+      document.body.appendChild(badge);
+    }
+
+    if (isPrimary) {
+      badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#10b981';
+      badge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#10b981; animation: pulse 1.5s infinite;"></span> Onlayn (Bulut)';
+    } else {
+      badge.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+      badge.style.color = '#f59e0b';
+      badge.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#f59e0b; animation: pulse 1.5s infinite;"></span> Oflayn (Lokal Zaxira)';
+    }
+  }
+
+  async function resolveActiveServer() {
+    try {
+      const configRes = await fetch('/config.json').catch(() => fetch('http://localhost:3000/config.json')).catch(() => null);
+      if (configRes && configRes.ok) {
+        const config = await configRes.json();
+        primaryServerUrl = config.primaryServerUrl || primaryServerUrl;
+        fallbackServerUrl = config.fallbackServerUrl || fallbackServerUrl;
+      }
+    } catch (e) {
+      console.warn("Failed to load config.json:", e);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) {
+        serverUrl = primaryServerUrl;
+        isPrimaryActive = true;
+      } else {
+        serverUrl = fallbackServerUrl;
+        isPrimaryActive = false;
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      serverUrl = fallbackServerUrl;
+      isPrimaryActive = false;
+    }
+
+    updateConnectionBadge(isPrimaryActive);
+  }
+
+  setInterval(async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    let primaryHealthy = false;
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) primaryHealthy = true;
+    } catch (err) {
+      clearTimeout(timeoutId);
+    }
+
+    if (primaryHealthy !== isPrimaryActive) {
+      isPrimaryActive = primaryHealthy;
+      serverUrl = isPrimaryActive ? primaryServerUrl : fallbackServerUrl;
+      updateConnectionBadge(isPrimaryActive);
+      if (socket) {
+        socket.close();
+      }
+      loadBranding();
+      if (currentOperator) {
+        loadWaitingList();
+        loadStats();
+      }
+    }
+  }, 15000);
+
   // Load dynamic branding settings
   async function loadBranding() {
     try {
-      const response = await fetch('/api/settings');
+      const response = await fetch(serverUrl + '/api/settings');
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
       if (settings) {
@@ -106,16 +223,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Load branding
-  loadBranding();
-
   // Check login state on startup
   const savedOperator = localStorage.getItem('operator');
   if (savedOperator) {
     currentOperator = JSON.parse(savedOperator);
-    showConsole();
+    resolveActiveServer().then(() => {
+      loadBranding().then(() => {
+        showConsole();
+      });
+    });
   } else {
-    showLogin();
+    resolveActiveServer().then(() => {
+      loadBranding().then(() => {
+        showLogin();
+      });
+    });
   }
 
   // Handle Login form submit
@@ -125,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = passwordInput.value;
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch(serverUrl + '/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -196,9 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function connectWebSocket() {
     if (socket) socket.close();
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    socket = new WebSocket(`${protocol}//${host}`);
+    const wsUrl = serverUrl.replace(/^http/, 'ws');
+    socket = new WebSocket(wsUrl);
 
     socket.onmessage = (event) => {
       try {
@@ -226,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load Waiting list filtered by operator room directions
   async function loadWaitingList() {
     try {
-      const response = await fetch(`/api/operator/queue?operator_id=${currentOperator.id}`);
+      const response = await fetch(`${serverUrl}/api/operator/queue?operator_id=${currentOperator.id}`);
       if (!response.ok) throw new Error('Kutish ro\'yxatini yuklab bo\'lmadi');
       const queue = await response.json();
 
@@ -269,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load Operator stats
   async function loadStats() {
     try {
-      const response = await fetch(`/api/operator/stats?room=${currentOperator.room}`);
+      const response = await fetch(`${serverUrl}/api/operator/stats?room=${currentOperator.room}`);
       if (!response.ok) throw new Error('Statistikani yuklab bo\'lmadi');
       const stats = await response.json();
 
@@ -312,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Call Next Ticket Action
   nextBtn.addEventListener('click', async () => {
     try {
-      const response = await fetch('/api/operator/call', {
+      const response = await fetch(serverUrl + '/api/operator/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -342,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
   recallBtn.addEventListener('click', async () => {
     if (!activeTicket) return;
     try {
-      const response = await fetch('/api/operator/recall', {
+      const response = await fetch(serverUrl + '/api/operator/recall', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: activeTicket.id })
@@ -358,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
   completeBtn.addEventListener('click', async () => {
     if (!activeTicket) return;
     try {
-      const response = await fetch('/api/operator/complete', {
+      const response = await fetch(serverUrl + '/api/operator/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: activeTicket.id })
@@ -379,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
   skipBtn.addEventListener('click', async () => {
     if (!activeTicket) return;
     try {
-      const response = await fetch('/api/operator/skip', {
+      const response = await fetch(serverUrl + '/api/operator/skip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: activeTicket.id })

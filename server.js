@@ -22,6 +22,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
   }
 }));
 
+app.get('/config.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'config.json'));
+});
+
 // WebSocket Broadcast helper
 function broadcast(data) {
   const message = JSON.stringify(data);

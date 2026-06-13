@@ -38,6 +38,123 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ─── CONNECTION RESOLUTION & FAILOVER ─────────────────────────────────────
+  let primaryServerUrl = 'https://elektron-navbat.onrender.com';
+  let fallbackServerUrl = 'http://10.70.7.17:3000';
+  let serverUrl = fallbackServerUrl;
+  let isPrimaryActive = false;
+
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function updateConnectionBadge(isPrimary) {
+    let badge = document.getElementById('connection-status-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = 'connection-status-badge';
+      badge.style.position = 'fixed';
+      badge.style.bottom = '16px';
+      badge.style.left = '16px';
+      badge.style.zIndex = '9999';
+      badge.style.padding = '8px 12px';
+      badge.style.borderRadius = '20px';
+      badge.style.fontSize = '12px';
+      badge.style.fontWeight = 'bold';
+      badge.style.display = 'flex';
+      badge.style.alignItems = 'center';
+      badge.style.gap = '6px';
+      badge.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      badge.style.pointerEvents = 'none';
+      badge.style.transition = 'all 0.3s ease';
+      document.body.appendChild(badge);
+    }
+
+    if (isPrimary) {
+      badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#10b981';
+      badge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#10b981; animation: pulse 1.5s infinite;"></span> Onlayn (Bulut)';
+    } else {
+      badge.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+      badge.style.color = '#f59e0b';
+      badge.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#f59e0b; animation: pulse 1.5s infinite;"></span> Oflayn (Lokal Zaxira)';
+    }
+  }
+
+  async function resolveActiveServer() {
+    try {
+      const configRes = await fetch('/config.json').catch(() => fetch('http://localhost:3000/config.json')).catch(() => null);
+      if (configRes && configRes.ok) {
+        const config = await configRes.json();
+        primaryServerUrl = config.primaryServerUrl || primaryServerUrl;
+        fallbackServerUrl = config.fallbackServerUrl || fallbackServerUrl;
+      }
+    } catch (e) {
+      console.warn("Failed to load config.json:", e);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) {
+        serverUrl = primaryServerUrl;
+        isPrimaryActive = true;
+      } else {
+        serverUrl = fallbackServerUrl;
+        isPrimaryActive = false;
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      serverUrl = fallbackServerUrl;
+      isPrimaryActive = false;
+    }
+
+    updateConnectionBadge(isPrimaryActive);
+  }
+
+  setInterval(async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    let primaryHealthy = false;
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) primaryHealthy = true;
+    } catch (err) {
+      clearTimeout(timeoutId);
+    }
+
+    if (primaryHealthy !== isPrimaryActive) {
+      isPrimaryActive = primaryHealthy;
+      serverUrl = isPrimaryActive ? primaryServerUrl : fallbackServerUrl;
+      updateConnectionBadge(isPrimaryActive);
+      const activeMenuItem = document.querySelector('.menu-item.active');
+      if (activeMenuItem) {
+        const target = activeMenuItem.getAttribute('data-target');
+        if (target === 'tab-directions') loadDirections();
+        if (target === 'tab-operators') loadOperators();
+        if (target === 'tab-history') loadHistory();
+        if (target === 'tab-settings') loadSettings();
+      }
+    }
+  }, 15000);
+
   // --- Directions Elements & CRUD ---
   const tableDirectionsBody = document.getElementById('table-directions-body');
   const btnAddDirection = document.getElementById('btn-add-direction');
@@ -54,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load directions
   async function loadDirections() {
     try {
-      const response = await fetch('/api/directions');
+      const response = await fetch(serverUrl + '/api/directions');
       if (!response.ok) throw new Error('Yo\'nalishlarni yuklashda xatolik');
       const directions = await response.json();
 
@@ -118,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomVal = directionRoomInput.value.trim();
     const room = roomVal !== '' ? parseInt(roomVal) : null;
 
-    const url = id ? `/api/admin/directions/${id}` : '/api/admin/directions';
+    const url = id ? `${serverUrl}/api/admin/directions/${id}` : `${serverUrl}/api/admin/directions`;
     const method = id ? 'PUT' : 'POST';
 
     try {
@@ -143,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function deleteDirection(id) {
     if (!confirm('Haqiqatdan ham ushbu yo\'nalishni o\'chirmoqchimisiz?')) return;
     try {
-      const response = await fetch(`/api/admin/directions/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${serverUrl}/api/admin/directions/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Yo\'nalishni o\'chirib bo\'lmadi');
       loadDirections();
     } catch (err) {
@@ -171,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load operators
   async function loadOperators() {
     try {
-      const response = await fetch('/api/admin/operators');
+      const response = await fetch(serverUrl + '/api/admin/operators');
       if (!response.ok) throw new Error('Operatorlarni yuklashda xatolik');
       const operators = await response.json();
 
@@ -216,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
 
     try {
-      const response = await fetch('/api/directions');
+      const response = await fetch(serverUrl + '/api/directions');
       if (!response.ok) throw new Error('Yo\'nalishlarni yuklab bo\'lmadi');
       const directions = await response.json();
 
@@ -265,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 2. Fetch and check mapped direction checkboxes
       try {
-        const res = await fetch(`/api/admin/operators/${op.id}/directions`);
+        const res = await fetch(`${serverUrl}/api/admin/operators/${op.id}/directions`);
         if (res.ok) {
           const assignedIds = await res.json();
           const checkboxes = document.querySelectorAll('.operator-direction-checkbox');
@@ -311,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const url = id ? `/api/admin/operators/${id}` : '/api/admin/operators';
+    const url = id ? `${serverUrl}/api/admin/operators/${id}` : `${serverUrl}/api/admin/operators`;
     const method = id ? 'PUT' : 'POST';
 
     try {
@@ -336,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function deleteOperator(id) {
     if (!confirm('Haqiqatdan ham ushbu operatorni o\'chirmoqchimisiz?')) return;
     try {
-      const response = await fetch(`/api/admin/operators/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${serverUrl}/api/admin/operators/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Operatorni o\'chirib bo\'lmadi');
       loadOperators();
     } catch (err) {
@@ -353,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadHistory() {
     try {
-      const response = await fetch('/api/admin/history');
+      const response = await fetch(serverUrl + '/api/admin/history');
       if (!response.ok) throw new Error('Tarixni yuklashda xatolik');
       historyData = await response.json();
 
@@ -646,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadSettings() {
     try {
-      const response = await fetch('/api/settings');
+      const response = await fetch(serverUrl + '/api/settings');
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
  
@@ -789,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
  
       try {
-        const response = await fetch('/api/settings', {
+        const response = await fetch(serverUrl + '/api/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -818,5 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Load initial active tab data
-  loadDirections();
+  resolveActiveServer().then(() => {
+    loadDirections();
+  });
 });

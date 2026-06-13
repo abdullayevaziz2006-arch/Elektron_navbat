@@ -17,7 +17,10 @@ function getConfig() {
       return JSON.parse(fs.readFileSync(configPath, 'utf8'));
     }
   } catch (e) {}
-  return { serverUrl: 'http://localhost:3000' };
+  return {
+    primaryServerUrl: "https://elektron-navbat.onrender.com",
+    fallbackServerUrl: "http://localhost:3000"
+  };
 }
 
 // ─── Qo'shimcha argument orqali rolni aniqlash ──────────────────────────────
@@ -84,14 +87,19 @@ let mainWindow = null;
 async function createWindow() {
   const config = getConfig();
   const role = getRole();
-  const isLocal = config.serverUrl.includes('localhost') || config.serverUrl.includes('127.0.0.1');
 
-  // Lokal server kerakmi? Ishga tushuramiz
+  const primaryServerUrl = config.primaryServerUrl || 'https://elektron-navbat.onrender.com';
+  const fallbackServerUrl = config.fallbackServerUrl || 'http://localhost:3000';
+
+  // Start local server if either URL points to localhost/127.0.0.1
+  const isLocal = primaryServerUrl.includes('localhost') || primaryServerUrl.includes('127.0.0.1') ||
+                  fallbackServerUrl.includes('localhost') || fallbackServerUrl.includes('127.0.0.1');
+
   if (isLocal) {
     await startLocalServer();
   }
 
-  const serverUrl = config.serverUrl.replace(/\/$/, '');
+  const serverUrl = fallbackServerUrl.replace(/\/$/, '');
 
   // Rol bo'yicha URL va oyna sozlamalarini belgilaymiz
   const roleConfig = {

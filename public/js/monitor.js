@@ -21,10 +21,129 @@ document.addEventListener('DOMContentLoaded', () => {
   let isSpeaking = false;
   let activeCallingRooms = new Set();
 
+  // ─── CONNECTION RESOLUTION & FAILOVER ─────────────────────────────────────
+  let primaryServerUrl = 'https://elektron-navbat.onrender.com';
+  let fallbackServerUrl = 'http://10.70.7.17:3000';
+  let serverUrl = fallbackServerUrl;
+  let isPrimaryActive = false;
+
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.5; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function updateConnectionBadge(isPrimary) {
+    let badge = document.getElementById('connection-status-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = 'connection-status-badge';
+      badge.style.position = 'fixed';
+      badge.style.bottom = '16px';
+      badge.style.left = '16px';
+      badge.style.zIndex = '9999';
+      badge.style.padding = '8px 12px';
+      badge.style.borderRadius = '20px';
+      badge.style.fontSize = '12px';
+      badge.style.fontWeight = 'bold';
+      badge.style.display = 'flex';
+      badge.style.alignItems = 'center';
+      badge.style.gap = '6px';
+      badge.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      badge.style.pointerEvents = 'none';
+      badge.style.transition = 'all 0.3s ease';
+      document.body.appendChild(badge);
+    }
+
+    if (isPrimary) {
+      badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#10b981';
+      badge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#10b981; animation: pulse 1.5s infinite;"></span> Onlayn (Bulut)';
+    } else {
+      badge.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+      badge.style.color = '#f59e0b';
+      badge.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+      badge.innerHTML = '<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#f59e0b; animation: pulse 1.5s infinite;"></span> Oflayn (Lokal Zaxira)';
+    }
+  }
+
+  async function resolveActiveServer() {
+    try {
+      const configRes = await fetch('/config.json').catch(() => fetch('http://localhost:3000/config.json')).catch(() => null);
+      if (configRes && configRes.ok) {
+        const config = await configRes.json();
+        primaryServerUrl = config.primaryServerUrl || primaryServerUrl;
+        fallbackServerUrl = config.fallbackServerUrl || fallbackServerUrl;
+      }
+    } catch (e) {
+      console.warn("Failed to load config.json:", e);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) {
+        serverUrl = primaryServerUrl;
+        isPrimaryActive = true;
+      } else {
+        serverUrl = fallbackServerUrl;
+        isPrimaryActive = false;
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      serverUrl = fallbackServerUrl;
+      isPrimaryActive = false;
+    }
+
+    updateConnectionBadge(isPrimaryActive);
+  }
+
+  setInterval(async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    let primaryHealthy = false;
+    try {
+      const pingRes = await fetch(`${primaryServerUrl}/api/settings`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (pingRes.ok) primaryHealthy = true;
+    } catch (err) {
+      clearTimeout(timeoutId);
+    }
+
+    if (primaryHealthy !== isPrimaryActive) {
+      isPrimaryActive = primaryHealthy;
+      serverUrl = isPrimaryActive ? primaryServerUrl : fallbackServerUrl;
+      updateConnectionBadge(isPrimaryActive);
+      if (socket) {
+        socket.close();
+      }
+      loadBranding();
+      if (typeof loadMonitorState === 'function') {
+        loadMonitorState().then(() => {
+          renderLanes();
+          renderWaitingGrid();
+        });
+      }
+    }
+  }, 15000);
+
   // Load dynamic settings branding
   async function loadBranding() {
     try {
-      const response = await fetch('/api/settings');
+      const response = await fetch(serverUrl + '/api/settings');
       if (!response.ok) throw new Error('Sozlamalarni yuklab bo\'lmadi');
       const settings = await response.json();
       if (settings) {
@@ -69,7 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isSvg) {
               try {
                 const cacheBusterUrl = settings.logo_img + (settings.logo_img.includes('?') ? '&' : '?') + 't=' + Date.now();
-                const svgResponse = await fetch(cacheBusterUrl);
+                const targetUrl = cacheBusterUrl.startsWith('/') ? (serverUrl + cacheBusterUrl) : cacheBusterUrl;
+                const svgResponse = await fetch(targetUrl);
                 if (svgResponse.ok) {
                   const svgText = await svgResponse.text();
                   logoContainer.innerHTML = svgText;
@@ -143,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await loadBranding();
 
       // 1. Fetch active operators/rooms
-      const opRes = await fetch('/api/admin/operators');
+      const opRes = await fetch(serverUrl + '/api/admin/operators');
       if (opRes.ok) {
         const operators = await opRes.json();
         // Collect unique rooms, sorted ascending
@@ -175,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load active serving and waiting queue from API
   async function loadMonitorState() {
     try {
-      const response = await fetch('/api/monitor/state');
+      const response = await fetch(serverUrl + '/api/monitor/state');
       if (!response.ok) throw new Error('Monitor holatini yuklab bo\'lmadi');
       const state = await response.json();
 
@@ -429,9 +549,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // WebSocket connection
   function connectWebSocket() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    socket = new WebSocket(`${protocol}//${host}`);
+    const wsUrl = serverUrl.replace(/^http/, 'ws');
+    socket = new WebSocket(wsUrl);
 
     socket.onmessage = (event) => {
       try {
@@ -494,7 +613,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  initMonitor().then(() => {
-    connectWebSocket();
+  resolveActiveServer().then(() => {
+    initMonitor().then(() => {
+      connectWebSocket();
+    });
   });
 });
