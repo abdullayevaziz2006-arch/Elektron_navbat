@@ -1,320 +1,388 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kutish Zali Monitori | Elektron Navbat</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.6">
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Kutish Zali Monitori | RANCH University</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Google Material Symbols (Outlined & Rounded for maximum compatibility) -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed-dim": "#c5c7c8",
+            "secondary-fixed": "#e5e2e1",
+            "surface-container-highest": "#dbe4ed",
+            "surface-bright": "#f6faff",
+            "error": "#ba1a1a",
+            "outline-variant": "#e7bdb8",
+            "surface-container": "#e6eff8",
+            "tertiary-container": "#737576",
+            "on-primary-fixed": "#410002",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#141d23",
+            "surface-tint": "#c00014",
+            "on-surface": "#141d23",
+            "inverse-on-surface": "#e9f2fb",
+            "on-error": "#ffffff",
+            "background": "#f6faff",
+            "outline": "#926f6b",
+            "on-secondary-container": "#636262",
+            "primary-fixed": "#ffdad6",
+            "surface-variant": "#dbe4ed",
+            "surface-container-high": "#e0e9f2",
+            "secondary": "#5f5e5e",
+            "tertiary-fixed": "#e1e3e4",
+            "primary-container": "#e22326",
+            "on-tertiary-fixed-variant": "#454748",
+            "surface-dim": "#d2dbe4",
+            "on-secondary-fixed-variant": "#474746",
+            "on-primary-container": "#fffbff",
+            "surface": "#f6faff",
+            "on-tertiary-fixed": "#191c1d",
+            "secondary-container": "#e2dfde",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#ecf5fe",
+            "inverse-primary": "#ffb4ab",
+            "on-primary-fixed-variant": "#93000c",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed": "#1c1b1b",
+            "inverse-surface": "#293138",
+            "tertiary": "#5a5c5d",
+            "on-tertiary-container": "#fcfdfe",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#c8c6c5",
+            "primary": "var(--brand-color, #bb0013)",
+            "on-surface-variant": "#5d3f3c",
+            "primary-fixed-dim": "#ffb4ab"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "sm": "8px",
+            "xl": "32px",
+            "md": "16px",
+            "gutter": "24px",
+            "kiosk-padding": "40px",
+            "unit": "8px",
+            "xs": "4px",
+            "xxl": "48px",
+            "lg": "24px"
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "label-bold": ["Inter"],
+            "monitor-label": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "monitor-num": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          fontSize: {
+            "label-bold": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "monitor-label": ["48px", {"lineHeight": "56px", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+            "monitor-num": ["120px", {"lineHeight": "120px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+          }
+        },
+      },
+    }
+  </script>
+
   <style>
-    body {
-      background-color: var(--bg-primary);
-      height: 100vh;
+    body { font-family: 'Inter', sans-serif; overflow: hidden; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48; }
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    /* ── Calling animation on the operator cards ── */
+    .operator-card { transition: all 0.3s ease; }
+    .operator-card.calling { animation: pulse-active 2s infinite ease-in-out; }
+    @keyframes pulse-active {
+      0% { background-color: #ffffff; }
+      50% { background-color: #fff1f1; border-color: var(--brand-color, #bb0013); }
+      100% { background-color: #ffffff; }
+    }
+
+    .text-glow-red { text-shadow: 0px 0px 8px rgba(237, 44, 44, 0.2); }
+
+    /* ── Scrolling marquee ── */
+    .marquee-container {
       overflow: hidden;
-      display: grid;
-      grid-template-columns: var(--monitor-grid-template, 30% 45% 25%);
-      margin: 0;
-      padding: 0;
-      font-family: 'Outfit', 'Inter', sans-serif;
-    }
-
-    /* Left Branding Column (Red Background) */
-    .brand-section {
-      background-color: transparent;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 3rem;
-      color: var(--text-primary);
-      position: relative;
-      z-index: 5;
-    }
-
-    .brand-logo-container {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      animation: float 4s infinite ease-in-out;
-    }
-
-    .ranch-logo-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-    }
-
-    .ranch-bar {
-      background: var(--color-primary);
-      transform: skewX(-20deg);
-      border-radius: 2px;
-      width: 10px;
-    }
-
-    .ranch-bar-1 { height: 28px; opacity: 0.7; }
-    .ranch-bar-2 { height: 42px; opacity: 0.85; }
-    .ranch-bar-3 { height: 56px; opacity: 0.95; }
-    .ranch-bar-4 { height: 75px; width: 14px; }
-
-    .brand-text {
-      text-align: left;
-    }
-
-    .brand-text h1 {
-      font-size: 2.8rem;
-      font-weight: 800;
-      line-height: 0.9;
-      letter-spacing: -1px;
-      margin: 0;
-      color: var(--text-primary);
-    }
-
-    .brand-text p {
-      font-size: 1.3rem;
-      font-weight: 500;
-      letter-spacing: 2px;
-      color: var(--text-secondary);
-      margin: 0;
-      text-transform: uppercase;
-    }
-
-    .brand-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-top: 3rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-top: 1px solid var(--glass-border);
-      padding-top: 1.5rem;
-      width: 80%;
-      text-align: center;
-    }
-
-    .brand-clock {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      font-family: var(--font-title);
-      margin-top: 2rem;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 0.5rem 2rem;
-      border-radius: 12px;
-      border: 1px solid var(--glass-border);
-    }
-
-    /* Center Active Lanes Column */
-    .active-section {
-      display: flex;
-      flex-direction: column;
-      padding: 2rem;
-      background-color: transparent;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .section-header {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 1.5rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .lanes-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      flex-grow: 1;
-      overflow-y: auto;
-      padding-right: 0.5rem;
-    }
-
-    /* Redesigned Active Row: Purple/Indigo Left, White Right */
-    .active-lane-row {
-      display: flex;
-      background-color: var(--brand-color, #e60000); /* Brand divider lines */
-      padding: 3px;
-      border-radius: 8px;
-      height: 75px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
-    }
-
-    .active-lane-row.flashing {
-      animation: pulseGold 2s infinite;
-      transform: scale(1.02);
-    }
-
-    .lane-ticket-box {
-      width: 45%;
-      background-color: #311b92; /* Royal Indigo */
-      color: white;
-      font-size: 2.8rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-title);
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      letter-spacing: -1px;
-      transition: background-color 0.3s ease;
-    }
-
-    .active-lane-row.flashing .lane-ticket-box {
-      background-color: #4a148c;
-    }
-
-    .lane-room-box {
-      width: 55%;
-      background-color: white;
-      color: #0f172a;
-      font-size: 1.8rem;
-      font-weight: 800;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-
-    .lane-room-subtitle {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: -2px;
-    }
-
-    /* Right Waiting List Column */
-    .waiting-section {
-      background-color: transparent;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .waiting-list-scroll {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding-right: 0.5rem;
-      display: grid;
-      grid-template-columns: var(--monitor-waiting-columns, repeat(2, 1fr));
-      gap: 0.8rem;
-      align-content: start;
-    }
-
-    .waiting-badge {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 1rem 0.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .waiting-badge-code {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--color-primary);
-      font-family: var(--font-title);
-      line-height: 1.1;
-    }
-
-    .waiting-badge-dir {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 90%;
-      margin-top: 3px;
     }
 
-    .back-btn-corner {
-      position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      color: rgba(255, 255, 255, 0.6);
-      text-decoration: none;
-      transition: var(--transition-fast);
-      z-index: 10;
+    .marquee-content {
+      display: inline-block;
+      animation: marquee 30s linear infinite;
     }
-    .back-btn-corner:hover {
-      color: white;
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── Logo Image styles ── */
+    .brand-logo-container img {
+      max-height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+
+    /* Scrollbar styling for operator list and waiting list */
+    #lanes-container::-webkit-scrollbar,
+    #waiting-grid-container::-webkit-scrollbar { width: 6px; }
+    #lanes-container::-webkit-scrollbar-track,
+    #waiting-grid-container::-webkit-scrollbar-track { background: transparent; }
+    #lanes-container::-webkit-scrollbar-thumb,
+    #waiting-grid-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* ── Waiting Grid layout ── */
+    .waiting-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      align-content: start;
     }
   </style>
 </head>
-<body>
+<body class="bg-background text-on-surface h-screen flex flex-col">
 
-
-
-  <!-- Left: Branding Panel -->
-  <section class="brand-section">
-    <div class="brand-logo-container">
-      <div class="ranch-logo-bars">
-        <div class="ranch-bar ranch-bar-1"></div>
-        <div class="ranch-bar ranch-bar-2"></div>
-        <div class="ranch-bar ranch-bar-3"></div>
-        <div class="ranch-bar ranch-bar-4"></div>
+  <!-- Wrapper div prevents loss of styling when monitor.js clears body classes -->
+  <div class="h-screen w-screen flex flex-col bg-background text-on-surface overflow-hidden">
+    
+    <!-- ═══════════════════════════════════════════════════
+         HEADER SECTION
+    ═══════════════════════════════════════════════════ -->
+    <header class="grid grid-cols-3 items-center px-8 py-4 bg-inverse-surface shadow-lg z-20 shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col">
+          <span class="text-xl font-bold text-white tracking-tight">Queue Management</span>
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-widest">Premium Service</span>
+        </div>
       </div>
-      <div class="brand-text">
-        <h1>RANCH</h1>
-        <p>University</p>
+      
+      <div class="brand-logo-container flex items-center justify-center">
+        <img src="/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png"
+             class="h-12 w-auto object-contain brightness-0 invert"
+             alt="RANCH University Logo">
       </div>
-    </div>
-    <div class="brand-title">Tizim Monitori</div>
-    <div class="brand-clock" id="clock">18:17:00</div>
-  </section>
-
-  <!-- Center: Active Serving Lanes -->
-  <section class="active-section">
-    <h3 class="section-header">
-      <span style="color: var(--color-accent);">●</span> Qabulda (Serving)
-    </h3>
-    <div class="lanes-container" id="lanes-container">
-      <!-- Active rows rendered dynamically for each operator room -->
-      <div style="text-align: center; padding: 4rem; color: var(--text-muted);">
-        Yuklanmoqda...
+      
+      <div class="flex items-center justify-end gap-6">
+        <div class="flex flex-col items-end">
+          <div class="text-3xl font-bold tabular-nums text-white" id="clock">00:00:00</div>
+          <div class="text-xs font-medium text-slate-400 mt-1 tracking-wide" id="current-date"></div>
+        </div>
+        <div class="bg-primary p-2.5 rounded-lg text-white">
+          <span class="material-symbols-outlined leading-none">timer</span>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Right: Waiting List -->
-  <section class="waiting-section">
-    <h3 class="section-header" style="justify-content: space-between;">
-      <span>Navbatda (Waiting)</span>
-      <span class="badge-room" id="waiting-count-tag" style="background: var(--color-primary); font-size: 0.8rem; padding: 0.1rem 0.6rem;">0 ta</span>
-    </h3>
-    <div class="waiting-list-scroll" id="waiting-grid-container">
-      <!-- Waiting badges injected dynamically -->
-      <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: var(--text-muted); font-size: 0.95rem;">
-        Navbat bo'sh
+      <!-- Hidden brand-title span (used by monitor.js to set monitor title text) -->
+      <span class="brand-title" aria-hidden="true" style="display: none;"></span>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════
+         MAIN CONTENT AREA
+    ═══════════════════════════════════════════════════ -->
+    <main class="flex-grow flex overflow-hidden">
+      
+      <!-- Left: Called (Dynamic Operators Grid) -->
+      <section class="w-[65%] h-full bg-surface-container-low p-lg flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between mb-md px-md">
+          <h2 class="text-headline-md font-bold text-on-surface flex items-center gap-md uppercase tracking-tight">
+            <span class="material-symbols-outlined text-primary scale-110">campaign</span>
+            Chaqirilganlar
+          </h2>
+          <div class="px-md py-1 bg-primary/10 text-primary rounded-full text-label-bold">
+            XIZMAT KO'RSATILMOQDA
+          </div>
+        </div>
+        
+        <!-- Operators Grid (Populated dynamically by monitor.js) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-md flex-grow overflow-y-auto pr-2" id="lanes-container">
+          <!-- Cards injected dynamically here -->
+        </div>
+      </section>
+
+      <!-- Right Section: Waiting/Upcoming -->
+      <section class="w-[35%] h-full bg-white border-l border-outline-variant flex flex-col overflow-hidden shrink-0">
+        <div class="p-lg bg-surface-container-high border-b border-outline-variant">
+          <h2 class="text-headline-md font-bold text-on-surface flex items-center gap-md uppercase tracking-tight">
+            <span class="material-symbols-outlined text-primary">hourglass_empty</span>
+            Kutilmoqda
+          </h2>
+          <p class="text-label-sm text-on-surface-variant mt-1">Keyingi navbatdagi ticketlar (<span id="waiting-count-tag">0 ta</span>)</p>
+        </div>
+        
+        <!-- Scrollable waiting grid -->
+        <div id="waiting-grid-container" class="flex-grow overflow-y-auto p-lg waiting-grid">
+          <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: #9ca3af; font-size: 0.95rem;">
+            Navbat bo'sh
+          </div>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="mt-auto bg-primary-container p-lg text-on-primary-container text-center border-t border-primary/20">
+          <p class="text-body-md font-semibold">NAVIBATINGIZNI KUTING</p>
+          <p class="text-label-sm opacity-90 italic">Ma'lumot uchun kioskaga murojaat qiling</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════
+         FOOTER TICKER (Marquee)
+    ═══════════════════════════════════════════════════ -->
+    <footer class="h-16 bg-inverse-surface border-t border-slate-800 flex items-center overflow-hidden z-20 shrink-0">
+      <div class="marquee-container w-full">
+        <div class="marquee-content flex items-center gap-24 text-white">
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Navbatingizni kuting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Kioskada ro'yxatdan o'ting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Navbatingizni kuting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">RANCH University xizmatidan foydalaning</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <!-- Duplicate for seamless marquee loop -->
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Navbatingizni kuting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Kioskada ro'yxatdan o'ting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">Navbatingizni kuting</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-bold uppercase tracking-widest">RANCH University xizmatidan foydalaning</span>
+            <span class="material-symbols-outlined text-primary text-2xl">notifications_active</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </footer>
 
-  <!-- Autoplay Activation Overlay -->
-  <div id="autoplay-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.96); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; cursor: pointer; transition: opacity 0.3s ease;">
-    <div style="font-size: 5rem; margin-bottom: 2rem; animation: float 3s infinite ease-in-out;">🔊</div>
-    <h2 style="font-size: 2.2rem; margin-bottom: 1rem; color: white; font-family: 'Outfit', sans-serif;">Ovozli Navbat Tizimi Faol</h2>
-    <p style="font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; line-height: 1.5;">Ovozli va musiqali chaqiruvlarni faollashtirish hamda tarmoqqa ulanish uchun **ekranning istalgan joyiga bosing**.</p>
   </div>
 
-  <script src="js/monitor.js?v=1.0.6"></script>
+  <!-- ═══════════════════════════════════════════════════
+       AUTOPLAY ACTIVATION OVERLAY
+  ═══════════════════════════════════════════════════ -->
+  <div id="autoplay-overlay"
+       style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.96);z-index:1000;
+              display:flex;flex-direction:column;justify-content:center;align-items:center;
+              text-align:center;padding:2rem;cursor:pointer;transition:opacity 0.3s ease;">
+    <div style="font-size:5rem;margin-bottom:1.5rem;animation:bounce-pulse 2s infinite;">🔊</div>
+    <h2 style="font-size:2.25rem;font-weight:800;color:white;font-family:'Inter',sans-serif;margin-bottom:1rem;">
+      Ovozli Navbat Tizimi Faol
+    </h2>
+    <p style="font-size:1.125rem;color:rgba(255,255,255,0.6);max-width:550px;line-height:1.6;font-family:'Inter',sans-serif;">
+      Ovozli va musiqali chaqiruvlarni faollashtirish hamda tarmoqqa ulanish uchun
+      <strong style="color:rgba(255,255,255,0.95);">ekranning istalgan joyiga bosing</strong>.
+    </p>
+  </div>
+
+  <style>
+    @keyframes bounce-pulse {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-12px) scale(1.05); }
+    }
+  </style>
+
+  <!-- Main JS file -->
+  <script src="js/monitor.js?v=1.0.9"></script>
+
+  <!-- ═══════════════════════════════════════════════════
+       DATE PATCH & RGB STYLING SYNCHRONIZATION SCRIPT
+  ═══════════════════════════════════════════════════ -->
+  <script>
+    (function () {
+      // 1. Update current-date patch
+      const dateEl = document.getElementById('current-date');
+      function updateDate() {
+        const now = new Date();
+        if (dateEl) {
+          dateEl.textContent = now.toLocaleDateString('uz-UZ', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+          });
+        }
+      }
+      updateDate();
+      setInterval(updateDate, 60000);
+
+      // 2. Dynamic RGB conversion helper for brand color pulse box-shadow
+      function updateBrandColorRGB() {
+        const root = document.documentElement;
+        const body = document.body;
+        const brandColor = getComputedStyle(body).getPropertyValue('--brand-color').trim() || 
+                           getComputedStyle(root).getPropertyValue('--brand-color').trim();
+        if (brandColor) {
+          let hex = brandColor.replace('#', '');
+          if (hex.length === 3) {
+            hex = hex.split('').map(c => c + c).join('');
+          }
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+            body.style.setProperty('--brand-color-rgb', `${r}, ${g}, ${b}`);
+            root.style.setProperty('--brand-color-rgb', `${r}, ${g}, ${b}`);
+          }
+        }
+      }
+
+      const brandObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+          if (mutation.attributeName === 'style') {
+            updateBrandColorRGB();
+          }
+        });
+      });
+      brandObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+      
+      setTimeout(updateBrandColorRGB, 100);
+      setTimeout(updateBrandColorRGB, 1000);
+    })();
+  </script>
 </body>
 </html>

@@ -6,7 +6,13 @@ const { spawn } = require('child_process');
 // ─── Konfiguratsiyani o'qish ────────────────────────────────────────────────
 function getConfig() {
   try {
-    const configPath = path.join(__dirname, 'config.json');
+    // Check next to the executable first (if packaged)
+    let configPath = path.join(path.dirname(process.execPath), 'config.json');
+    if (fs.existsSync(configPath)) {
+      return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    }
+    // Fallback to app directory
+    configPath = path.join(__dirname, 'config.json');
     if (fs.existsSync(configPath)) {
       return JSON.parse(fs.readFileSync(configPath, 'utf8'));
     }
@@ -16,7 +22,7 @@ function getConfig() {
 
 // ─── Qo'shimcha argument orqali rolni aniqlash ──────────────────────────────
 function getRole() {
-  const args = process.argv.slice(2);
+  const args = process.argv;
   if (args.includes('--kiosk'))    return 'kiosk';
   if (args.includes('--monitor'))  return 'monitor';
   if (args.includes('--operator')) return 'operator';
@@ -36,7 +42,7 @@ function startLocalServer() {
     }
 
     serverProcess = spawn('node', [serverScript], {
-      cwd: __dirname,
+      cwd: app.isPackaged ? path.dirname(process.execPath) : __dirname,
       detached: false,
       stdio: 'ignore'
     });
@@ -206,11 +212,14 @@ ipcMain.on('open-role', (event, role) => {
     ? path.join(path.dirname(execPath), 'resources', 'app')
     : __dirname;
 
-  const electron = require('electron');
   const child = spawn(
-    app.isPackaged ? execPath : electron,
+    execPath,
     app.isPackaged ? [`--${role}`] : [appPath, `--${role}`],
-    { detached: true, stdio: 'ignore', cwd: __dirname }
+    {
+      detached: true,
+      stdio: 'ignore',
+      cwd: app.isPackaged ? path.dirname(execPath) : __dirname
+    }
   );
   child.unref();
 });

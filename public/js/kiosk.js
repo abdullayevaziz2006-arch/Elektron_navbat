@@ -171,6 +171,70 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  function getDirectionIcon(name, defaultIcon = 'arrow_forward') {
+    if (!name) return defaultIcon;
+    const lower = name.toLowerCase();
+    
+    // Transport & Logistics & Vehicles
+    if (lower.includes('logistika')) return 'local_shipping';
+    if (lower.includes('transport') || lower.includes('avtomobil') || lower.includes('avtamoil') || lower.includes('mashina') || lower.includes('traktor')) return 'directions_car';
+    
+    // Engineering & Technology & Manufacturing & Energy
+    if (lower.includes('energetika') || lower.includes('elektr')) return 'bolt';
+    if (lower.includes('muhandis') || lower.includes('texnik') || lower.includes('injener') || lower.includes('injiniring') || lower.includes('texnologik') || lower.includes('jihoz')) return 'engineering';
+    
+    // Economics & Finance & Accounting & Banking & Marketing
+    if (lower.includes('moliya') || lower.includes('finans') || lower.includes('iqtisod') || lower.includes('buxgalter') || lower.includes('pul') || lower.includes('grant') || lower.includes('tolov') || lower.includes("to'lov") || lower.includes('shartnoma') || lower.includes('bank') || lower.includes('marketing') || lower.includes('menedjment') || lower.includes('menejment')) return 'payments';
+    
+    // IT & Computer Science & Cybersecurity
+    if (lower.includes('it') || lower.includes('kompyuter') || lower.includes('dastur') || lower.includes('infomatika') || lower.includes('axborot') || lower.includes('aloqa') || lower.includes('kiber') || lower.includes('xavfsizlik') || lower.includes('multimedia') || lower.includes('ma\'lumotlar ilmi')) return 'computer';
+    
+    // Architecture & Construction
+    if (lower.includes('arxitektura') || lower.includes('qurilish') || lower.includes('loyiha') || lower.includes('shahar') || lower.includes('qurulish') || lower.includes('loyihalash')) return 'architecture';
+    
+    // Medicine & Health & Pharmacy
+    if (lower.includes('tibbiyot') || lower.includes('shifokor') || lower.includes('vrach') || lower.includes('med') || lower.includes('psixolog') || lower.includes('stomatologiya') || lower.includes('davolash') || lower.includes('pediateriya') || lower.includes('pediatr')) return 'medical_services';
+    
+    // Sports & Fitness
+    if (lower.includes('boks')) return 'sports_martial_arts';
+    if (lower.includes('futbol')) return 'sports_soccer';
+    if (lower.includes('valeybol') || lower.includes('voleybol')) return 'sports_volleyball';
+    if (lower.includes('atletika')) return 'directions_run';
+    if (lower.includes('kurash')) return 'sports_kabaddi';
+    if (lower.includes('sport') || lower.includes('jismoniy')) return 'fitness_center';
+    
+    // Languages & Philology & Translation
+    if (lower.includes('filologiya') || lower.includes('til') || lower.includes('tillar') || lower.includes('o\'qitish') || lower.includes('tarjima')) return 'translate';
+    
+    // General Education & Child Care / Pediatrics
+    if (lower.includes('maktabgacha') || lower.includes('yoshlar') || lower.includes('boshlang\'ich') || lower.includes('boshlangich') || lower.includes('talim') || lower.includes('ta\'lim') || lower.includes('pedagogika')) return 'school';
+    
+    // General Sciences
+    if (lower.includes('matematika') || lower.includes('fizika') || lower.includes('kimyo') || lower.includes('biologiya')) return 'calculate';
+    
+    // Library
+    if (lower.includes('kutubxona') || lower.includes('kitob')) return 'menu_book';
+    
+    // Dean's office / Administration
+    if (lower.includes('qabul') || lower.includes('komissiya') || lower.includes('arxiv') || lower.includes('hujjat')) return 'assignment_ind';
+    if (lower.includes('dekanat') || lower.includes('dekan') || lower.includes('magistr') || lower.includes('doktor')) return 'school';
+    
+    // Dormitory / Residence
+    if (lower.includes('yotoqxona') || lower.includes('ttj') || lower.includes('yotoq')) return 'bed';
+    
+    // International
+    if (lower.includes('xalqaro') || lower.includes('international') || lower.includes('viza')) return 'public';
+    
+    // Law / Legal
+    if (lower.includes('yuridik') || lower.includes('huquq') || lower.includes('qonun') || lower.includes('advokat')) return 'gavel';
+    
+    // Career
+    if (lower.includes('karyera') || lower.includes('ish') || lower.includes('bandlik')) return 'work';
+    
+    // Default fallback
+    return defaultIcon;
+  }
+
   // Load directions from API
   async function loadDirections() {
     try {
@@ -181,19 +245,23 @@ document.addEventListener('DOMContentLoaded', () => {
       directionsGrid.innerHTML = '';
       if (directions.length === 0) {
         directionsGrid.innerHTML = `
-          <div style="text-align: center; grid-column: 1/-1; padding: 3rem; color: var(--text-secondary);">
+          <div style="text-align: center; grid-column: 1/-1; padding: 3rem; color: #5f5e5e;">
+            <span class="material-symbols-outlined" style="font-size: 3rem; color: #bb0013; opacity: 0.4; display: block; margin-bottom: 0.75rem;">inbox</span>
             Hozircha yo'nalishlar mavjud emas. Admin panelda yo'nalishlar qo'shing.
           </div>
         `;
         return;
       }
-
+ 
       directions.forEach(dir => {
-        const button = document.createElement('div');
-        button.className = 'direction-btn glass-panel';
+        const button = document.createElement('button');
+        button.className = 'relative overflow-hidden flex flex-col items-center justify-center gap-md bg-white border-2 border-primary/20 rounded-xl h-44 shadow-sm active:scale-95 transition-all duration-200 hover:border-primary group direction-btn';
+        button.style.minHeight = 'unset';
         button.dataset.id = dir.id;
+        const iconName = dir.icon && dir.icon.trim() !== '' ? dir.icon : getDirectionIcon(dir.name);
         button.innerHTML = `
-          <div class="direction-name" style="font-size: 1.8rem; margin: 0.5rem 0; font-weight: 800; pointer-events: none;">${dir.name}</div>
+            <span class="material-symbols-outlined text-primary text-5xl transition-transform duration-300 group-hover:scale-110" data-icon="${iconName}">${iconName}</span>
+            <span class="text-headline-md font-headline-md text-on-surface text-center px-md leading-tight">${dir.name}</span>
         `;
 
         // Apply individual custom position & size
@@ -226,7 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error(err);
       directionsGrid.innerHTML = `
-        <div style="text-align: center; grid-column: 1/-1; padding: 3rem; color: var(--color-danger);">
+        <div style="text-align: center; grid-column: 1/-1; padding: 3rem; color: #ba1a1a;">
+          <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 0.75rem;">error</span>
           Xatolik yuz berdi: ${err.message}
         </div>
       `;
@@ -304,14 +373,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // Update Modal elements
       receiptDirectionName.textContent = ticket.direction_name.toUpperCase();
       receiptNumberDisplay.textContent = ticket.ticket_code;
-      receiptRoomDisplay.textContent = `${ticket.room}-operator (Xona ${ticket.room})`;
+      receiptRoomDisplay.textContent = `${ticket.room}-operator`;
       receiptIdText.textContent = `*T-${String(ticket.id).padStart(5, '0')}*`;
       receiptDateTime.textContent = fullDateTimeStr;
 
       // Update Print Area elements
       printDirection.textContent = ticket.direction_name.toUpperCase();
       printNumber.textContent = ticket.ticket_code;
-      printRoom.textContent = `${ticket.room}-operator (Xona ${ticket.room})`;
+      printRoom.textContent = `${ticket.room}-operator`;
       printTime.textContent = fullDateTimeStr;
 
       // Display Modal

@@ -50,6 +50,11 @@ wss.on('connection', (ws) => {
 
 // API Routes
 
+app.post('/api/debug-log', (req, res) => {
+  console.log('CLIENT DEBUG LOG:', JSON.stringify(req.body, null, 2));
+  res.sendStatus(200);
+});
+
 // --- Authentication ---
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;

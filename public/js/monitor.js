@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let waitingQueue = [];  // List of waiting tickets
   let announcementQueue = [];
   let isSpeaking = false;
+  let activeCallingRooms = new Set();
 
   // Load dynamic settings branding
   async function loadBranding() {
@@ -201,26 +202,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Render Lanes (Indigo-White Rows)
+  // Render Lanes (Operators Grid)
   function renderLanes() {
     lanesContainer.innerHTML = '';
     
     operatorRooms.forEach(room => {
       const ticket = activeLanes[room];
-      const ticketCode = ticket ? ticket.ticket_code : '- - -';
+      const ticketCode = ticket ? ticket.ticket_code : '—';
+      const isCalling = activeCallingRooms.has(room);
       
-      const row = document.createElement('div');
-      row.className = 'active-lane-row';
-      row.id = `lane-room-${room}`;
-      row.innerHTML = `
-        <div class="lane-ticket-box" id="lane-ticket-val-${room}">${ticketCode}</div>
-        <div class="lane-room-box">
-          <div>${room}-operator</div>
-          <div class="lane-room-subtitle">xona ${room}</div>
+      const card = document.createElement('div');
+      card.id = `operator-card-${room}`;
+      
+      let cardClasses = 'operator-card bg-white rounded-xl p-md flex justify-between items-center shadow-sm';
+      if (isCalling) {
+        cardClasses += ' calling border-primary/20 border-2';
+      } else {
+        cardClasses += ' border-outline-variant border';
+      }
+      
+      if (!ticket) {
+        cardClasses += ' opacity-60';
+      }
+      
+      card.className = cardClasses;
+
+      // Handle full width center for last odd item
+      const totalCount = operatorRooms.length;
+      const index = operatorRooms.indexOf(room);
+      if (totalCount % 2 !== 0 && index === totalCount - 1) {
+        card.classList.add('col-span-1', 'sm:col-span-2', 'xl:col-span-3', 'max-w-md', 'mx-auto', 'w-full');
+      }
+
+      card.innerHTML = `
+        <div class="flex flex-col">
+          <span class="text-label-sm font-bold text-on-surface-variant uppercase">Operator</span>
+          <span class="${ticket ? 'text-monitor-label' : 'text-headline-lg'} font-bold text-on-surface leading-none">${room}</span>
+        </div>
+        <div class="text-right">
+          <span class="text-label-sm font-bold ${ticket ? 'text-primary' : 'text-on-surface-variant'} uppercase">Ticket</span>
+          <div class="${ticket ? (isCalling ? 'text-headline-lg font-extrabold text-primary text-glow-red animate-pulse' : 'text-headline-lg font-extrabold text-primary') : 'text-headline-md font-bold text-on-surface'} leading-none">${ticketCode}</div>
         </div>
       `;
       
-      lanesContainer.appendChild(row);
+      lanesContainer.appendChild(card);
     });
   }
 
@@ -230,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (waitingQueue.length === 0) {
       waitingGridContainer.innerHTML = `
-        <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: var(--text-muted); font-size: 0.95rem;">
+        <div style="text-align: center; grid-column: 1/-1; padding: 4rem; color: #9ca3af; font-size: 0.95rem;">
           Navbat bo'sh
         </div>
       `;
@@ -239,10 +264,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     waitingQueue.forEach(ticket => {
       const badge = document.createElement('div');
-      badge.className = 'waiting-badge';
+      badge.className = 'bg-surface-container-low border border-outline-variant rounded-lg p-md text-center';
       badge.innerHTML = `
-        <div class="waiting-badge-code">${ticket.ticket_code}</div>
-        <div class="waiting-badge-dir">${ticket.direction_name}</div>
+        <span class="text-headline-md font-bold text-on-surface">${ticket.ticket_code}</span>
       `;
       waitingGridContainer.appendChild(badge);
     });
@@ -318,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
         letterPronunciation = letterMapping[letterCode];
       }
 
-      const text = `Navbat raqami, ${letterPronunciation} ${ticket.number}. ${ticket.room} xonaga.`;
+      const text = `Navbat raqami, ${letterPronunciation} ${ticket.number}. ${ticket.room}-operatorga.`;
       const utterance = new SpeechSynthesisUtterance(text);
       
       const voices = window.speechSynthesis.getVoices();
@@ -363,14 +387,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 2. Render state on screen (waiting list removes the called ticket, active lane updates)
     activeLanes[ticket.room] = ticket;
+    
+    // 3. Highlight the active operator card that was called
+    activeCallingRooms.add(ticket.room);
     renderLanes();
     renderWaitingGrid();
-
-    // 3. Highlight the active lane row that was called
-    const activeRow = document.getElementById(`lane-room-${ticket.room}`);
-    if (activeRow) {
-      activeRow.classList.add('flashing');
-    }
 
     // 4. Play Ding-Dong chime
     await playDingDong();
@@ -378,11 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Speak announcement
     await speakAnnouncement(ticket);
 
-    // Keep flashing a little longer, then clear
+    // Keep flashing a little longer, then clear calling state
     setTimeout(() => {
-      if (activeRow) {
-        activeRow.classList.remove('flashing');
-      }
+      activeCallingRooms.delete(ticket.room);
+      renderLanes();
       isSpeaking = false;
       processQueue(); // Process next called ticket in queue
     }, 1500);

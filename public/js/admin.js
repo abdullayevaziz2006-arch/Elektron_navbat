@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.innerHTML = `
           <td>${op.id}</td>
           <td><strong>${op.username}</strong></td>
-          <td>${op.room}-xona</td>
+          <td>${op.room}-operator</td>
           <td style="text-align: right;">
             <button class="btn btn-secondary btn-edit-op" data-id="${op.id}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; margin-right: 0.5rem;">Tahrirlash</button>
             <button class="btn btn-danger btn-delete-op" data-id="${op.id}" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">O'chirish</button>
@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${createdTimeStr}</td>
           <td>${statusBadge}</td>
           <td>${item.operator_username || '-'}</td>
-          <td>${item.room}-xona</td>
+          <td>${item.room}-operator</td>
           <td>${waitMins}</td>
         `;
 
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Client-side CSV download
+  // Client-side Excel download
   btnExportCsv.addEventListener('click', () => {
     if (historyData.length === 0) {
       alert('Eksport qilish uchun ma\'lumot yo\'q');
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const headers = [
       'Chipta kodi', 'Yo\'nalish', 'Yaratilgan vaqt', 
       'Chaqirilgan vaqt', 'Yakunlangan vaqt', 'Status', 
-      'Operator', 'Xona', 'Kutish vaqti (daqiqa)'
+      'Operator', 'Operator raqami', 'Kutish vaqti (daqiqa)'
     ];
 
     const rows = historyData.map(item => {
@@ -437,32 +437,76 @@ document.addEventListener('DOMContentLoaded', () => {
         waitMins = Math.round(diff / 60000);
       }
 
-      // Escape quotes and fields containing commas
+      // Map status values to Uzbek
+      let statusUz = item.status;
+      if (item.status === 'completed') statusUz = 'Bajarildi';
+      else if (item.status === 'skipped') statusUz = 'Kelmagan';
+      else if (item.status === 'called') statusUz = 'Chaqirilgan';
+      else if (item.status === 'waiting') statusUz = 'Kutilmoqda';
+
       return [
-        `"${item.direction_code}${item.number}"`,
-        `"${item.direction_name}"`,
-        `"${created}"`,
-        `"${called}"`,
-        `"${completed}"`,
-        `"${item.status}"`,
-        `"${item.operator_username || ''}"`,
-        `"${item.room}"`,
-        `"${waitMins}"`
+        `${item.direction_code}${item.number}`,
+        item.direction_name,
+        created,
+        called,
+        completed,
+        statusUz,
+        item.operator_username || '-',
+        item.room,
+        waitMins
       ];
     });
 
-    // Combine headers and rows
-    const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    // Generate Excel HTML Table with stylesheet and gridline XML configuration
+    const excelTemplate = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Navbat Tarixi</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          table { border-collapse: collapse; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; }
+          th { background-color: #bb0013; color: #ffffff; font-weight: bold; border: 1px solid #cccccc; padding: 10px; text-align: left; font-size: 13px; }
+          td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 12px; color: #1e293b; }
+          tr:nth-child(even) { background-color: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h2 style="font-family: Arial, sans-serif; color: #1e293b; margin-bottom: 5px;">RANCH UNIVERSITY - ELEKTRON NAVBAT TIZIMI HISOBOTI</h2>
+        <p style="font-family: Arial, sans-serif; color: #64748b; font-size: 12px; margin-top: 0;">Eksport qilingan vaqt: ${new Date().toLocaleString('uz-UZ')}</p>
+        <br>
+        <table>
+          <thead>
+            <tr>
+              ${headers.map(h => `<th>${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
 
-    // Add UTF-8 BOM to make Excel render Uzbek letters correctly
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    // Create download link
+    // Create a Blob and trigger the download of the file
+    const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `navbat_tarixi_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `navbat_tarixi_${new Date().toISOString().split('T')[0]}.xls`);
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);

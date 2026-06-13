@@ -799,187 +799,50 @@ async function initDatabase() {
   const settingsCount = await get(`SELECT COUNT(*) as count FROM settings`);
   if (settingsCount.count === 0) {
     const defaultSettings = [
-    {
-        "key": "css_bg_secondary",
-        "value": "#0f172a"
-    },
-    {
-        "key": "css_text_secondary",
-        "value": "#94a3b8"
-    },
-    {
-        "key": "css_bg_color_2",
-        "value": "#6a280b"
-    },
-    {
-        "key": "css_bg_angle",
-        "value": "285deg"
-    },
-    {
-        "key": "css_glass_blur",
-        "value": "35px"
-    },
-    {
-        "key": "logo_position",
-        "value": "logo-left"
-    },
-    {
-        "key": "css_bg_primary",
-        "value": "#ff0f0f"
-    },
-    {
-        "key": "css_text_primary",
-        "value": "#f8fafc"
-    },
-    {
-        "key": "css_kiosk_btn_width",
-        "value": "420px"
-    },
-    {
-        "key": "org_name",
-        "value": "RANCH UNIVERSITY"
-    },
-    {
-        "key": "logo_main",
-        "value": "RANCH"
-    },
-    {
-        "key": "logo_sub",
-        "value": "University"
-    },
-    {
-        "key": "brand_color",
-        "value": "#ed2c2c"
-    },
-    {
-        "key": "theme",
-        "value": "theme-royal-gold"
-    },
-    {
-        "key": "admin_theme",
-        "value": "minimalist-slate"
-    },
-    {
-        "key": "kiosk_theme",
-        "value": "modern-dark"
-    },
-    {
-        "key": "monitor_theme",
-        "value": "minimalist-slate"
-    },
-    {
-        "key": "op_theme",
-        "value": "light-mode"
-    },
-    {
-        "key": "bg_img",
-        "value": ""
-    },
-    {
-        "key": "kiosk_title",
-        "value": "Elektron Navbat"
-    },
-    {
-        "key": "monitor_title",
-        "value": "Tizim Monitori"
-    },
-    {
-        "key": "custom_css",
-        "value": ""
-    },
-    {
-        "key": "css_kiosk_bg_primary",
-        "value": "#020617"
-    },
-    {
-        "key": "css_kiosk_bg_secondary",
-        "value": "#0f172a"
-    },
-    {
-        "key": "css_kiosk_text_primary",
-        "value": "#f8fafc"
-    },
-    {
-        "key": "css_kiosk_text_secondary",
-        "value": "#94a3b8"
-    },
-    {
-        "key": "css_monitor_bg_primary",
-        "value": "#000000"
-    },
-    {
-        "key": "css_monitor_text_primary",
-        "value": "#ffffff"
-    },
-    {
-        "key": "css_monitor_text_secondary",
-        "value": "#ffffff"
-    },
-    {
-        "key": "css_op_bg_primary",
-        "value": "#0024c7"
-    },
-    {
-        "key": "css_op_bg_secondary",
-        "value": "#1d4dbf"
-    },
-    {
-        "key": "css_op_text_primary",
-        "value": "#2d73b9"
-    },
-    {
-        "key": "css_op_text_secondary",
-        "value": "#4177c3"
-    },
-    {
-        "key": "css_admin_bg_primary",
-        "value": "#020617"
-    },
-    {
-        "key": "css_admin_bg_secondary",
-        "value": "#0f172a"
-    },
-    {
-        "key": "css_admin_text_primary",
-        "value": "#f8fafc"
-    },
-    {
-        "key": "css_admin_text_secondary",
-        "value": "#94a3b8"
-    },
-    {
-        "key": "css_radius_sm",
-        "value": "8px"
-    },
-    {
-        "key": "css_radius_md",
-        "value": "16px"
-    },
-    {
-        "key": "css_kiosk_columns",
-        "value": "repeat(4, 1fr)"
-    },
-    {
-        "key": "css_kiosk_btn_padding",
-        "value": "1.2rem 2.0rem"
-    },
-    {
-        "key": "logo_img",
-        "value": "/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.svg"
-    },
-    {
-        "key": "css_logo_pos",
-        "value": "absolute"
-    },
-    {
-        "key": "css_logo_top",
-        "value": "1px"
-    },
-    {
-        "key": "css_logo_left",
-        "value": "1312px"
-    }
-];
+      { "key": "brand_color", "value": "#bb0013" },
+      { "key": "theme", "value": "theme-elegant-light" },
+      { "key": "kiosk_theme", "value": "theme-elegant-light" },
+      { "key": "monitor_theme", "value": "theme-elegant-light" },
+      { "key": "op_theme", "value": "theme-elegant-light" },
+      { "key": "admin_theme", "value": "light-mode" },
+      { "key": "bg_img", "value": "" },
+      { "key": "kiosk_title", "value": "Elektron Navbat Tizimi" },
+      { "key": "monitor_title", "value": "Navbat Monitori" },
+      { "key": "org_name", "value": "RANCH UNIVERSITY" },
+      { "key": "logo_main", "value": "RANCH" },
+      { "key": "logo_sub", "value": "University" },
+      { "key": "logo_img", "value": "/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png" },
+      { "key": "css_bg_primary", "value": "#f6faff" },
+      { "key": "css_bg_secondary", "value": "#ffffff" },
+      { "key": "css_text_primary", "value": "#141d23" },
+      { "key": "css_text_secondary", "value": "#5d3f3c" },
+      { "key": "css_bg_color_2", "value": "#ecf5fe" },
+      { "key": "css_bg_angle", "value": "135deg" },
+      { "key": "css_glass_blur", "value": "0px" },
+      { "key": "css_kiosk_bg_primary", "value": "#f6faff" },
+      { "key": "css_kiosk_bg_secondary", "value": "#ffffff" },
+      { "key": "css_kiosk_text_primary", "value": "#141d23" },
+      { "key": "css_kiosk_text_secondary", "value": "#5d3f3c" },
+      { "key": "css_monitor_bg_primary", "value": "#293138" },
+      { "key": "css_monitor_bg_secondary", "value": "#1e293b" },
+      { "key": "css_monitor_text_primary", "value": "#ffffff" },
+      { "key": "css_monitor_text_secondary", "value": "#ffffff" },
+      { "key": "css_op_bg_primary", "value": "#f8fafc" },
+      { "key": "css_op_bg_secondary", "value": "#ffffff" },
+      { "key": "css_op_text_primary", "value": "#1e293b" },
+      { "key": "css_op_text_secondary", "value": "#64748b" },
+      { "key": "css_admin_bg_primary", "value": "#f8fafc" },
+      { "key": "css_admin_bg_secondary", "value": "#ffffff" },
+      { "key": "css_admin_text_primary", "value": "#1e293b" },
+      { "key": "css_admin_text_secondary", "value": "#64748b" },
+      { "key": "css_radius_sm", "value": "8px" },
+      { "key": "css_radius_md", "value": "16px" },
+      { "key": "css_kiosk_columns", "value": "repeat(auto-fill, minmax(280px, 1fr))" },
+      { "key": "css_kiosk_btn_padding", "value": "1.2rem 2.0rem" },
+      { "key": "css_kiosk_btn_width", "value": "280px" },
+      { "key": "logo_position", "value": "logo-center" },
+      { "key": "custom_css", "value": "" }
+    ];
     for (const s of defaultSettings) {
       await run(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`, [s.key, s.value]);
     }

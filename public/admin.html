@@ -1,544 +1,1142 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html class="light" lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tizim Administratori | Elektron Navbat</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.1">
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>RANCH Elektron Navbat - Admin Panel</title>
+  <meta name="description" content="RANCH Queue Management System - Admin Panel. Tizim yo'nalishlari, operatorlar va xonalarni boshqarish.">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com?v=1.0.8&plugins=forms,container-queries"></script>
+  
+  <!-- Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed-dim": "#c5c7c8",
+            "secondary-fixed": "#e5e2e1",
+            "surface-container-highest": "#dbe4ed",
+            "surface-bright": "#f6faff",
+            "error": "#ba1a1a",
+            "outline-variant": "#e7bdb8",
+            "surface-container": "#e6eff8",
+            "tertiary-container": "#737576",
+            "on-primary-fixed": "#410002",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#141d23",
+            "surface-tint": "#c00014",
+            "on-surface": "#141d23",
+            "inverse-on-surface": "#e9f2fb",
+            "on-error": "#ffffff",
+            "background": "#f6faff",
+            "outline": "#926f6b",
+            "on-secondary-container": "#636262",
+            "primary-fixed": "#ffdad6",
+            "surface-variant": "#dbe4ed",
+            "surface-container-high": "#e0e9f2",
+            "secondary": "#5f5e5e",
+            "tertiary-fixed": "#e1e3e4",
+            "primary-container": "#e22326",
+            "on-tertiary-fixed-variant": "#454748",
+            "surface-dim": "#d2dbe4",
+            "on-secondary-fixed-variant": "#474746",
+            "on-primary-container": "#fffbff",
+            "surface": "#ffffff",
+            "on-tertiary-fixed": "#191c1d",
+            "secondary-container": "#e2dfde",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#ecf5fe",
+            "inverse-primary": "#ffb4ab",
+            "on-primary-fixed-variant": "#93000c",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed": "#1c1b1b",
+            "inverse-surface": "#293138",
+            "tertiary": "#5a5c5d",
+            "on-tertiary-container": "#fcfdfe",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#c8c6c5",
+            "primary": "var(--brand-color, #bb0013)",
+            "on-surface-variant": "#5d3f3c",
+            "primary-fixed-dim": "#ffb4ab"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1.5rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "sm": "8px",
+            "xl": "32px",
+            "md": "16px",
+            "gutter": "24px",
+            "kiosk-padding": "40px",
+            "unit": "8px",
+            "xs": "4px",
+            "xxl": "48px",
+            "lg": "24px"
+          },
+          "fontFamily": {
+            "sans": ["Inter", "sans-serif"],
+            "label-bold": ["Inter"],
+            "monitor-label": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "monitor-num": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "label-bold": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "monitor-label": ["48px", {"lineHeight": "56px", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+            "monitor-num": ["120px", {"lineHeight": "120px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+          },
+          "boxShadow": {
+            "soft": "0 2px 12px -2px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02)",
+            "premium": "0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)",
+          }
+        },
+      },
+    }
+  </script>
+
   <style>
+    :root {
+      --color-success: #10b981;
+      --color-danger: #ef4444;
+      --color-accent: #f59e0b;
+      --text-secondary: #5d5e62;
+      --text-muted: #74777f;
+    }
+
     body {
-      background-color: #020617;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
       display: flex;
-      flex-direction: row;
       min-height: 100vh;
+      background-color: var(--bg-primary, #f8f9fa);
+      color: var(--text-primary, #1a1c1e);
+      overflow-x: hidden;
     }
 
-    /* Sidebar Layout */
-    .admin-sidebar {
-      width: 280px;
-      background: rgba(15, 23, 42, 0.85);
-      border-right: 1px solid var(--glass-border);
-      padding: 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      backdrop-filter: blur(10px);
+    .bg-white {
+      background-color: var(--bg-secondary, #ffffff) !important;
     }
 
-    .admin-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
+    .rounded-xl {
+      border-radius: var(--radius-sm, 12px) !important;
     }
 
-    .admin-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex-grow: 1;
+    .rounded-2xl {
+      border-radius: var(--radius-md, 16px) !important;
     }
 
+    .text-on-surface {
+      color: var(--text-primary, #1a1c1e) !important;
+    }
+
+    .text-on-surface-variant {
+      color: var(--text-secondary, #44474e) !important;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* ===== SIDEBAR ===== */
     .menu-item {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
-      padding: 0.9rem 1.2rem;
-      border-radius: var(--radius-sm);
-      color: var(--text-secondary);
-      text-decoration: none;
+      gap: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 8px 16px;
+      transition: all 0.2s ease;
+      border-radius: 0.5rem;
+      font-size: 15px;
       font-weight: 500;
-      font-size: 0.95rem;
       cursor: pointer;
-      transition: var(--transition-fast);
-      border: 1px solid transparent;
+      user-select: none;
     }
 
     .menu-item:hover {
-      color: white;
-      background: rgba(255, 255, 255, 0.03);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
     }
 
     .menu-item.active {
-      color: white;
-      background: rgba(59, 130, 246, 0.15);
-      border-color: rgba(59, 130, 246, 0.25);
+      color: var(--primary, #bb0013);
+      background-color: rgba(187, 0, 19, 0.08);
+      border-left: 4px solid var(--primary, #bb0013);
+      border-radius: 0 0.5rem 0.5rem 0;
+      font-weight: 600;
     }
 
-    /* Content Area */
-    .admin-content {
-      flex-grow: 1;
-      padding: 2.5rem 3rem;
-      overflow-y: auto;
-      height: 100vh;
-      animation: fadeIn 0.4s ease;
+    .menu-item.active .material-symbols-outlined {
+      color: var(--primary, #bb0013);
     }
 
-    .content-header {
-      display: flex;
-      justify-content: space-between;
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(116, 119, 127, 0.2);
+      border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(116, 119, 127, 0.4);
+    }
+
+    /* ===== TABLES ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background-color: rgba(241, 243, 245, 0.5);
+    }
+    th {
+      padding: 12px 24px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #44474e;
+      border-bottom: 1px solid rgba(196, 199, 207, 0.5);
+    }
+    td {
+      padding: 16px 24px;
+      font-size: 14px;
+      color: #1a1c1e;
+      border-bottom: 1px solid rgba(196, 199, 207, 0.3);
+      vertical-align: middle;
+    }
+    tbody tr {
+      transition: background-color 0.2s ease;
+    }
+    tbody tr:hover {
+      background-color: rgba(241, 243, 245, 0.2);
+    }
+    tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    /* Action Buttons in Dynamically Rendered Rows */
+    .btn-edit-dir, .btn-edit-op {
+      background: transparent !important;
+      color: #44474e !important;
+      border: none !important;
+      padding: 8px !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      font-size: 13px !important;
+    }
+    .btn-edit-dir:hover, .btn-edit-op:hover {
+      background-color: rgba(187, 0, 19, 0.08) !important;
+      color: var(--primary, #bb0013) !important;
+    }
+
+    .btn-delete-dir, .btn-delete-op {
+      background: transparent !important;
+      color: #44474e !important;
+      border: none !important;
+      padding: 8px !important;
+      border-radius: 8px !important;
+      transition: all 0.2s ease !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      font-size: 13px !important;
+    }
+    .btn-delete-dir:hover, .btn-delete-op:hover {
+      background-color: rgba(186, 26, 26, 0.1) !important;
+      color: #ba1a1a !important;
+    }
+
+    /* ===== BADGES ===== */
+    .badge-room {
+      display: inline-flex;
       align-items: center;
-      margin-bottom: 2.5rem;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
     }
 
-    .content-header h2 {
-      font-size: 2rem;
-      font-weight: 800;
+    /* ===== MODALS ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 28, 30, 0.4);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+      animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .modal-content {
+      background: #ffffff;
+      border: 1px solid rgba(116, 119, 127, 0.2);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 48px -8px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content {
+      animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(196, 199, 207, 0.3);
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1c1e;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f3f5;
+      color: #44474e;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      line-height: 1;
+    }
+    .modal-close:hover {
+      background-color: rgba(187, 0, 19, 0.08);
+      color: var(--primary, #bb0013);
+    }
+    .modal-body {
+      padding: 24px;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
-    .admin-card {
-      margin-bottom: 2rem;
+    /* ===== FORMS ===== */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #44474e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-control {
+      background-color: #f1f3f5;
+      border: 1px solid rgba(116, 119, 127, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #1a1c1e;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    .form-control:focus {
+      border-color: var(--primary, #bb0013);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(187, 0, 19, 0.1);
+    }
+    .form-control::placeholder {
+      color: #74777f;
     }
 
-    /* Modal Form Custom Layout */
-    .grid-form {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.2rem;
+    /* Sub-tabs settings styling */
+    .sub-tab-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #44474e;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sub-tab-btn:hover {
+      background-color: #f1f3f5;
+      color: #1a1c1e;
+    }
+    .sub-tab-btn.active {
+      background-color: rgba(187, 0, 19, 0.08);
+      color: var(--primary, #bb0013);
     }
 
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .admin-sidebar {
-        width: 100%;
-        height: auto;
-        padding: 1rem;
-        flex-direction: row;
-        justify-content: space-between;
-      }
-      .admin-menu {
-        flex-direction: row;
-        flex-grow: 0;
-      }
-      .admin-content {
-        padding: 1.5rem;
-        height: auto;
-      }
+    /* Operator checkboxes */
+    #operator-directions-checkboxes label {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-size: 13px !important;
+      color: #1a1c1e !important;
+      cursor: pointer !important;
+      text-transform: none !important;
+    }
+    #operator-directions-checkboxes input[type="checkbox"] {
+      border-radius: 4px;
+      border-color: rgba(116, 119, 127, 0.3);
+      color: var(--primary, #bb0013);
+      focus: ring-primary/20;
+    }
+
+    /* Glass Effect Panels */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+    }
+
+    /* ===== TAB PANELS ===== */
+    .tab-panel {
+      display: none;
+      animation: tabFadeIn 0.3s ease;
+    }
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-<body>
+<body class="bg-background text-on-surface">
 
   <!-- Sidebar -->
-  <aside class="admin-sidebar">
-    <div class="admin-logo">
-      <div class="logo-icon" style="width: 35px; height: 35px; font-size: 1.1rem;">AD</div>
-      <div class="logo-text">
-        <h1 style="font-size: 1rem; line-height: 1.1;">ADMIN PANEL</h1>
-        <p style="font-size: 0.65rem;">Elektron Navbat</p>
+  <aside class="fixed left-0 top-0 h-full w-[280px] bg-inverse-surface flex flex-col z-40 shadow-premium">
+    <div class="p-6 mb-4">
+      <div class="flex items-center justify-center">
+        <img src="/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png" class="h-10 w-auto object-contain" alt="RANCH Logo">
       </div>
     </div>
-
-    <nav class="admin-menu">
+    
+    <nav class="flex-1 px-4 flex flex-col gap-1">
+      <div class="menu-item" data-target="tab-directions" style="display:none;">
+        <span class="material-symbols-outlined text-[22px]">dashboard</span>
+        <span class="text-[15px]">Dashboard</span>
+      </div>
       <div class="menu-item active" data-target="tab-directions">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-        Yo'nalishlar
+        <span class="material-symbols-outlined text-[22px]">settings_suggest</span>
+        <span class="text-[15px]">Yo'nalishlar</span>
       </div>
       <div class="menu-item" data-target="tab-operators">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        Operatorlar
+        <span class="material-symbols-outlined text-[22px]">group</span>
+        <span class="text-[15px]">Operatorlar</span>
       </div>
       <div class="menu-item" data-target="tab-history">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        Navbat Tarixi
+        <span class="material-symbols-outlined text-[22px]">analytics</span>
+        <span class="text-[15px]">Hisobotlar</span>
       </div>
       <div class="menu-item" data-target="tab-settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        Sozlamalar
+        <span class="material-symbols-outlined text-[22px]">tune</span>
+        <span class="text-[15px]">Sozlamalar</span>
       </div>
     </nav>
 
-    <div>
-      <a href="index.html" class="menu-item" style="color: var(--text-muted); border-top: 1px solid var(--glass-border); padding-top: 1.5rem;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+    <div class="p-6 mt-auto space-y-3">
+      <button id="btn-sidebar-add-direction" class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-semibold shadow-lg hover:brightness-110 active:scale-[0.98] transition-all">
+        <span class="material-symbols-outlined text-[20px]">add</span>
+        Yangi Yo'nalish
+      </button>
+      <a href="index.html" class="flex items-center justify-center gap-2 text-white/50 hover:text-white transition-all text-xs font-semibold py-2">
+        <span class="material-symbols-outlined text-[18px]">logout</span>
         Portaldan Chiqish
       </a>
     </div>
   </aside>
 
-  <!-- Main Content Areas -->
-  <main class="admin-content">
+  <!-- Main Canvas -->
+  <main class="ml-[280px] flex-1 min-h-screen">
 
-    <!-- 1. DIRECTIONS TAB -->
-    <div id="tab-directions" class="tab-panel">
-      <div class="content-header">
-        <div>
-          <h2>Yo'nalishlar Boshqaruvi</h2>
-          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Kiosk tugmalari va chipta kodlarini sozlash</p>
+    <!-- ===== 1. DIRECTIONS TAB ===== -->
+    <div id="tab-directions" class="tab-panel" style="display:block;">
+      <!-- Header -->
+      <header class="sticky top-0 z-30 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex items-center gap-4">
+          <div>
+            <nav class="flex items-center gap-1 text-[11px] text-on-surface-variant font-medium uppercase tracking-wider">
+              <span>Admin</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary">Yo'nalishlar</span>
+            </nav>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Xizmat Yo'nalishlari</h2>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-add-direction">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Yo'nalish Qo'shish
-        </button>
-      </div>
+        <div class="flex items-center gap-6">
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+            <input id="search-directions" class="pl-12 pr-4 py-2.5 bg-surface-variant/50 border-none rounded-full focus:ring-2 focus:ring-primary/20 w-80 text-sm transition-all" placeholder="Qidiruv..." type="text">
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors relative">
+              <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+              <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full border-2 border-white"></span>
+            </button>
+          </div>
+          <div class="h-8 w-px bg-outline-variant"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-bold text-on-surface leading-tight">Admin User</p>
+              <p class="text-[11px] text-on-surface-variant uppercase tracking-wider font-medium">Super Admin</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm ring-1 ring-outline-variant">
+              AD
+            </div>
+          </div>
+        </div>
+      </header>
 
-      <div class="glass-panel table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nomi</th>
-              <th style="text-align: right;">Amallar</th>
-            </tr>
-          </thead>
-          <tbody id="table-directions-body">
-            <!-- Loaded dynamically -->
-          </tbody>
-        </table>
+      <!-- Panel Content Wrapper -->
+      <div class="p-6 space-y-6">
+        <!-- Stats Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-soft border border-outline-variant/30 flex flex-col justify-between hover:shadow-premium transition-shadow group">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-blue-600">category</span>
+              </div>
+              <p class="text-sm font-medium text-on-surface-variant">Jami Yo'nalishlar</p>
+            </div>
+            <div class="flex items-end justify-between mt-4">
+              <span class="text-3xl font-bold" id="total-directions-count">—</span>
+              <span class="text-[13px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[14px]">trending_up</span> 8%
+              </span>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-soft border border-outline-variant/30 flex flex-col justify-between hover:shadow-premium transition-shadow group">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-primary">groups</span>
+              </div>
+              <p class="text-sm font-medium text-on-surface-variant">Faol Operatorlar</p>
+            </div>
+            <div class="flex items-end justify-between mt-4">
+              <span class="text-3xl font-bold" id="active-operators-count">—</span>
+              <span class="text-[13px] font-medium text-secondary">Online</span>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-soft border border-outline-variant/30 flex flex-col justify-between hover:shadow-premium transition-shadow group">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-orange-600">timer</span>
+              </div>
+              <p class="text-sm font-medium text-on-surface-variant">O'rtacha Kutish</p>
+            </div>
+            <div class="flex items-end justify-between mt-4">
+              <span class="text-3xl font-bold" id="avg-wait-time">—</span>
+              <span class="text-[13px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[14px]">arrow_downward</span> 12%
+              </span>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-soft border border-outline-variant/30 flex flex-col justify-between hover:shadow-premium transition-shadow group">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-green-600">bolt</span>
+              </div>
+              <p class="text-sm font-medium text-on-surface-variant">Tizim Yuklamasi</p>
+            </div>
+            <div class="flex items-end justify-between mt-4 w-full">
+              <span class="text-3xl font-bold" id="system-load">—</span>
+              <span class="text-[13px] font-medium text-secondary">Mijozlar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left Column -->
+          <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+              <div class="p-6 flex justify-between items-center border-b border-outline-variant/30">
+                <div class="flex items-center gap-4">
+                  <h3 class="font-bold text-lg text-on-surface">Yo'nalishlar Ro'yxati</h3>
+                </div>
+                <div class="flex gap-2">
+                  <button class="btn btn-primary btn-sm flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg font-semibold text-sm hover:brightness-110 shadow-soft transition-all" id="btn-add-direction">
+                    <span class="material-symbols-outlined text-[18px]">add</span> Qo'shish
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-surface-variant/30 text-[12px] font-bold text-on-surface-variant uppercase tracking-wider">
+                      <th class="px-6 py-4">ID</th>
+                      <th class="px-6 py-4">Yo'nalish Nomi</th>
+                      <th class="px-6 py-4 text-right">Amallar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-directions-body" class="text-sm">
+                    <!-- Dynamically loaded -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Activity Dynamics Chart -->
+            <div class="bg-inverse-surface rounded-2xl p-6 shadow-premium relative overflow-hidden group">
+              <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                <span class="material-symbols-outlined text-[120px] text-white">query_stats</span>
+              </div>
+              <div class="relative z-10">
+                <div class="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 class="text-xl font-bold text-white">Tizim Faolligi Dinamikasi</h3>
+                    <p class="text-white/60 text-sm mt-1">Oxirgi 24 soatdagi yuklama tahlili</p>
+                  </div>
+                </div>
+                <div class="flex items-end gap-3 h-32 px-4" id="activity-chart">
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[30%]" title="08:00"></div>
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[45%]" title="10:00"></div>
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[80%]" title="12:00"></div>
+                  <div class="flex-1 bg-primary rounded-t-lg h-[100%]" title="Pik: 14:00"></div>
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[70%]" title="16:00"></div>
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[40%]" title="18:00"></div>
+                  <div class="flex-1 bg-white/20 hover:bg-primary transition-all rounded-t-lg h-[25%]" title="20:00"></div>
+                </div>
+                <div class="flex justify-between mt-4 px-4 text-[11px] text-white/40 font-bold uppercase">
+                  <span>08:00</span>
+                  <span>12:00</span>
+                  <span>16:00</span>
+                  <span>20:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="lg:col-span-4 space-y-6">
+            <!-- Quick Branding -->
+            <section class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+              <div class="p-6 bg-surface-variant/20 border-b border-outline-variant/30 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">auto_fix_high</span>
+                <h3 class="font-bold text-sm text-on-surface">Brending Sozlamalari</h3>
+              </div>
+              <div class="p-6 space-y-4">
+                <div>
+                  <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 block">Tizim Nomi</label>
+                  <input id="settings-org-name-quick" class="w-full bg-surface-variant/50 border border-outline-variant/30 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all" type="text" placeholder="RANCH University Queue">
+                </div>
+                <div>
+                  <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 block">Brend Logotipi</label>
+                  <div class="p-6 rounded-2xl bg-inverse-surface flex flex-col items-center gap-4 border border-outline-variant/10 shadow-inner">
+                    <img alt="RANCH Logo" class="h-10 w-auto object-contain brightness-0 invert" src="/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png" onerror="this.style.display='none';">
+                    <button type="button" class="text-primary text-xs font-bold uppercase tracking-widest hover:underline px-4 py-1.5 bg-white/5 rounded-full transition-all" onclick="document.querySelector('[data-target=\'tab-settings\']').click();">O'zgartirish</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-2 block">Asosiy Rang</label>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary shadow-premium ring-4 ring-primary/10" id="quick-color-preview"></div>
+                    <input type="text" id="settings-brand-color-hex-quick" class="w-full bg-surface-variant/50 border border-outline-variant/30 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all" placeholder="ED2C2C">
+                  </div>
+                </div>
+                <button type="button" id="btn-save-branding-quick" class="w-full py-3 bg-primary text-white rounded-xl font-bold shadow-soft hover:brightness-110 active:scale-[0.98] transition-all">O'zgarishlarni Saqlash</button>
+              </div>
+            </section>
+
+            <!-- Navbatchi Operatorlar -->
+            <section class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+              <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">person_add_alt_1</span>
+                  <h3 class="font-bold text-sm text-on-surface">Navbatchi Operatorlar</h3>
+                </div>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 bg-green-50 text-green-700 rounded ring-1 ring-green-100 uppercase tracking-tighter">Live</span>
+              </div>
+              <div class="p-6 space-y-4">
+                <div id="operator-assignment-list" class="space-y-3">
+                  <div style="font-size:0.78rem; color:#475569; text-align:center; padding:1rem 0;">
+                    Operatorlar yuklanmoqda...
+                  </div>
+                </div>
+                <button class="w-full py-3 bg-slate-50 border border-dashed border-outline-variant hover:bg-slate-100/50 text-primary rounded-xl font-semibold flex items-center justify-center gap-2 text-sm transition-all" id="btn-add-operator-quick">
+                  <span class="material-symbols-outlined">add</span> Yangi Operator Qo'shish
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 2. OPERATORS TAB -->
-    <div id="tab-operators" class="tab-panel" style="display: none;">
-      <div class="content-header">
-        <div>
-          <h2>Operatorlar Boshqaruvi</h2>
-          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Tizim operatorlari akkauntlari va xonalarni bog'lash</p>
+    <!-- ===== 2. OPERATORS TAB ===== -->
+    <div id="tab-operators" class="tab-panel" style="display:none;">
+      <!-- Header -->
+      <header class="sticky top-0 z-30 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex items-center gap-4">
+          <div>
+            <nav class="flex items-center gap-1 text-[11px] text-on-surface-variant font-medium uppercase tracking-wider">
+              <span>Admin</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary">Operatorlar</span>
+            </nav>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Operatorlar Boshqaruvi</h2>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-add-operator">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Operator Qo'shish
-        </button>
-      </div>
+        <div class="flex items-center gap-6">
+          <div class="relative group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+            <input id="search-operators" class="pl-12 pr-4 py-2.5 bg-surface-variant/50 border-none rounded-full focus:ring-2 focus:ring-primary/20 w-80 text-sm transition-all" placeholder="Operator qidirish..." type="text">
+          </div>
+          <div class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors relative">
+            <span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+          </div>
+          <div class="h-8 w-px bg-outline-variant"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm ring-1 ring-outline-variant">
+              AD
+            </div>
+          </div>
+        </div>
+      </header>
 
-      <div class="glass-panel table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Foydalanuvchi nomi</th>
-              <th>Belgilangan xona</th>
-              <th style="text-align: right;">Amallar</th>
-            </tr>
-          </thead>
-          <tbody id="table-operators-body">
-            <!-- Loaded dynamically -->
-          </tbody>
-        </table>
+      <div class="p-6">
+        <div class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+          <div class="p-6 flex justify-between items-center border-b border-outline-variant/30">
+            <div class="flex items-center gap-4">
+              <h3 class="font-bold text-lg text-on-surface">Operatorlar Ro'yxati</h3>
+            </div>
+            <button class="btn btn-primary btn-sm flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg font-semibold text-sm hover:brightness-110 shadow-soft transition-all" id="btn-add-operator">
+              <span class="material-symbols-outlined text-[18px]">add</span> Operator Qo'shish
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-variant/30 text-[12px] font-bold text-on-surface-variant uppercase tracking-wider">
+                  <th class="px-6 py-4">ID</th>
+                  <th class="px-6 py-4">Foydalanuvchi Nomi</th>
+                  <th class="px-6 py-4">Operator</th>
+                  <th class="px-6 py-4 text-right">Amallar</th>
+                </tr>
+              </thead>
+              <tbody id="table-operators-body" class="text-sm">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 3. QUEUE HISTORY TAB -->
-    <div id="tab-history" class="tab-panel" style="display: none;">
-      <div class="content-header">
-        <div>
-          <h2>Barcha Navbatlar Tarixi</h2>
-          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Barcha olingan navbat chiptalari va qabul arxivlari</p>
+    <!-- ===== 3. HISTORY / REPORTS TAB ===== -->
+    <div id="tab-history" class="tab-panel" style="display:none;">
+      <!-- Header -->
+      <header class="sticky top-0 z-30 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex items-center gap-4">
+          <div>
+            <nav class="flex items-center gap-1 text-[11px] text-on-surface-variant font-medium uppercase tracking-wider">
+              <span>Admin</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary">Hisobotlar</span>
+            </nav>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Barcha Navbatlar Tarixi</h2>
+          </div>
         </div>
-        <button class="btn btn-accent" id="btn-export-csv">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: -3px; margin-right: 5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Excel/CSV Yuklab Olish
-        </button>
-      </div>
-
-      <div class="glass-panel table-container" style="max-height: 650px;">
-        <table>
-          <thead>
-            <tr>
-              <th>Chipta</th>
-              <th>Yo'nalish</th>
-              <th>Sana/Vaqt</th>
-              <th>Status</th>
-              <th>Operator</th>
-              <th>Xona</th>
-              <th>Kutish (min)</th>
-            </tr>
-          </thead>
-          <tbody id="table-history-body">
-            <!-- Loaded dynamically -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 4. SETTINGS TAB -->
-    <div id="tab-settings" class="tab-panel" style="display: none;">
-      <div class="content-header">
-        <div>
-          <h2>Tizim Sozlamalari (White-Label)</h2>
-          <p style="color: var(--text-secondary); margin-top: 0.3rem;">Tashkilot nomi, logotip va panel dizayn sozlamalari</p>
-        </div>
-      </div>
-
-      <div class="glass-panel" style="max-width: 650px; padding: 2rem;">
-        <div class="settings-sub-tabs">
-          <button type="button" class="sub-tab-btn active" data-sub="settings-kiosk">Kiosk</button>
-          <button type="button" class="sub-tab-btn" data-sub="settings-monitor">Monitor Oynasi</button>
-          <button type="button" class="sub-tab-btn" data-sub="settings-operator">Operator Oynasi</button>
-          <button type="button" class="sub-tab-btn" data-sub="settings-admin">Admin Panel</button>
-        </div>
-
-        <form id="form-settings">
-          
-          <!-- 1. KIOSK PANEL -->
-          <div id="settings-kiosk" class="settings-sub-panel">
-            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Kiosk Sozlamalari</h3>
-            
-            <div class="form-group">
-              <label for="settings-org-name">Tashkilot nomi (Organization Name)</label>
-              <input type="text" id="settings-org-name" class="form-control" placeholder="Masalan: RANCH UNIVERSITY" required>
-            </div>
-            
-            <div class="grid-form">
-              <div class="form-group">
-                <label for="settings-logo-main">Logo asosiy matni (e.g. RANCH)</label>
-                <input type="text" id="settings-logo-main" class="form-control" placeholder="Masalan: RANCH" required>
-              </div>
-              <div class="form-group">
-                <label for="settings-logo-sub">Logo yordamchi matni (e.g. University)</label>
-                <input type="text" id="settings-logo-sub" class="form-control" placeholder="Masalan: University" required>
-              </div>
-            </div>
-
-            <div class="grid-form" style="margin-top: 1rem;">
-              <div class="form-group">
-                <label for="settings-brand-color">Brend rangi (Brand Color)</label>
-                <div style="display: flex; gap: 0.8rem; align-items: center;">
-                  <input type="color" id="settings-brand-color" style="width: 55px; height: 42px; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer;" required>
-                  <input type="text" id="settings-brand-color-hex" class="form-control" placeholder="#e60000" pattern="^#[0-9a-fA-F]{6}$" required>
-                </div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
-              <div class="form-group">
-                <label for="settings-logo-file">Logotip Rasmi (PNG/SVG - Matn o'rniga)</label>
-                <input type="file" id="settings-logo-file" class="form-control" accept="image/*">
-                <input type="hidden" id="settings-logo-img">
-                <div id="settings-logo-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                  <img id="settings-logo-preview" style="max-height: 40px; max-width: 120px; border-radius: 4px; background: rgba(255,255,255,0.05); padding: 4px;">
-                  <button type="button" class="btn btn-danger" id="btn-reset-logo" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="settings-bg-file">Orqa Fon Rasmi (Background Image)</label>
-                <input type="file" id="settings-bg-file" class="form-control" accept="image/*">
-                <input type="hidden" id="settings-bg-img">
-                <div id="settings-bg-preview-container" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
-                  <span style="font-size: 0.8rem; color: var(--color-success);">Rasm yuklandi</span>
-                  <button type="button" class="btn btn-danger" id="btn-reset-bg" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">O'chirish</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 1rem;">
-              <label for="settings-kiosk-title">Kiosk Sarlavhasi (Kiosk Title)</label>
-              <input type="text" id="settings-kiosk-title" class="form-control" placeholder="Masalan: Elektron Navbat Kioski" required>
-            </div>
-
-            <div class="form-group" style="margin-top: 1rem;">
-              <label for="settings-kiosk-theme">Kiosk Dizayn Mavzusi (Theme)</label>
-              <select id="settings-kiosk-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
-                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
-                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
-                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
-              </select>
-            </div>
-
-            <!-- Kiosk design colors -->
-            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Kiosk Fon & Matn Ranglari</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-kiosk-bg-primary">Asosiy fon rangi (Color 1)</label>
-                  <input type="color" id="css-kiosk-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-kiosk-bg-secondary">Yordamchi fon rangi (Color 2)</label>
-                  <input type="color" id="css-kiosk-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-              <div class="grid-form" style="margin-top: 0.5rem;">
-                <div class="form-group">
-                  <label for="css-kiosk-text-primary">Asosiy matn rangi</label>
-                  <input type="color" id="css-kiosk-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-kiosk-text-secondary">Yordamchi matn rangi</label>
-                  <input type="color" id="css-kiosk-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-            </div>
-
-            <!-- Kiosk layout -->
-            <div class="grid-form" style="margin-top: 1rem;">
-              <div class="form-group">
-                <label for="css-kiosk-columns">Kiosk ustunlari soni</label>
-                <select id="css-kiosk-columns" class="form-control">
-                  <option value="repeat(auto-fit, minmax(320px, 1fr))">Avtomatik (auto-fit)</option>
-                  <option value="repeat(1, 1fr)">1 ustun</option>
-                  <option value="repeat(2, 1fr)">2 ustun</option>
-                  <option value="repeat(3, 1fr)">3 ustun</option>
-                  <option value="repeat(4, 1fr)">4 ustun</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="css-kiosk-btn-padding">Kiosk tugmalari balandligi (Padding)</label>
-                <select id="css-kiosk-btn-padding" class="form-control">
-                  <option value="1.5rem 1rem">Kichik (S)</option>
-                  <option value="2.5rem 1.5rem">O'rtacha (M)</option>
-                  <option value="3.5rem 2rem">Katta (L)</option>
-                  <option value="4.5rem 2.5rem">Juda katta (XL)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- 1b. MONITOR PANEL -->
-          <div id="settings-monitor" class="settings-sub-panel" style="display: none;">
-            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Monitor Oynasi Sozlamalari</h3>
-            
-            <div class="form-group">
-              <label for="settings-monitor-title">Monitor Sarlavhasi (Monitor Title)</label>
-              <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
-            </div>
-
-            <div class="form-group" style="margin-top: 1rem;">
-              <label for="settings-monitor-theme">Monitor Dizayn Mavzusi (Theme)</label>
-              <select id="settings-monitor-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
-                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
-                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
-                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
-              </select>
-            </div>
-
-            <!-- Monitor design colors -->
-            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Monitor Fon & Matn Ranglari</h4>
-              <div class="form-group">
-                <label for="css-monitor-bg-primary">Asosiy fon rangi</label>
-                <input type="color" id="css-monitor-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-              </div>
-              <div class="grid-form" style="margin-top: 0.5rem;">
-                <div class="form-group">
-                  <label for="css-monitor-text-primary">Asosiy matn rangi</label>
-                  <input type="color" id="css-monitor-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-monitor-text-secondary">Yordamchi matn rangi</label>
-                  <input type="color" id="css-monitor-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. OPERATOR OYNASI PANEL -->
-          <div id="settings-operator" class="settings-sub-panel" style="display: none;">
-            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Operator Oynasi Sozlamalari</h3>
-            
-            <div class="form-group" style="margin-bottom: 1.2rem;">
-              <label for="settings-op-theme">Operator Dizayn Mavzusi (Theme)</label>
-              <select id="settings-op-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
-                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
-                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
-                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
-              </select>
-            </div>
-            
-            <!-- Operator design colors -->
-            <div class="glass-panel" style="padding: 1.2rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Operator Fon & Matn Ranglari</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-op-bg-primary">Asosiy fon rangi (Color 1)</label>
-                  <input type="color" id="css-op-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-op-bg-secondary">Yordamchi fon rangi (Color 2)</label>
-                  <input type="color" id="css-op-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-              <div class="grid-form" style="margin-top: 0.5rem;">
-                <div class="form-group">
-                  <label for="css-op-text-primary">Asosiy matn rangi</label>
-                  <input type="color" id="css-op-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-op-text-secondary">Yordamchi matn rangi</label>
-                  <input type="color" id="css-op-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. ADMIN PANEL PANEL -->
-          <div id="settings-admin" class="settings-sub-panel" style="display: none;">
-            <h3 style="font-size: 1.1rem; color: white; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); padding-left: 0.5rem;">Admin Panel Sozlamalari</h3>
-            
-            <div class="form-group">
-              <label for="settings-admin-theme">Admin Dizayn Mavzusi (Theme)</label>
-              <select id="settings-admin-theme" class="form-control" style="background: var(--bg-secondary); color: var(--text-primary); cursor: pointer;" required>
-                <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
-                <option value="light-mode">Klassik Yorug' (Light Mode)</option>
-                <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
-              </select>
-            </div>
-
-            <!-- Admin design colors -->
-            <div class="glass-panel" style="padding: 1.2rem; margin-top: 1rem; background: rgba(0,0,0,0.15);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--color-accent);">Admin Fon & Matn Ranglari</h4>
-              <div class="grid-form">
-                <div class="form-group">
-                  <label for="css-admin-bg-primary">Asosiy fon rangi (Color 1)</label>
-                  <input type="color" id="css-admin-bg-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-admin-bg-secondary">Yordamchi fon rangi (Color 2)</label>
-                  <input type="color" id="css-admin-bg-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-              <div class="grid-form" style="margin-top: 0.5rem;">
-                <div class="form-group">
-                  <label for="css-admin-text-primary">Asosiy matn rangi</label>
-                  <input type="color" id="css-admin-text-primary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-                <div class="form-group">
-                  <label for="css-admin-text-secondary">Yordamchi matn rangi</label>
-                  <input type="color" id="css-admin-text-secondary" class="form-control" style="padding: 0; width: 100%; height: 40px; border: none; cursor: pointer;">
-                </div>
-              </div>
-            </div>
-
-            <!-- Admin border radius -->
-            <div class="grid-form" style="margin-top: 1rem;">
-              <div class="form-group">
-                <label for="css-radius-sm">Tugmalar yumaloqligi</label>
-                <select id="css-radius-sm" class="form-control">
-                  <option value="0px">0px (O'tkir burchak)</option>
-                  <option value="4px">4px (Kichik yumaloq)</option>
-                  <option value="8px">8px (O'rtacha yumaloq)</option>
-                  <option value="16px">16px (Katta yumaloq)</option>
-                  <option value="30px">30px (Yarim doira)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="css-radius-md">Bloklar (Kardlar) yumaloqligi</label>
-                <select id="css-radius-md" class="form-control">
-                  <option value="0px">0px (O'tkir burchak)</option>
-                  <option value="8px">8px (Kichik yumaloq)</option>
-                  <option value="16px">16px (O'rtacha yumaloq)</option>
-                  <option value="24px">24px (Katta yumaloq)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 1rem;">
-              <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
-              <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height: 120px; font-family: monospace; font-size: 0.85rem; line-height: 1.4; resize: vertical;"></textarea>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.8rem; padding: 0.9rem;">
-            Sozlamalarni Saqlash
+        <div class="flex items-center gap-6">
+          <button class="btn btn-accent flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg font-semibold text-sm transition-all" id="btn-export-csv">
+            <span class="material-symbols-outlined text-[18px]">download</span> Excel Formatida Yuklash
           </button>
-        </form>
+          <div class="h-8 w-px bg-outline-variant"></div>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm ring-1 ring-outline-variant">
+              AD
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-6">
+        <div class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden">
+          <div class="p-6 flex justify-between items-center border-b border-outline-variant/30">
+            <h3 class="font-bold text-lg text-on-surface">Navbat Tarixi</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-variant/30 text-[12px] font-bold text-on-surface-variant uppercase tracking-wider">
+                  <th class="px-6 py-4">Chipta</th>
+                  <th class="px-6 py-4">Yo'nalish</th>
+                  <th class="px-6 py-4">Sana/Vaqt</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4">Operator</th>
+                  <th class="px-6 py-4">Operator raqami</th>
+                  <th class="px-6 py-4">Kutish (min)</th>
+                </tr>
+              </thead>
+              <tbody id="table-history-body" class="text-sm">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4. SETTINGS TAB ===== -->
+    <div id="tab-settings" class="tab-panel" style="display:none;">
+      <!-- Header -->
+      <header class="sticky top-0 z-30 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md border-b border-outline-variant/30">
+        <div class="flex items-center gap-4">
+          <div>
+            <nav class="flex items-center gap-1 text-[11px] text-on-surface-variant font-medium uppercase tracking-wider">
+              <span>Admin</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary">Sozlamalar</span>
+            </nav>
+            <h2 class="text-2xl font-extrabold text-on-surface tracking-tight">Tizim Sozlamalari (White-Label)</h2>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold text-sm ring-1 ring-outline-variant">
+            AD
+          </div>
+        </div>
+      </header>
+
+      <div class="p-6">
+        <div class="bg-white rounded-2xl shadow-soft border border-outline-variant/30 overflow-hidden max-w-4xl">
+          <div class="p-6 border-b border-outline-variant/30">
+            <h3 class="font-bold text-lg text-on-surface">Sozlamalar Paneli</h3>
+          </div>
+          <div class="p-6">
+            <div class="settings-sub-tabs flex gap-2 border-b border-outline-variant pb-2 mb-6">
+              <button type="button" class="sub-tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-on-surface-variant hover:text-primary active" data-sub="settings-kiosk">Kiosk</button>
+              <button type="button" class="sub-tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-on-surface-variant hover:text-primary" data-sub="settings-monitor">Monitor Oynasi</button>
+              <button type="button" class="sub-tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-on-surface-variant hover:text-primary" data-sub="settings-operator">Operator Oynasi</button>
+              <button type="button" class="sub-tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-on-surface-variant hover:text-primary" data-sub="settings-admin">Admin Panel</button>
+            </div>
+
+            <form id="form-settings">
+              <!-- 1. KIOSK PANEL -->
+              <div id="settings-kiosk" class="settings-sub-panel" style="display:block;">
+                <div class="text-sm font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">tablet_mac</span>
+                  Kiosk Sozlamalari
+                </div>
+
+                <div class="form-group">
+                  <label for="settings-org-name">Tashkilot nomi (Organization Name)</label>
+                  <input type="text" id="settings-org-name" class="form-control" placeholder="Masalan: RANCH UNIVERSITY" required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div class="form-group">
+                    <label for="settings-logo-main">Logo asosiy matni (e.g. RANCH)</label>
+                    <input type="text" id="settings-logo-main" class="form-control" placeholder="Masalan: RANCH" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="settings-logo-sub">Logo yordamchi matni (e.g. University)</label>
+                    <input type="text" id="settings-logo-sub" class="form-control" placeholder="Masalan: University" required>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div class="form-group">
+                    <label>Brend rangi (Brand Color)</label>
+                    <div class="flex gap-3 items-center">
+                      <input type="color" id="settings-brand-color" class="w-12 h-10 p-0 border border-outline-variant/30 rounded-xl cursor-pointer" required>
+                      <input type="text" id="settings-brand-color-hex" class="form-control font-mono uppercase" placeholder="#e60000" pattern="^#[0-9a-fA-F]{6}$" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4 mb-4">
+                  <div class="form-group">
+                    <label for="settings-logo-file">Logotip Rasmi (PNG/SVG - Matn o'rniga)</label>
+                    <input type="file" id="settings-logo-file" class="form-control" accept="image/*">
+                    <input type="hidden" id="settings-logo-img">
+                    <div id="settings-logo-preview-container" class="hidden items-center gap-3 mt-2">
+                      <img id="settings-logo-preview" class="max-h-10 max-w-[120px] rounded-lg bg-surface-variant p-1">
+                      <button type="button" class="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold" id="btn-reset-logo">O'chirish</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="settings-bg-file">Orqa Fon Rasmi (Background Image)</label>
+                    <input type="file" id="settings-bg-file" class="form-control" accept="image/*">
+                    <input type="hidden" id="settings-bg-img">
+                    <div id="settings-bg-preview-container" class="hidden items-center gap-3 mt-2">
+                      <span class="text-xs text-green-600 font-bold">✓ Rasm yuklandi</span>
+                      <button type="button" class="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold" id="btn-reset-bg">O'chirish</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="settings-kiosk-title">Kiosk Sarlavhasi (Kiosk Title)</label>
+                  <input type="text" id="settings-kiosk-title" class="form-control" placeholder="Masalan: Elektron Navbat Kioski" required>
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="settings-kiosk-theme">Kiosk Dizayn Mavzusi (Theme)</label>
+                  <select id="settings-kiosk-theme" class="form-control" required>
+                    <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                    <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                    <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+                  </select>
+                </div>
+
+                <div class="p-4 bg-surface-variant/30 border border-outline-variant/30 rounded-2xl mb-4">
+                  <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-3">Kiosk Fon &amp; Matn Ranglari</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div class="form-group">
+                      <label for="css-kiosk-bg-primary">Asosiy fon rangi (Color 1)</label>
+                      <input type="color" id="css-kiosk-bg-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-kiosk-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                      <input type="color" id="css-kiosk-bg-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label for="css-kiosk-text-primary">Asosiy matn rangi</label>
+                      <input type="color" id="css-kiosk-text-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-kiosk-text-secondary">Yordamchi matn rangi</label>
+                      <input type="color" id="css-kiosk-text-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="form-group">
+                    <label for="css-kiosk-columns">Kiosk ustunlari soni</label>
+                    <select id="css-kiosk-columns" class="form-control">
+                      <option value="repeat(auto-fit, minmax(320px, 1fr))">Avtomatik (auto-fit)</option>
+                      <option value="repeat(1, 1fr)">1 ustun</option>
+                      <option value="repeat(2, 1fr)">2 ustun</option>
+                      <option value="repeat(3, 1fr)">3 ustun</option>
+                      <option value="repeat(4, 1fr)">4 ustun</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="css-kiosk-btn-padding">Kiosk tugmalari balandligi (Padding)</label>
+                    <select id="css-kiosk-btn-padding" class="form-control">
+                      <option value="1.5rem 1rem">Kichik (S)</option>
+                      <option value="2.5rem 1.5rem">O'rtacha (M)</option>
+                      <option value="3.5rem 2rem">Katta (L)</option>
+                      <option value="4.5rem 2.5rem">Juda katta (XL)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. MONITOR PANEL -->
+              <div id="settings-monitor" class="settings-sub-panel" style="display:none;">
+                <div class="text-sm font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">monitor</span>
+                  Monitor Oynasi Sozlamalari
+                </div>
+
+                <div class="form-group">
+                  <label for="settings-monitor-title">Monitor Sarlavhasi (Monitor Title)</label>
+                  <input type="text" id="settings-monitor-title" class="form-control" placeholder="Masalan: Tizim Monitori" required>
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="settings-monitor-theme">Monitor Dizayn Mavzusi (Theme)</label>
+                  <select id="settings-monitor-theme" class="form-control" required>
+                    <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                    <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                    <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+                  </select>
+                </div>
+
+                <div class="p-4 bg-surface-variant/30 border border-outline-variant/30 rounded-2xl">
+                  <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-3">Monitor Fon &amp; Matn Ranglari</h4>
+                  <div class="form-group mb-3">
+                    <label for="css-monitor-bg-primary">Asosiy fon rangi</label>
+                    <input type="color" id="css-monitor-bg-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label for="css-monitor-text-primary">Asosiy matn rangi</label>
+                      <input type="color" id="css-monitor-text-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-monitor-text-secondary">Yordamchi matn rangi</label>
+                      <input type="color" id="css-monitor-text-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. OPERATOR OYNASI PANEL -->
+              <div id="settings-operator" class="settings-sub-panel" style="display:none;">
+                <div class="text-sm font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">support_agent</span>
+                  Operator Oynasi Sozlamalari
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="settings-op-theme">Operator Dizayn Mavzusi (Theme)</label>
+                  <select id="settings-op-theme" class="form-control" required>
+                    <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                    <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                    <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+                  </select>
+                </div>
+
+                <div class="p-4 bg-surface-variant/30 border border-outline-variant/30 rounded-2xl">
+                  <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-3">Operator Fon &amp; Matn Ranglari</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div class="form-group">
+                      <label for="css-op-bg-primary">Asosiy fon rangi (Color 1)</label>
+                      <input type="color" id="css-op-bg-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-op-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                      <input type="color" id="css-op-bg-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label for="css-op-text-primary">Asosiy matn rangi</label>
+                      <input type="color" id="css-op-text-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-op-text-secondary">Yordamchi matn rangi</label>
+                      <input type="color" id="css-op-text-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. ADMIN PANEL PANEL -->
+              <div id="settings-admin" class="settings-sub-panel" style="display:none;">
+                <div class="text-sm font-bold text-on-surface mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+                  Admin Panel Sozlamalari
+                </div>
+
+                <div class="form-group mb-4">
+                  <label for="settings-admin-theme">Admin Dizayn Mavzusi (Theme)</label>
+                  <select id="settings-admin-theme" class="form-control" required>
+                    <option value="modern-dark">Zamonaviy To'q (Modern Dark)</option>
+                    <option value="light-mode">Klassik Yorug' (Light Mode)</option>
+                    <option value="minimalist-slate">Minimalistik Kulrang (Slate)</option>
+                  </select>
+                </div>
+
+                <div class="p-4 bg-surface-variant/30 border border-outline-variant/30 rounded-2xl mb-4">
+                  <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-3">Admin Fon &amp; Matn Ranglari</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div class="form-group">
+                      <label for="css-admin-bg-primary">Asosiy fon rangi (Color 1)</label>
+                      <input type="color" id="css-admin-bg-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-admin-bg-secondary">Yordamchi fon rangi (Color 2)</label>
+                      <input type="color" id="css-admin-bg-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label for="css-admin-text-primary">Asosiy matn rangi</label>
+                      <input type="color" id="css-admin-text-primary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                    <div class="form-group">
+                      <label for="css-admin-text-secondary">Yordamchi matn rangi</label>
+                      <input type="color" id="css-admin-text-secondary" class="form-control h-10 p-0 border-none cursor-pointer">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div class="form-group">
+                    <label for="css-radius-sm">Tugmalar yumaloqligi</label>
+                    <select id="css-radius-sm" class="form-control">
+                      <option value="0px">0px (O'tkir burchak)</option>
+                      <option value="4px">4px (Kichik yumaloq)</option>
+                      <option value="8px">8px (O'rtacha yumaloq)</option>
+                      <option value="16px">16px (Katta yumaloq)</option>
+                      <option value="30px">30px (Yarim doira)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="css-radius-md">Bloklar (Kardlar) yumaloqligi</label>
+                    <select id="css-radius-md" class="form-control">
+                      <option value="0px">0px (O'tkir burchak)</option>
+                      <option value="8px">8px (Kichik yumaloq)</option>
+                      <option value="16px">16px (O'rtacha yumaloq)</option>
+                      <option value="24px">24px (Katta yumaloq)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="settings-custom-css">Maxsus CSS kodlari (Custom CSS Injection)</label>
+                  <textarea id="settings-custom-css" class="form-control" placeholder="Masalan: .direction-btn { border-radius: 50px !important; }" style="height:120px; font-family:monospace; font-size:13px; line-height:1.5; resize:vertical;"></textarea>
+                </div>
+              </div>
+
+              <button type="submit" class="w-full py-3 bg-primary text-white rounded-xl font-bold shadow-soft hover:brightness-110 active:scale-[0.98] transition-all mt-6 flex items-center justify-center gap-2 text-sm">
+                <span class="material-symbols-outlined text-[18px]">save</span> Sozlamalarni Saqlash
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
   </main>
 
-  <!-- 4. MODAL: ADD/EDIT DIRECTION -->
+  <!-- ===== MODAL: ADD/EDIT DIRECTION ===== -->
   <div class="modal-overlay" id="modal-direction">
     <div class="modal-content">
       <div class="modal-header">
@@ -548,29 +1146,32 @@
       <div class="modal-body">
         <form id="form-direction">
           <input type="hidden" id="direction-id">
+
           <div class="form-group">
             <label for="direction-name">Yo'nalish nomi</label>
             <input type="text" id="direction-name" class="form-control" placeholder="Masalan: Iqtisodiyot" required>
           </div>
-          <div class="grid-form" style="display: none;">
+
+          <div class="grid grid-cols-2 gap-4" style="display:none;">
             <div class="form-group">
-              <label for="direction-code">Chipta kodi (1-2 ta harf - ixtiyoriy)</label>
-              <input type="text" id="direction-code" class="form-control" placeholder="Avtomatik (A, B, D...)">
+              <label for="direction-code">Chipta kodi</label>
+              <input type="text" id="direction-code" class="form-control" placeholder="Avtomatik (A, B...)">
             </div>
             <div class="form-group">
-              <label for="direction-room">Xona raqami (ixtiyoriy)</label>
-              <input type="number" id="direction-room" class="form-control" placeholder="Operator xonasi bo'yicha">
+              <label for="direction-room">Operator raqami</label>
+              <input type="number" id="direction-room" class="form-control" placeholder="Operator raqami">
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">
-            Saqlash
+
+          <button type="submit" class="w-full py-3 bg-primary text-white rounded-xl font-bold shadow-soft hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm mt-4">
+            <span class="material-symbols-outlined text-[18px]">save</span> Saqlash
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- 5. MODAL: ADD/EDIT OPERATOR -->
+  <!-- ===== MODAL: ADD/EDIT OPERATOR ===== -->
   <div class="modal-overlay" id="modal-operator">
     <div class="modal-content">
       <div class="modal-header">
@@ -580,35 +1181,176 @@
       <div class="modal-body">
         <form id="form-operator">
           <input type="hidden" id="operator-id">
+
           <div class="form-group">
             <label for="operator-username">Foydalanuvchi nomi (Login)</label>
             <input type="text" id="operator-username" class="form-control" placeholder="operator1" required>
           </div>
-          <div class="grid-form">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="form-group">
               <label for="operator-password" id="label-password">Parol</label>
               <input type="password" id="operator-password" class="form-control" placeholder="••••••••" required>
-              <span style="font-size: 0.75rem; color: var(--text-muted); display: none;" id="operator-pw-hint">Tahrirlashda parolni o'zgartirmasangiz, bo'sh qoldiring</span>
+              <span style="font-size:11px; color:#74777f; margin-top:4px;" id="operator-pw-hint">
+                Tahrirlashda parolni o'zgartirmasangiz, bo'sh qoldiring
+              </span>
             </div>
             <div class="form-group">
-              <label for="operator-room">Xona raqami</label>
+              <label for="operator-room">Operator raqami</label>
               <input type="number" id="operator-room" class="form-control" placeholder="1" required>
             </div>
           </div>
-          <div class="form-group" style="margin-top: 1rem;">
-            <label style="margin-bottom: 0.5rem; display: block; font-size: 0.85rem; color: var(--text-secondary);">Biriktirilgan yo'nalishlar (Kamida bittasini tanlang):</label>
-            <div id="operator-directions-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 4px; border: 1px solid var(--glass-border);">
+
+          <div class="form-group mt-4">
+            <label class="mb-2 block text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+              Biriktirilgan yo'nalishlar (Kamida bittasini tanlang):
+            </label>
+            <div id="operator-directions-checkboxes" class="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto bg-surface-variant/50 p-4 rounded-xl border border-outline-variant/30">
               <!-- Loaded dynamically via JS -->
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.9rem;">
-            Saqlash
+
+          <button type="submit" class="w-full py-3 bg-primary text-white rounded-xl font-bold shadow-soft hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm mt-6">
+            <span class="material-symbols-outlined text-[18px]">save</span> Saqlash
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <script src="js/admin.js?v=1.0.1"></script>
+  <!-- Extra glue script to wire up sidebar quick-add buttons + operator assignment panel refresh -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wire sidebar "Yangi Yo'nalish" button to the same modal trigger
+      const sidebarBtn = document.getElementById('btn-sidebar-add-direction');
+      const mainAddBtn = document.getElementById('btn-add-direction');
+      if (sidebarBtn && mainAddBtn) {
+        sidebarBtn.addEventListener('click', () => mainAddBtn.click());
+      }
+
+      // Wire the dashed "Yangi Operator Qo'shish" button inside the right panel
+      const quickAddOpBtn = document.getElementById('btn-add-operator-quick');
+      const mainAddOpBtn  = document.getElementById('btn-add-operator');
+      if (quickAddOpBtn && mainAddOpBtn) {
+        quickAddOpBtn.addEventListener('click', () => mainAddOpBtn.click());
+      }
+
+      // Initialize staff assignment panel refresh
+      patchOperatorAssignmentList();
+      
+      // Wire tab changes to refresh staff assignment list
+      document.querySelectorAll('.menu-item[data-target="tab-directions"]').forEach(el => {
+        el.addEventListener('click', () => {
+          setTimeout(patchOperatorAssignmentList, 500);
+        });
+      });
+
+      // Quick branding settings sync
+      const quickOrgName = document.getElementById('settings-org-name-quick');
+      const quickColorHex = document.getElementById('settings-brand-color-hex-quick');
+      const btnSaveBrandingQuick = document.getElementById('btn-save-branding-quick');
+      
+      if (btnSaveBrandingQuick) {
+        btnSaveBrandingQuick.addEventListener('click', () => {
+          if (quickOrgName) {
+            document.getElementById('settings-org-name').value = quickOrgName.value;
+          }
+          if (quickColorHex) {
+            const hex = quickColorHex.value.startsWith('#') ? quickColorHex.value : '#' + quickColorHex.value;
+            document.getElementById('settings-brand-color-hex').value = hex;
+            document.getElementById('settings-brand-color').value = hex;
+          }
+          // Submit settings form
+          document.getElementById('form-settings').dispatchEvent(new Event('submit'));
+        });
+      }
+
+      // Load initial quick settings branding info
+      async function initQuickBranding() {
+        try {
+          const res = await fetch('/api/settings');
+          if (res.ok) {
+            const settings = await res.json();
+            if (settings) {
+              if (quickOrgName) quickOrgName.value = settings.org_name || '';
+              if (quickColorHex) {
+                const color = settings.brand_color || '#bb0013';
+                quickColorHex.value = color.replace('#', '');
+                const preview = document.getElementById('quick-color-preview');
+                if (preview) preview.style.backgroundColor = color;
+              }
+            }
+          }
+        } catch(e) {}
+      }
+      initQuickBranding();
+
+      // Search filters logic
+      const searchDirections = document.getElementById('search-directions');
+      if (searchDirections) {
+        searchDirections.addEventListener('input', (e) => {
+          const rows = document.querySelectorAll('#table-directions-body tr');
+          const val = e.target.value.toLowerCase();
+          rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(val) ? '' : 'none';
+          });
+        });
+      }
+
+      const searchOperators = document.getElementById('search-operators');
+      if (searchOperators) {
+        searchOperators.addEventListener('input', (e) => {
+          const rows = document.querySelectorAll('#table-operators-body tr');
+          const val = e.target.value.toLowerCase();
+          rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(val) ? '' : 'none';
+          });
+        });
+      }
+    });
+
+    function patchOperatorAssignmentList() {
+      const assignList = document.getElementById('operator-assignment-list');
+      if (!assignList) return;
+
+      async function refreshAssignList() {
+        try {
+          const res = await fetch('/api/admin/operators');
+          if (!res.ok) return;
+          const ops = await res.json();
+          if (ops.length === 0) {
+            assignList.innerHTML = '<div style="font-size:0.78rem;color:#475569;text-align:center;padding:1rem 0;">Hali operator qo\'shilmagan</div>';
+            return;
+          }
+          assignList.innerHTML = ops.map(op => {
+            const initials = op.username.slice(0,2).toUpperCase();
+            return `
+              <div class="p-4 bg-white border border-outline-variant/20 rounded-2xl flex items-center gap-4 hover:shadow-premium hover:border-primary/20 transition-all group cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm ring-2 ring-primary-container relative">
+                  ${initials}
+                  <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                </div>
+                <div class="flex-1">
+                  <h4 class="text-sm font-bold text-on-surface">${op.username}</h4>
+                  <p class="text-[12px] text-primary font-semibold">${op.room}-operator</p>
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant/40 group-hover:text-primary transition-colors">swap_horiz</span>
+              </div>
+            `;
+          }).join('');
+        } catch(e) { /* silent */ }
+      }
+
+      refreshAssignList();
+      // Refresh assignment list every 10 seconds
+      if (!window.opAssignIntervalId) {
+        window.opAssignIntervalId = setInterval(refreshAssignList, 10000);
+      }
+    }
+  </script>
+
+  <script src="js/admin.js?v=1.0.8"></script>
 </body>
 </html>

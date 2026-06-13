@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update headers
     operatorNameDisplay.textContent = currentOperator.username;
-    operatorRoomBadge.textContent = `${currentOperator.room}-xonaga yo'naltirilgan`;
+    operatorRoomBadge.textContent = `Operator: ${currentOperator.room}`;
     operatorAvatar.textContent = currentOperator.username.substring(0, 2).toUpperCase();
 
     // Check if there was an active ticket saved

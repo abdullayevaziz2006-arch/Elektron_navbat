@@ -3,342 +3,501 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operator Oynasi | Elektron Navbat</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.1">
+  <title>Operator Paneli | RANCH Queue Management System</title>
+  <meta name="description" content="RANCH University Queue Management System — Operator Panel for managing student queues and service directions.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN with plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-tertiary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed-dim": "#c5c7c8",
+            "secondary-fixed": "#e5e2e1",
+            "surface-container-highest": "#dbe4ed",
+            "surface-bright": "#f6faff",
+            "error": "#ba1a1a",
+            "outline-variant": "#e7bdb8",
+            "surface-container": "#e6eff8",
+            "tertiary-container": "#737576",
+            "on-primary-fixed": "#410002",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#141d23",
+            "surface-tint": "#c00014",
+            "on-surface": "#141d23",
+            "inverse-on-surface": "#e9f2fb",
+            "on-error": "#ffffff",
+            "background": "#f6faff",
+            "outline": "#926f6b",
+            "on-secondary-container": "#636262",
+            "primary-fixed": "#ffdad6",
+            "surface-variant": "#dbe4ed",
+            "surface-container-high": "#e0e9f2",
+            "secondary": "#5f5e5e",
+            "tertiary-fixed": "#e1e3e4",
+            "primary-container": "#e22326",
+            "on-tertiary-fixed-variant": "#454748",
+            "surface-dim": "#d2dbe4",
+            "on-secondary-fixed-variant": "#474746",
+            "on-primary-container": "#fffbff",
+            "surface": "#ffffff",
+            "on-tertiary-fixed": "#191c1d",
+            "secondary-container": "#e2dfde",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#ecf5fe",
+            "inverse-primary": "#ffb4ab",
+            "on-primary-fixed-variant": "#93000c",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed": "#1c1b1b",
+            "inverse-surface": "#293138",
+            "tertiary": "#5a5c5d",
+            "on-tertiary-container": "#fcfdfe",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#c8c6c5",
+            "primary": "var(--brand-color, #bb0013)",
+            "primary-dark": "#c21d1d",
+            "on-surface-variant": "#5d3f3c",
+            "primary-fixed-dim": "#ffb4ab",
+            "sidebar": "#1e293b",
+            "login-background": "#f6faff"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1.5rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "sm": "8px",
+            "xl": "32px",
+            "md": "16px",
+            "gutter": "24px",
+            "kiosk-padding": "40px",
+            "unit": "8px",
+            "xs": "4px",
+            "xxl": "48px",
+            "lg": "24px"
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "body-md": ["Inter"],
+            "label-bold": ["Inter"],
+            "headline-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "monitor-label": ["Inter"],
+            "monitor-num": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"]
+          },
+          fontSize: {
+            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "monitor-label": ["48px", {"lineHeight": "56px", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "monitor-num": ["120px", {"lineHeight": "120px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+            "label-bold": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+          },
+          boxShadow: {
+            "premium": "0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
+            "premium-lg": "0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04)"
+          }
+        }
+      }
+    };
+  </script>
+
   <style>
-    body {
-      background: linear-gradient(135deg, #020617 0%, #0c1530 100%);
+    body { font-family: 'Inter', sans-serif; }
+    
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
     }
-
-    .operator-container {
-      max-width: 1300px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-      width: 100%;
-      display: none; /* Hidden until login */
-      animation: fadeIn 0.4s ease;
+    
+    .active-scale:active { transform: scale(0.98); }
+    
+    /* Input focus border for login */
+    .input-focus-border {
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.2s ease;
     }
-
-    .login-container {
-      max-width: 450px;
-      margin: 6rem auto;
-      width: 90%;
-      animation: fadeIn 0.4s ease;
+    .input-focus-border:focus-within {
+      border-color: var(--primary, #bb0013);
     }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .login-header h2 {
-      font-size: 2rem;
+    
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    /* Queue item classes for JS integration */
+    .queue-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+      cursor: pointer;
       margin-bottom: 0.5rem;
     }
 
-    .login-header p {
-      color: var(--text-secondary);
-    }
-
-    .console-grid {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    @media (max-width: 900px) {
-      .console-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .current-call-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 3rem 2rem;
-      position: relative;
-    }
-
-    .current-ticket-display {
-      font-size: 5.5rem;
-      font-weight: 800;
-      color: var(--color-accent);
-      margin: 1.5rem 0;
-      font-family: var(--font-title);
-      text-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-      line-height: 1;
-    }
-
-    .current-ticket-details {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-    }
-
-    .controls-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      width: 100%;
-    }
-
-    .controls-row .btn {
-      padding: 1.2rem;
-      font-size: 1.1rem;
-      border-radius: var(--radius-md);
-    }
-
-    .queue-list-card {
-      display: flex;
-      flex-direction: column;
-      height: 480px;
-    }
-
-    .queue-list-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--glass-border);
-      padding-bottom: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .queue-list-scroll {
-      flex-grow: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      padding-right: 0.5rem;
-    }
-
-    .queue-item {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: var(--transition-fast);
-    }
     .queue-item:hover {
-      background: rgba(255,255,255,0.04);
-      border-color: rgba(255,255,255,0.15);
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .queue-item > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
     }
 
     .queue-item-code {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--color-primary);
-      font-family: var(--font-title);
+      width: 3rem;
+      height: 3rem;
+      background: rgba(187, 0, 19, 0.08);
+      color: var(--primary, #bb0013);
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
     }
 
     .queue-item-name {
-      font-size: 0.95rem;
-      font-weight: 500;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .queue-item-time {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    /* Stats bar */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .stat-card {
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-      padding: 1.5rem;
-    }
-
-    .stat-icon {
-      height: 50px;
-      width: 50px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.03);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .stat-info h4 {
-      font-size: 1.8rem;
-      font-weight: 800;
-      line-height: 1.1;
-      font-family: var(--font-title);
-    }
-
-    .stat-info p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
-
-    .operator-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-
-    .operator-user-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--color-success), var(--color-primary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .badge-room {
-      background: var(--color-success);
-      color: white;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: bold;
+      text-align: right;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary, #bb0013);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
     }
   </style>
 </head>
-<body>
+<body class="bg-background text-on-surface min-h-screen">
 
-  <!-- 1. Operator Login Panel (Glassmorphic) -->
-  <div class="login-container glass-panel" id="login-panel">
-    <div class="login-header">
-      <div class="logo-icon" style="margin: 0 auto 1rem auto;">OP</div>
-      <h2>Operator Kirishi</h2>
-      <p>Elektron navbat tizimini boshqarish uchun hisobingizga kiring</p>
-    </div>
-
-    <form id="login-form">
-      <div class="form-group">
-        <label for="username">Foydalanuvchi nomi</label>
-        <input type="text" id="username" class="form-control" placeholder="Masalan: operator1" required>
-      </div>
-      <div class="form-group" style="margin-bottom: 2rem;">
-        <label for="password">Parol</label>
-        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
-      </div>
-      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem;">
-        Tizimga Kirish
-      </button>
-    </form>
-  </div>
-
-  <!-- 2. Operator Console Panel (Dashboard) -->
-  <div class="operator-container" id="operator-panel">
-    
-    <div class="operator-header">
-      <div class="operator-user-info">
-        <div class="avatar" id="operator-avatar">OP</div>
-        <div>
-          <h3 id="operator-name-display">Operator</h3>
-          <span class="badge-room" id="operator-room-badge">Room 2</span>
+  <!-- ══════════════════════════════════════
+       1. LOGIN PANEL (Mobil Login Sahifasi layout)
+  ══════════════════════════════════════ -->
+  <div id="login-panel" class="fixed inset-0 bg-[#f6faff] text-[#141d23] min-h-screen flex flex-col justify-between z-100 overflow-y-auto">
+    <main class="flex-grow flex items-center justify-center px-lg py-xl">
+      <div class="w-full max-w-md flex flex-col items-center">
+        <!-- Logo -->
+        <div class="mb-xxl">
+          <img alt="RANCH Logo" class="h-16 md:h-20 w-auto object-contain mx-auto" style="filter: brightness(0);" src="/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png" onerror="this.style.display='none'; document.getElementById('login-logo-fallback').style.display='flex';"/>
+          <div id="login-logo-fallback" class="hidden w-[64px] h-[64px] rounded-full bg-primary text-white items-center justify-center font-extrabold text-xl mx-auto mb-4">
+            OP
+          </div>
         </div>
-      </div>
-      <div style="display: flex; gap: 1rem;">
-        <button class="btn btn-danger" id="logout-btn">Chiqish</button>
-      </div>
-    </div>
-
-    <div class="console-grid">
-      <!-- Left side: Current Student Management -->
-      <div class="glass-panel current-call-card">
-        <h3 style="color: var(--text-secondary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">
-          Hozir qabulda:
-        </h3>
-        
-        <div class="current-ticket-display" id="current-ticket-code">- - -</div>
-        
-        <div class="current-ticket-details" id="current-ticket-details">
-          Qabul qilishni boshlash uchun "KEYINGI" tugmasini bosing
+        <!-- Login Card -->
+        <div class="w-full bg-white shadow-premium-lg p-xl rounded-xl space-y-lg border border-[#e2e8f0]">
+          <div class="text-center space-y-sm">
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-[#0f172a]">Operator Kirishi</h1>
+            <p class="font-body-md text-body-md text-slate-500">Elektron navbat tizimiga kiring</p>
+          </div>
+          <form id="login-form" class="space-y-md">
+            <div class="space-y-xs">
+              <label class="font-label-bold text-label-bold text-slate-600 ml-xs" for="username">Foydalanuvchi nomi</label>
+              <div class="relative flex items-center bg-[#F1F3F5] rounded-lg p-sm border-b-2 border-transparent focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-slate-400 mr-sm">person</span>
+                <input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md text-[#0f172a] placeholder:text-slate-400" id="username" name="username" placeholder="Masalan: operator1" type="text" required autocomplete="username"/>
+              </div>
+            </div>
+            <div class="space-y-xs">
+              <div class="flex justify-between items-center px-xs">
+                <label class="font-label-bold text-label-bold text-slate-600" for="password">Parol</label>
+                <a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Parolni unutdingizmi?</a>
+              </div>
+              <div class="relative flex items-center bg-[#F1F3F5] rounded-lg p-sm border-b-2 border-transparent focus-within:border-primary transition-all">
+                <span class="material-symbols-outlined text-slate-400 mr-sm">lock</span>
+                <input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md text-[#0f172a] placeholder:text-slate-400" id="password" name="password" placeholder="••••••••" type="password" required autocomplete="current-password"/>
+                <button class="text-slate-400 hover:text-primary transition-colors ml-sm" onclick="togglePassword()" type="button">
+                  <span class="material-symbols-outlined" id="eye-icon">visibility</span>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="w-full h-[64px] bg-primary text-white font-headline-md text-headline-md rounded-xl active:scale-[0.98] transition-transform shadow-md mt-lg flex items-center justify-center gap-sm">
+              Tizimga kirish
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </form>
         </div>
-
-        <div class="controls-row">
-          <button class="btn btn-danger" id="skip-btn" disabled>Kelmidi (O'tkazish)</button>
-          <button class="btn btn-primary" id="recall-btn" disabled>Chaqirish (Ovoz/Chime)</button>
-          
-          <button class="btn btn-success" id="complete-btn" style="grid-column: 1 / -1; margin-top: 0.5rem;" disabled>
-            Qabul Tugallandi
-          </button>
-        </div>
-
-        <button class="btn btn-accent" id="next-btn" style="width: 100%; margin-top: 1.5rem; padding: 1.2rem; font-size: 1.2rem;">
-          KEYINGI TALABA (Chaqirish)
-        </button>
-      </div>
-
-      <!-- Right side: Waiting List -->
-      <div class="glass-panel queue-list-card">
-        <div class="queue-list-header">
-          <h3>Kutish ro'yxati</h3>
-          <span class="badge-room" id="waiting-count-badge" style="background: var(--color-primary);">0 talaba</span>
-        </div>
-        
-        <div class="queue-list-scroll" id="waiting-list-container">
-          <!-- Waiting list items injected dynamically -->
-          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
-            Kutayotganlar yo'q
+        <div class="mt-xl flex flex-col items-center space-y-md text-center">
+          <div class="flex items-center gap-sm text-slate-500">
+            <span class="material-symbols-outlined text-[18px]">info</span>
+            <p class="font-label-sm text-label-sm">Yordam kerakmi? <a class="text-primary font-label-bold" href="#">Qo'llab-quvvatlash</a></p>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Bottom: Daily Statistics -->
-    <div class="stats-grid">
-      <div class="glass-panel stat-card">
-        <div class="stat-icon" style="color: var(--color-success);">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <div class="stat-info">
-          <h4 id="stat-served">0</h4>
-          <p>Qabul qilindi</p>
-        </div>
-      </div>
-
-      <div class="glass-panel stat-card">
-        <div class="stat-icon" style="color: var(--color-danger);">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </div>
-        <div class="stat-info">
-          <h4 id="stat-skipped">0</h4>
-          <p>Kelmaganlar</p>
-        </div>
-      </div>
-
-      <div class="glass-panel stat-card">
-        <div class="stat-icon" style="color: var(--color-primary);">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        </div>
-        <div class="stat-info">
-          <h4 id="stat-avg-wait">0m</h4>
-          <p>O'rtacha kutish</p>
-        </div>
-      </div>
-    </div>
-
+    </main>
+    <footer class="w-full flex flex-col items-center justify-center p-lg space-y-xs text-slate-400">
+      <p class="font-label-bold text-label-bold text-slate-500 font-semibold">RANCH University</p>
+      <p class="font-label-sm text-label-sm opacity-60 font-medium">Version 2.4.0 • Electronic Queue System</p>
+      <p class="font-label-sm text-label-sm mt-sm">© 2026 RANCH University. Barcha huquqlar himoyalangan.</p>
+    </footer>
   </div>
 
-  <script src="js/operator.js?v=1.0.1"></script>
+  <!-- ══════════════════════════════════════
+       2. OPERATOR CONSOLE (Professional Operator Panel layout)
+  ══════════════════════════════════════ -->
+  <div id="operator-panel" class="min-h-screen" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-0 h-full w-[280px] bg-[#1e293b] text-white flex flex-col z-40">
+      <div class="p-lg mb-md">
+        <div class="flex items-center justify-center">
+          <img src="/uploads/RANCH_LOGO_CMYK_02-D_lsJGq0.png" class="h-10 w-auto object-contain" alt="RANCH Logo">
+        </div>
+      </div>
+      <nav class="flex-1 px-md space-y-1">
+        <a class="flex items-center gap-md px-md py-3 bg-primary text-white rounded-lg shadow-lg font-semibold text-sm" href="#">
+          <span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+          Navbatni boshqarish
+        </a>
+      </nav>
+      <div class="mt-auto p-md space-y-md">
+        <div class="text-center">
+          <span id="operator-room-badge" class="inline-block text-[11px] font-bold text-white bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-full shadow-sm">
+            Operator —
+          </span>
+        </div>
+        <div class="flex items-center gap-md p-md bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div id="operator-avatar" class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-base shadow-sm">OP</div>
+          <div class="min-w-0 flex-1">
+            <p id="operator-name-display" class="text-sm font-semibold truncate text-white">Operator</p>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              <span class="text-[10px] text-slate-400 uppercase tracking-tighter">Onlayn</span>
+            </div>
+          </div>
+          <button id="logout-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-red-900/40 border border-slate-700 hover:border-red-500/30 text-slate-400 hover:text-red-400 flex items-center justify-center transition-all" title="Chiqish">
+            <span class="material-symbols-outlined text-base">logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-[280px] flex-1 flex flex-col h-screen overflow-hidden">
+      <!-- Header -->
+      <header class="h-20 bg-white border-b border-outline flex justify-between items-center px-xl sticky top-0 z-30 flex-shrink-0">
+        <div class="flex flex-col">
+          <h1 class="text-xl font-bold text-slate-800">Queue Management</h1>
+          <p class="text-xs text-on-surface-variant font-medium">Operator Panel</p>
+        </div>
+        <div class="flex items-center gap-lg">
+          <div class="hidden md:flex items-center gap-sm bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-100">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span class="text-xs font-bold uppercase tracking-wider">Onlayn</span>
+          </div>
+          <div class="h-6 w-[1px] bg-outline"></div>
+          <div class="flex items-center gap-md">
+            <button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-slate-50 rounded-full transition-colors relative">
+              <span class="material-symbols-outlined">notifications</span>
+              <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white"></span>
+            </button>
+            <button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-slate-50 rounded-full transition-colors">
+              <span class="material-symbols-outlined">help_outline</span>
+            </button>
+          </div>
+          <div class="h-6 w-[1px] bg-outline"></div>
+          <div class="flex items-center gap-md">
+            <div class="text-right">
+              <p id="operator-name" class="text-sm font-bold text-slate-800">Operator</p>
+              <div class="flex justify-end">
+                <span class="text-[10px] text-emerald-600 font-semibold uppercase tracking-wider">Onlayn</span>
+              </div>
+            </div>
+            <div id="header-avatar" class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm">OP</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="flex-1 overflow-y-auto p-xl bg-background">
+        <div class="max-w-[1400px] mx-auto grid grid-cols-12 gap-xl">
+          <!-- Left: Queue Control & Stats -->
+          <div class="col-span-12 lg:col-span-8 space-y-xl">
+            <!-- Current Ticket Card -->
+            <div class="bg-white rounded-2xl p-xl shadow-premium border border-outline relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-1.5 bg-primary"></div>
+              <div class="flex flex-col items-center py-8">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Hozirgi Chaqirilgan</span>
+                <div id="current-ticket-code" class="text-[110px] font-extrabold text-slate-900 leading-none tracking-tighter mb-4">- - -</div>
+                <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full border border-slate-100 text-on-surface-variant mb-10">
+                  <span class="material-symbols-outlined text-[18px]">schedule</span>
+                  <span id="current-ticket-details" class="text-sm font-medium">Qabul qilishni boshlash uchun "KEYINGI" tugmasini bosing</span>
+                </div>
+                <!-- Main Actions -->
+                <div class="w-full max-w-lg space-y-md">
+                  <button id="next-btn" class="w-full bg-primary hover:bg-primary-dark text-white h-20 rounded-xl flex items-center justify-center gap-md shadow-premium transition-all active-scale group">
+                    <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">campaign</span>
+                    <span class="text-lg font-bold uppercase tracking-tight">Keyingini Chaqirish</span>
+                  </button>
+                  <div class="grid grid-cols-3 gap-md">
+                    <button id="recall-btn" class="flex flex-col items-center justify-center p-4 bg-white border border-outline rounded-xl hover:border-primary/30 hover:bg-slate-50 transition-all active-scale group" disabled>
+                      <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-1">replay</span>
+                      <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Qayta chaqirish</span>
+                    </button>
+                    <button id="complete-btn" class="flex flex-col items-center justify-center p-4 bg-white border border-outline rounded-xl hover:border-emerald-500/30 hover:bg-emerald-50 transition-all active-scale group" disabled>
+                      <span class="material-symbols-outlined text-on-surface-variant group-hover:text-emerald-600 mb-1">check_circle</span>
+                      <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Yakunlash</span>
+                    </button>
+                    <button id="skip-btn" class="flex flex-col items-center justify-center p-4 bg-white border border-outline rounded-xl hover:border-amber-500/30 hover:bg-amber-50 transition-all active-scale group" disabled>
+                      <span class="material-symbols-outlined text-on-surface-variant group-hover:text-amber-600 mb-1">coffee</span>
+                      <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Tanaffus</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Widgets -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-xl">
+              <!-- Bugun qabul qilinganlar -->
+              <div class="bg-white rounded-2xl p-lg shadow-premium border border-outline flex items-center gap-lg">
+                <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl">task_alt</span>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Bugun qabul qilinganlar</p>
+                  <div class="flex items-baseline gap-2">
+                    <span id="stat-served" class="text-3xl font-bold text-slate-900">0</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- O'tkazib yuborilgan -->
+              <div class="bg-white rounded-2xl p-lg shadow-premium border border-outline flex items-center gap-lg">
+                <div class="w-14 h-14 rounded-xl bg-rose-50 text-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl">person_off</span>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">O'tkazib yuborilgan</p>
+                  <div class="flex items-baseline gap-2">
+                    <span id="stat-skipped" class="text-3xl font-bold text-slate-900">0</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- O'rtacha vaqt -->
+              <div class="bg-white rounded-2xl p-lg shadow-premium border border-outline flex items-center gap-lg">
+                <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl">avg_time</span>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">O'rtacha vaqt</p>
+                  <div class="flex items-baseline gap-2">
+                    <span id="stat-avg-wait" class="text-3xl font-bold text-slate-900">0m</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Waiting List Widget -->
+          <div class="col-span-12 lg:col-span-4">
+            <div class="bg-white rounded-2xl shadow-premium-lg border border-outline flex flex-col h-full max-h-[calc(100vh-160px)]">
+              <div class="p-lg border-b border-outline flex justify-between items-center flex-shrink-0">
+                <div>
+                  <h3 class="text-lg font-bold text-slate-800">Navbatdagilar</h3>
+                  <p class="text-xs text-on-surface-variant">Hozirgi kutish ro'yxati</p>
+                </div>
+                <div id="waiting-count-badge" class="bg-primary text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm">
+                  0 ta talaba
+                </div>
+              </div>
+              <!-- Scrollable List -->
+              <div id="waiting-list-container" class="flex-1 overflow-y-auto p-md">
+                <div class="text-center padding py-10 text-slate-400">
+                  <span class="material-symbols-outlined text-[36px] block mb-2 opacity-50">inbox</span>
+                  Kutayotganlar yo'q
+                </div>
+              </div>
+              <!-- Footer Button -->
+              <div class="p-md bg-slate-50 border-t border-outline flex-shrink-0">
+                <button class="w-full py-2.5 text-sm font-bold text-primary hover:text-primary-dark transition-colors flex items-center justify-center gap-1 bg-white border border-slate-200 rounded-lg">
+                  Barcha navbatni ko'rish
+                  <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/operator.js?v=1.0.8"></script>
+
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.textContent = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.textContent = 'visibility';
+      }
+    }
+
+    // ─── UI SYNC: keep header operator-name in sync with sidebar ───
+    // operator.js sets #operator-name-display; we mirror to #operator-name
+    const _origShowConsole = window._origShowConsole;
+
+    // MutationObserver to sync header name with sidebar name
+    (function() {
+      const sidebarName = document.getElementById('operator-name-display');
+      const headerName  = document.getElementById('operator-name');
+      const headerAvatar = document.getElementById('header-avatar');
+
+      if (sidebarName && headerName) {
+        const observer = new MutationObserver(() => {
+          headerName.textContent = sidebarName.textContent;
+          if (headerAvatar) {
+            headerAvatar.textContent = sidebarName.textContent.substring(0,2).toUpperCase();
+          }
+        });
+        observer.observe(sidebarName, { childList: true, characterData: true, subtree: true });
+      }
+    })();
+  </script>
 </body>
 </html>
