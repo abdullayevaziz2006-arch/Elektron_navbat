@@ -369,13 +369,13 @@ document.addEventListener('DOMContentLoaded', () => {
  
       directions.forEach(dir => {
         const button = document.createElement('button');
-        button.className = 'relative overflow-hidden flex flex-col items-center justify-center gap-xs bg-white border-2 border-primary/20 rounded-xl h-28 shadow-sm active:scale-95 transition-all duration-200 hover:border-primary group direction-btn';
+        button.className = 'relative overflow-hidden flex flex-col items-center justify-center gap-xs bg-white border-2 border-primary/20 rounded-xl h-32 shadow-sm active:scale-95 transition-all duration-200 hover:border-primary group direction-btn';
         button.style.minHeight = 'unset';
         button.dataset.id = dir.id;
         const iconName = dir.icon && dir.icon.trim() !== '' ? dir.icon : getDirectionIcon(dir.name);
         button.innerHTML = `
-            <span class="material-symbols-outlined text-primary text-3xl transition-transform duration-300 group-hover:scale-110 pointer-events-none" data-icon="${iconName}">${iconName}</span>
-            <span class="text-xs font-bold text-on-surface text-center px-sm leading-tight pointer-events-none">${dir.name}</span>
+            <span class="material-symbols-outlined text-primary text-4xl transition-transform duration-300 group-hover:scale-110 pointer-events-none" data-icon="${iconName}">${iconName}</span>
+            <span class="text-sm font-bold text-on-surface text-center px-sm leading-tight pointer-events-none">${dir.name}</span>
         `;
 
         // Apply individual custom position & size
